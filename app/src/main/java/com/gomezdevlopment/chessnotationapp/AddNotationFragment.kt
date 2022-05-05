@@ -24,7 +24,7 @@ class AddNotationFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        FragmentAddNotationBinding.inflate(inflater, container, false)
+        binding = FragmentAddNotationBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -32,6 +32,7 @@ class AddNotationFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         createButtonHandlers(binding.textView)
+
     }
 
     private fun createButtonHandlers(textView: TextView) {
