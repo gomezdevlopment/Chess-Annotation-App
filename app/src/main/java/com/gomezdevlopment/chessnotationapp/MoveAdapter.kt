@@ -6,18 +6,18 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class MoveAdapter(val notations: ArrayList<String>): RecyclerView.Adapter<MoveAdapter.MyViewHolder>() {
+class MoveAdapter(private val notations: ArrayList<String>): RecyclerView.Adapter<MoveAdapter.MyViewHolder>() {
 
 
     class MyViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val annotation: TextView = itemView.findViewById(R.id.annotation)
     }
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MoveAdapter.MyViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val moveItem = LayoutInflater.from(parent.context).inflate(R.layout.move_item, parent, false)
         return MyViewHolder(moveItem)
     }
 
-    override fun onBindViewHolder(holder: MoveAdapter.MyViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val currentNotation = "${position+1}. ${notations[position]}"
         holder.annotation.text = currentNotation
     }
