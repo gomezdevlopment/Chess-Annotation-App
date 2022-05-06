@@ -7,7 +7,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import com.gomezdevlopment.chessnotationapp.MainActivity.Companion.blackAnnotations
+import com.gomezdevlopment.chessnotationapp.MainActivity.Companion.floatingActionButton
 import com.gomezdevlopment.chessnotationapp.MainActivity.Companion.whiteAnnotations
 import com.gomezdevlopment.chessnotationapp.databinding.FragmentAddNotationBinding
 
@@ -47,6 +49,8 @@ class AddNotationFragment : Fragment() {
             transaction?.replace(R.id.fragmentContainerView, HomeFragment())
             transaction?.disallowAddToBackStack()
             transaction?.commit()
+            MainActivity.notationFragmentOpen = false
+            floatingActionButton.setImageDrawable(ContextCompat.getDrawable(view.context, android.R.drawable.ic_menu_edit))
         }
 
     }
