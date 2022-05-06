@@ -2,15 +2,19 @@ package com.gomezdevlopment.chessnotationapp
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gomezdevlopment.chessnotationapp.MainActivity.Companion.blackAnnotations
 import com.gomezdevlopment.chessnotationapp.MainActivity.Companion.whiteAnnotations
 import com.gomezdevlopment.chessnotationapp.databinding.FragmentHomeBinding
+import java.io.File
+import java.util.*
 
 class HomeFragment : Fragment() {
 
@@ -47,9 +51,15 @@ class HomeFragment : Fragment() {
         binding.newGameButton.setOnClickListener {
             createNewGameAlert(view.context)
         }
+
+        binding.exportButton.setOnClickListener {
+            if(whiteAnnotations.isNotEmpty()){
+                exportGameFile(view.context)
+            }
+        }
     }
 
-    private fun createNewGameAlert(context: Context){
+    private fun createNewGameAlert(context: Context) {
         val builder = AlertDialog.Builder(context)
         builder.setTitle("Create a new game?")
         builder.setMessage("The current game will be deleted.")
@@ -65,5 +75,32 @@ class HomeFragment : Fragment() {
 
         }
         builder.show()
+    }
+
+    private fun exportGameFile(context: Context) {
+        val filename = "chess_game.pgn"
+        val path = activity?.getExternalFilesDir(null)
+        val pgnFile = File(path, filename)
+        pgnFile.delete()
+        pgnFile.createNewFile()
+
+        if(whiteAnnotations.size != blackAnnotations.size){
+            blackAnnotations.add("")
+        }
+
+        for (notation in whiteAnnotations) {
+            val index = whiteAnnotations.indexOf(notation)
+            pgnFile.appendText("${index+1}. $notation ${blackAnnotations[index]} ")
+        }
+            val uri = FileProvider.getUriForFile(
+                context,
+                activity?.applicationContext?.packageName.toString() + ".provider",
+                pgnFile
+            )
+            val sendIntent = Intent(Intent.ACTION_SEND)
+            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            sendIntent.putExtra(Intent.EXTRA_STREAM, uri)
+            sendIntent.type = "text/pgn"
+            startActivity(Intent.createChooser(sendIntent, "SHARE"))
     }
 }
