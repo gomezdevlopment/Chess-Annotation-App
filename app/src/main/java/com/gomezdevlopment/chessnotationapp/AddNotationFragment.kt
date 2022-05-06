@@ -1,6 +1,5 @@
 package com.gomezdevlopment.chessnotationapp
 
-import android.app.Dialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import com.gomezdevlopment.chessnotationapp.MainActivity.Companion.blackAnnotations
+import com.gomezdevlopment.chessnotationapp.MainActivity.Companion.whiteAnnotations
 import com.gomezdevlopment.chessnotationapp.databinding.FragmentAddNotationBinding
 
 class AddNotationFragment : Fragment() {
@@ -33,7 +34,24 @@ class AddNotationFragment : Fragment() {
 
         createButtonHandlers(binding.textView)
 
+        binding.enter.setOnClickListener {
+            val annotation = binding.textView.text.toString()
+            if(annotation.isNotEmpty()){
+                if(whiteAnnotations.size == blackAnnotations.size){
+                    whiteAnnotations.add(annotation)
+                }else{
+                    blackAnnotations.add(annotation)
+                }
+            }
+            val transaction = activity?.supportFragmentManager?.beginTransaction()
+            transaction?.replace(R.id.fragmentContainerView, HomeFragment())
+            transaction?.disallowAddToBackStack()
+            transaction?.commit()
+        }
+
     }
+
+
 
     private fun createButtonHandlers(textView: TextView) {
         val buttons: ArrayList<Button> = arrayListOf(
