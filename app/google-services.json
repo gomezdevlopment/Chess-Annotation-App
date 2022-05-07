@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "763793121700",
+    "project_id": "chessnotationapp",
+    "storage_bucket": "chessnotationapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:763793121700:android:2eff025b18195e65b2e131",
+        "android_client_info": {
+          "package_name": "com.gomezdevlopment.chessnotationapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "763793121700-2qsq83h6k8vjdqjcsqdqi8mo1qj2pnbc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwcJ1Mcave756dJ-A2bLpz_IOnMn_XZdk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "763793121700-2qsq83h6k8vjdqjcsqdqi8mo1qj2pnbc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
