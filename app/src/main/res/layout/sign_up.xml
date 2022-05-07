@@ -96,11 +96,11 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/signInButton"
         style="@style/Widget.MaterialComponents.Button.TextButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="20dp"
         android:text="Already have an account? Sign In"
         app:layout_constraintEnd_toEndOf="@+id/submitButton"
         app:layout_constraintStart_toStartOf="@+id/submitButton"
