@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_homeFragment_to_addNotationFragment"
             app:destination="@id/addNotationFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/signInFragment"
@@ -41,6 +44,17 @@
         tools:layout="@layout/fragment_add_notation" >
         <action
             android:id="@+id/action_addNotationFragment_to_homeFragment"
+            app:destination="@id/homeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.gomezdevlopment.chessnotationapp.view.settings.SettingsFragment"
+        android:label="SettingsFragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_signInFragment"
+            app:destination="@id/signInFragment" />
+        <action
+            android:id="@+id/action_settingsFragment_to_homeFragment"
             app:destination="@id/homeFragment" />
     </fragment>
 </navigation>

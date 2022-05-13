@@ -77,6 +77,10 @@ class HomeFragment : Fragment() {
             Navigation.findNavController(view)
                 .navigate(R.id.action_homeFragment_to_addNotationFragment)
         }
+
+        binding.settingsIcon.setOnClickListener {
+            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_settingsFragment)
+        }
     }
 
     private fun exportGameFile(context: Context) {

@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.gomezdevlopment.chessnotationapp.R
@@ -46,7 +47,13 @@ class AddNotationFragment : Fragment() {
                 }else{
                     homeViewModel.addBlackMove(annotation)
                 }
+                Navigation.findNavController(view).navigate(R.id.action_addNotationFragment_to_homeFragment)
+            }else{
+                Toast.makeText(view.context, "Please enter your notation.", Toast.LENGTH_SHORT).show()
             }
+        }
+
+        binding.cancelButton.setOnClickListener {
             Navigation.findNavController(view).navigate(R.id.action_addNotationFragment_to_homeFragment)
         }
     }
