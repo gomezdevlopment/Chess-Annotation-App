@@ -1,15 +1,17 @@
 package com.gomezdevlopment.chessnotationapp.model
 
+import android.app.AlertDialog
 import android.app.Application
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.navigation.Navigation
 import com.gomezdevlopment.chessnotationapp.R
+import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 
-class AppRepository(private val application: Application) {
+class AuthenticationRepository(private val application: Application) {
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val userMutableLiveData: MutableLiveData<FirebaseUser> = MutableLiveData()
     private val signedOutMutableLiveData: MutableLiveData<Boolean> = MutableLiveData()
@@ -68,4 +70,5 @@ class AppRepository(private val application: Application) {
     fun getSignedOutMutableLiveData(): MutableLiveData<Boolean>{
         return signedOutMutableLiveData
     }
+
 }

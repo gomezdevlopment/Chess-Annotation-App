@@ -7,19 +7,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
-import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.blackAnnotations
-import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.whiteAnnotations
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.databinding.FragmentAddNotationBinding
+import com.gomezdevlopment.chessnotationapp.view_model.HomeViewModel
 
 class AddNotationFragment : Fragment() {
 
     private lateinit var binding: FragmentAddNotationBinding
+    private lateinit var homeViewModel: HomeViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
+        homeViewModel.init()
     }
 
     override fun onCreateView(
@@ -39,15 +41,14 @@ class AddNotationFragment : Fragment() {
         binding.enter.setOnClickListener {
             val annotation = binding.textView.text.toString()
             if(annotation.isNotEmpty()){
-                if(whiteAnnotations.size == blackAnnotations.size){
-                    whiteAnnotations.add(annotation)
+                if(homeViewModel.getWhiteMoves().value?.size == homeViewModel.getBlackMoves().value?.size || homeViewModel.getWhiteMoves().value == null){
+                    homeViewModel.addWhiteMove(annotation)
                 }else{
-                    blackAnnotations.add(annotation)
+                    homeViewModel.addBlackMove(annotation)
                 }
             }
             Navigation.findNavController(view).navigate(R.id.action_addNotationFragment_to_homeFragment)
         }
-
     }
 
 

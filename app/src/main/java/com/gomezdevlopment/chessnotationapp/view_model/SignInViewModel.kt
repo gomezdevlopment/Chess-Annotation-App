@@ -4,12 +4,12 @@ import android.app.Application
 import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import com.gomezdevlopment.chessnotationapp.model.AppRepository
+import com.gomezdevlopment.chessnotationapp.model.AuthenticationRepository
 import com.google.firebase.auth.FirebaseUser
 
 class SignInViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val appRepository = AppRepository(application)
+    private val appRepository = AuthenticationRepository(application)
     private val userMutableLiveData: MutableLiveData<FirebaseUser> = appRepository.getUserMutableLiveData()
 
     fun signUp(email: String, password: String, confirmPassword: String){
