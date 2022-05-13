@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseUser
 class AppRepository(private val application: Application) {
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val userMutableLiveData: MutableLiveData<FirebaseUser> = MutableLiveData()
+    private val signedOutMutableLiveData: MutableLiveData<Boolean> = MutableLiveData()
 
 
     fun checkIfUserIsSignedIn(view: View){
@@ -55,7 +56,16 @@ class AppRepository(private val application: Application) {
         }
     }
 
-    fun getUserMutableLiveDate(): MutableLiveData<FirebaseUser>{
+    fun signOut(){
+        firebaseAuth.signOut()
+        signedOutMutableLiveData.postValue(true)
+    }
+
+    fun getUserMutableLiveData(): MutableLiveData<FirebaseUser>{
         return userMutableLiveData
+    }
+
+    fun getSignedOutMutableLiveData(): MutableLiveData<Boolean>{
+        return signedOutMutableLiveData
     }
 }

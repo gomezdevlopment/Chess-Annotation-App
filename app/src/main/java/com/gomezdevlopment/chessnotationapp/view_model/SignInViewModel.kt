@@ -10,7 +10,7 @@ import com.google.firebase.auth.FirebaseUser
 class SignInViewModel(application: Application) : AndroidViewModel(application) {
 
     private val appRepository = AppRepository(application)
-    private val userMutableLiveData: MutableLiveData<FirebaseUser> = appRepository.getUserMutableLiveDate()
+    private val userMutableLiveData: MutableLiveData<FirebaseUser> = appRepository.getUserMutableLiveData()
 
     fun signUp(email: String, password: String, confirmPassword: String){
         appRepository.signUp(email, password, confirmPassword)
