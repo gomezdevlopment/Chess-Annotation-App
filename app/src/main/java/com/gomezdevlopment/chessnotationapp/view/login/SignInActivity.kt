@@ -1,10 +1,11 @@
-package com.gomezdevlopment.chessnotationapp
+package com.gomezdevlopment.chessnotationapp.view.login
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.gomezdevlopment.chessnotationapp.databinding.SignInLayoutBinding
+import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class SignInActivity : AppCompatActivity() {

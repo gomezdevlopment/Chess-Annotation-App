@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp
+package com.gomezdevlopment.chessnotationapp.view.home_screen
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -8,10 +8,12 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.core.content.ContextCompat
-import com.gomezdevlopment.chessnotationapp.MainActivity.Companion.blackAnnotations
-import com.gomezdevlopment.chessnotationapp.MainActivity.Companion.floatingActionButton
-import com.gomezdevlopment.chessnotationapp.MainActivity.Companion.whiteAnnotations
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.blackAnnotations
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.floatingActionButton
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.whiteAnnotations
+import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.databinding.FragmentAddNotationBinding
+import com.gomezdevlopment.chessnotationapp.view.MainActivity
 
 class AddNotationFragment : Fragment() {
 

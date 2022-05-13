@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".SignInActivity"
+    tools:context=".view.login.SignInActivity"
     android:layout_gravity="center">
 
     <com.google.android.material.textfield.TextInputLayout

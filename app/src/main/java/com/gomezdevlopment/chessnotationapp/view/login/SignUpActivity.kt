@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp
+package com.gomezdevlopment.chessnotationapp.view.login
 
 import android.content.Intent
 import android.os.Bundle

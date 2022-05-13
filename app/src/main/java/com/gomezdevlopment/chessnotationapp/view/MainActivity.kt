@@ -1,10 +1,13 @@
-package com.gomezdevlopment.chessnotationapp
+package com.gomezdevlopment.chessnotationapp.view
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentTransaction
+import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.databinding.ActivityMainBinding
+import com.gomezdevlopment.chessnotationapp.view.home_screen.AddNotationFragment
+import com.gomezdevlopment.chessnotationapp.view.home_screen.HomeFragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 
@@ -36,7 +39,9 @@ class MainActivity : AppCompatActivity() {
                 val fragmentTransaction: FragmentTransaction = supportFragmentManager.beginTransaction()
                 fragmentTransaction.replace(binding.fragmentContainerView.id, addNotationFragment).commit()
                 notationFragmentOpen = true
-                binding.floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_cancel))
+                binding.floatingActionButton.setImageDrawable(ContextCompat.getDrawable(this,
+                    R.drawable.ic_cancel
+                ))
             }else{
                 val homeFragment = HomeFragment()
                 val fragmentTransaction: FragmentTransaction = supportFragmentManager.beginTransaction()

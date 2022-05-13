@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp
+package com.gomezdevlopment.chessnotationapp.view.home_screen
 
 import android.app.AlertDialog
 import android.content.Context
@@ -10,11 +10,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.FileProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.gomezdevlopment.chessnotationapp.MainActivity.Companion.blackAnnotations
-import com.gomezdevlopment.chessnotationapp.MainActivity.Companion.whiteAnnotations
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.blackAnnotations
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.whiteAnnotations
+import com.gomezdevlopment.chessnotationapp.MoveAdapter
 import com.gomezdevlopment.chessnotationapp.databinding.FragmentHomeBinding
 import java.io.File
-import java.util.*
 
 class HomeFragment : Fragment() {
 
