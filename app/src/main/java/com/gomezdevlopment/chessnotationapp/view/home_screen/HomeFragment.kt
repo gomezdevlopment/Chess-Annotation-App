@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentTransaction
+import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.blackAnnotations
@@ -63,13 +64,8 @@ class HomeFragment : Fragment() {
             }
         }
 
-        val floatingActionButton = binding.floatingActionButton
-
         binding.floatingActionButton.setOnClickListener {
-            val transaction = activity?.supportFragmentManager?.beginTransaction()
-            transaction?.replace(R.id.fragmentContainerView, HomeFragment())
-            transaction?.disallowAddToBackStack()
-            transaction?.commit()
+            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_addNotationFragment)
         }
     }
 

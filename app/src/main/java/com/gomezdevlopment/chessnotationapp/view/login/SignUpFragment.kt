@@ -8,12 +8,12 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.gomezdevlopment.chessnotationapp.R
-import com.gomezdevlopment.chessnotationapp.databinding.SignUpFragmentBinding
+import com.gomezdevlopment.chessnotationapp.databinding.FragmentSignUpBinding
 import com.gomezdevlopment.chessnotationapp.view_model.SignInViewModel
 
 class SignUpFragment: Fragment() {
 
-    private lateinit var binding: SignUpFragmentBinding
+    private lateinit var binding: FragmentSignUpBinding
     private lateinit var signInViewModel: SignInViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +26,7 @@ class SignUpFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = SignUpFragmentBinding.inflate(inflater, container, false)
+        binding = FragmentSignUpBinding.inflate(inflater, container, false)
         return binding.root
     }
 

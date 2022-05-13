@@ -7,12 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.navigation.Navigation
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.blackAnnotations
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.whiteAnnotations
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.databinding.FragmentAddNotationBinding
-import com.gomezdevlopment.chessnotationapp.view.MainActivity
-import com.gomezdevlopment.chessnotationapp.view.home_screen.HomeFragment
 
 class AddNotationFragment : Fragment() {
 
@@ -46,11 +45,7 @@ class AddNotationFragment : Fragment() {
                     blackAnnotations.add(annotation)
                 }
             }
-            val transaction = activity?.supportFragmentManager?.beginTransaction()
-            transaction?.replace(R.id.fragmentContainerView, HomeFragment())
-            transaction?.disallowAddToBackStack()
-            transaction?.commit()
-            MainActivity.notationFragmentOpen = false
+            Navigation.findNavController(view).navigate(R.id.action_addNotationFragment_to_homeFragment)
         }
 
     }

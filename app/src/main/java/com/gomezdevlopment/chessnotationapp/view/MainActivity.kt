@@ -11,7 +11,6 @@ class MainActivity : AppCompatActivity() {
 
 
     companion object{
-        var notationFragmentOpen: Boolean = false
         val whiteAnnotations: ArrayList<String> = arrayListOf()
         val blackAnnotations: ArrayList<String> = arrayListOf()
     }

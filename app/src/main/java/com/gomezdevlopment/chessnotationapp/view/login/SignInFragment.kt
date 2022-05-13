@@ -9,12 +9,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.gomezdevlopment.chessnotationapp.R
-import com.gomezdevlopment.chessnotationapp.databinding.SignInFragmentBinding
+import com.gomezdevlopment.chessnotationapp.databinding.FragmentSignInBinding
 import com.gomezdevlopment.chessnotationapp.view_model.SignInViewModel
 
 class SignInFragment : Fragment() {
 
-    private lateinit var binding: SignInFragmentBinding
+    private lateinit var binding: FragmentSignInBinding
     private lateinit var signInViewModel: SignInViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +27,7 @@ class SignInFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        binding = SignInFragmentBinding.inflate(inflater, container, false)
+        binding = FragmentSignInBinding.inflate(inflater, container, false)
         return binding.root
     }
 
