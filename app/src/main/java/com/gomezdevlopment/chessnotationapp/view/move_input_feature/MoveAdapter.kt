@@ -1,10 +1,11 @@
-package com.gomezdevlopment.chessnotationapp
+package com.gomezdevlopment.chessnotationapp.view.move_input_feature
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.gomezdevlopment.chessnotationapp.R
 
 class MoveAdapter(private val notations: ArrayList<String>): RecyclerView.Adapter<MoveAdapter.MyViewHolder>() {
 

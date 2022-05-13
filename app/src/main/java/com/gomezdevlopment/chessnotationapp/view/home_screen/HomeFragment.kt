@@ -8,12 +8,17 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.blackAnnotations
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.whiteAnnotations
-import com.gomezdevlopment.chessnotationapp.MoveAdapter
+import com.gomezdevlopment.chessnotationapp.view.move_input_feature.MoveAdapter
 import com.gomezdevlopment.chessnotationapp.databinding.FragmentHomeBinding
+import com.gomezdevlopment.chessnotationapp.view.MainActivity
+import com.gomezdevlopment.chessnotationapp.view.move_input_feature.AddNotationFragment
 import java.io.File
 
 class HomeFragment : Fragment() {
@@ -53,9 +58,18 @@ class HomeFragment : Fragment() {
         }
 
         binding.exportButton.setOnClickListener {
-            if(whiteAnnotations.isNotEmpty()){
+            if (whiteAnnotations.isNotEmpty()) {
                 exportGameFile(view.context)
             }
+        }
+
+        val floatingActionButton = binding.floatingActionButton
+
+        binding.floatingActionButton.setOnClickListener {
+            val transaction = activity?.supportFragmentManager?.beginTransaction()
+            transaction?.replace(R.id.fragmentContainerView, HomeFragment())
+            transaction?.disallowAddToBackStack()
+            transaction?.commit()
         }
     }
 
@@ -84,23 +98,23 @@ class HomeFragment : Fragment() {
         pgnFile.delete()
         pgnFile.createNewFile()
 
-        if(whiteAnnotations.size != blackAnnotations.size){
+        if (whiteAnnotations.size != blackAnnotations.size) {
             blackAnnotations.add("")
         }
 
         for (notation in whiteAnnotations) {
             val index = whiteAnnotations.indexOf(notation)
-            pgnFile.appendText("${index+1}. $notation ${blackAnnotations[index]} ")
+            pgnFile.appendText("${index + 1}. $notation ${blackAnnotations[index]} ")
         }
-            val uri = FileProvider.getUriForFile(
-                context,
-                activity?.applicationContext?.packageName.toString() + ".provider",
-                pgnFile
-            )
-            val sendIntent = Intent(Intent.ACTION_SEND)
-            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            sendIntent.putExtra(Intent.EXTRA_STREAM, uri)
-            sendIntent.type = "text/pgn"
-            startActivity(Intent.createChooser(sendIntent, "SHARE"))
+        val uri = FileProvider.getUriForFile(
+            context,
+            activity?.applicationContext?.packageName.toString() + ".provider",
+            pgnFile
+        )
+        val sendIntent = Intent(Intent.ACTION_SEND)
+        sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        sendIntent.putExtra(Intent.EXTRA_STREAM, uri)
+        sendIntent.type = "text/pgn"
+        startActivity(Intent.createChooser(sendIntent, "SHARE"))
     }
 }

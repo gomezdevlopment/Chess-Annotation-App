@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp.view.home_screen
+package com.gomezdevlopment.chessnotationapp.view.move_input_feature
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,13 +7,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.blackAnnotations
-import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.floatingActionButton
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.whiteAnnotations
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.databinding.FragmentAddNotationBinding
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
+import com.gomezdevlopment.chessnotationapp.view.home_screen.HomeFragment
 
 class AddNotationFragment : Fragment() {
 
@@ -52,7 +51,6 @@ class AddNotationFragment : Fragment() {
             transaction?.disallowAddToBackStack()
             transaction?.commit()
             MainActivity.notationFragmentOpen = false
-            floatingActionButton.setImageDrawable(ContextCompat.getDrawable(view.context, android.R.drawable.ic_menu_edit))
         }
 
     }
