@@ -8,8 +8,8 @@ This app uses Firebase Authentication for user sign up.
 
 ### Sign In Screen
 
-<img src="https://github.com/gomezdevlopment/chess-annotation-app/blob/master/chess_sign_in.png" width="360" height="800">
+<img src="https://github.com/gomezdevlopment/chess-annotation-app/blob/master/chess_sign_in.png" width="360" height="700">
 
 ### Home Screen
 
-<img src="https://github.com/gomezdevlopment/chess-annotation-app/blob/master/chess_home_screen.png" width="360" height="800"> 
+<img src="https://github.com/gomezdevlopment/chess-annotation-app/blob/master/chess_home_screen.png" width="360" height="700"> 
