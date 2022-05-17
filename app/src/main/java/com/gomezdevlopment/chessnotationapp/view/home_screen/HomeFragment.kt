@@ -64,7 +64,8 @@ class HomeFragment : Fragment() {
         })
 
         binding.newGameButton.setOnClickListener {
-            homeViewModel.createNewGameDialog(view.context)
+            //homeViewModel.createNewGameDialog(view.context)
+            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_gameFragment)
         }
 
         binding.exportButton.setOnClickListener {
