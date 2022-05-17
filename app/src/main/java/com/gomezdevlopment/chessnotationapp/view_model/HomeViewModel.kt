@@ -4,10 +4,12 @@ import android.app.AlertDialog
 import android.app.Application
 import android.content.Context
 import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.gomezdevlopment.chessnotationapp.model.HomeRepository
+import java.io.File
 
 class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private lateinit var homeRepository: HomeRepository
@@ -59,4 +61,7 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun createPGNString(): String{
+        return homeRepository.createPGNString()
+    }
 }

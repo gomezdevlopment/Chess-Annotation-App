@@ -2,11 +2,13 @@ package com.gomezdevlopment.chessnotationapp.model
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import java.lang.StringBuilder
 
 class HomeRepository() : ViewModel() {
 
     private val whiteMovesData: ArrayList<String> = arrayListOf()
     private val blackMovesData: ArrayList<String> = arrayListOf()
+    private val pgnData: StringBuilder = StringBuilder("")
 
     companion object {
         @Volatile
@@ -44,5 +46,13 @@ class HomeRepository() : ViewModel() {
     fun clearMoves(){
         whiteMovesData.clear()
         blackMovesData.clear()
+    }
+
+    fun createPGNString(): String{
+        for (notation in whiteMovesData) {
+            val index = whiteMovesData.indexOf(notation)
+            pgnData.append("${index + 1}. $notation ${blackMovesData[index]} ")
+        }
+        return pgnData.toString()
     }
 }
