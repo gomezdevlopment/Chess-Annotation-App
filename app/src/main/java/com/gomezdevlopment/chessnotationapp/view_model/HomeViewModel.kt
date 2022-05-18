@@ -11,7 +11,7 @@ import androidx.lifecycle.MutableLiveData
 import com.gomezdevlopment.chessnotationapp.model.HomeRepository
 import java.io.File
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+class HomeViewModel(private val app: Application) : AndroidViewModel(app) {
     private lateinit var homeRepository: HomeRepository
     private lateinit var whiteMovesMutableLiveData: MutableLiveData<ArrayList<String>>
     private lateinit var blackMovesMutableLiveData: MutableLiveData<ArrayList<String>>
@@ -48,8 +48,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }else{
             val builder = AlertDialog.Builder(context)
             builder.setTitle("Create a new game?")
-            builder.setMessage("The current game will be deleted.")
+            builder.setMessage("The current game will be cleared and stored in the cloud.")
             builder.setPositiveButton("Yes") { _, _ ->
+                addGameToUserGames(createPGNString())
                 homeRepository.clearMoves()
                 val whiteMoves = whiteMovesMutableLiveData.value
                 whiteMovesMutableLiveData.postValue(whiteMoves)
@@ -63,5 +64,10 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun createPGNString(): String{
         return homeRepository.createPGNString()
+    }
+
+    fun addGameToUserGames(pgnString: String){
+        println(pgnString)
+        homeRepository.addGameToDatabase(app, pgnString)
     }
 }

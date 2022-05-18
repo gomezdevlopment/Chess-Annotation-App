@@ -1,8 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.model
 
 import android.app.Application
-import android.content.ContentValues.TAG
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
@@ -14,6 +12,7 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import java.io.Serializable
 
+
 class AuthenticationRepository(private val application: Application) {
     private val firebaseAuth = FirebaseAuth.getInstance()
     private val userMutableLiveData: MutableLiveData<FirebaseUser> = MutableLiveData()
@@ -21,34 +20,39 @@ class AuthenticationRepository(private val application: Application) {
     private val db = Firebase.firestore
 
 
-    fun checkIfUserIsSignedIn(view: View){
-        if(firebaseAuth.currentUser != null){
+    fun checkIfUserIsSignedIn(view: View) {
+        if (firebaseAuth.currentUser != null) {
             Navigation.findNavController(view).navigate(R.id.action_signInFragment_to_homeFragment)
         }
     }
 
 
-    fun signUp(email: String, password: String, confirmPassword: String){
-        if(email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()){
-            if(password == confirmPassword){
+    fun signUp(email: String, password: String, confirmPassword: String) {
+        if (email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()) {
+            if (password == confirmPassword) {
                 firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
-                    if(it.isSuccessful){
+                    if (it.isSuccessful) {
                         userMutableLiveData.postValue(firebaseAuth.currentUser)
                         addFirestoreDocument(createUser(email, password))
-                        Toast.makeText(application, "Account Creation Successful", Toast.LENGTH_LONG).show()
-                    }else{
-                        Toast.makeText(application, it.exception.toString(), Toast.LENGTH_LONG).show()
+                        Toast.makeText(
+                            application,
+                            "Account Creation Successful",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    } else {
+                        Toast.makeText(application, it.exception.toString(), Toast.LENGTH_LONG)
+                            .show()
                     }
                 }
-            }else{
+            } else {
                 Toast.makeText(application, "Passwords do not match!", Toast.LENGTH_LONG).show()
             }
-        }else{
+        } else {
             Toast.makeText(application, "Fields cannot be left empty!", Toast.LENGTH_LONG).show()
         }
     }
 
-    fun signIn(email: String, password: String){
+    fun signIn(email: String, password: String) {
         if (email.isNotEmpty() && password.isNotEmpty()) {
 
             firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
@@ -63,16 +67,16 @@ class AuthenticationRepository(private val application: Application) {
         }
     }
 
-    fun signOut(){
+    fun signOut() {
         firebaseAuth.signOut()
         signedOutMutableLiveData.postValue(true)
     }
 
-    fun getUserMutableLiveData(): MutableLiveData<FirebaseUser>{
+    fun getUserMutableLiveData(): MutableLiveData<FirebaseUser> {
         return userMutableLiveData
     }
 
-    fun getSignedOutMutableLiveData(): MutableLiveData<Boolean>{
+    fun getSignedOutMutableLiveData(): MutableLiveData<Boolean> {
         return signedOutMutableLiveData
     }
 
@@ -84,15 +88,14 @@ class AuthenticationRepository(private val application: Application) {
         )
     }
 
-    private fun addFirestoreDocument(user: HashMap<String, Serializable>){
+    private fun addFirestoreDocument(user: HashMap<String, Serializable>) {
         db.collection("users")
             .add(user)
-            .addOnSuccessListener { documentReference ->
+            .addOnSuccessListener {
                 println("success")
             }
             .addOnFailureListener { e ->
                 println("error")
             }
     }
-
 }
