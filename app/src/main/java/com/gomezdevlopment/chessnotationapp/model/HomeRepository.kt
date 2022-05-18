@@ -6,10 +6,12 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
 import java.lang.StringBuilder
 
 class HomeRepository() : ViewModel() {
@@ -40,28 +42,28 @@ class HomeRepository() : ViewModel() {
         return MutableLiveData(whiteMovesData)
     }
 
-    fun getBlackMoves(): MutableLiveData<ArrayList<String>>{
+    fun getBlackMoves(): MutableLiveData<ArrayList<String>> {
         return MutableLiveData(blackMovesData)
     }
 
-    fun addWhiteMove(move: String){
+    fun addWhiteMove(move: String) {
         whiteMovesData.add(move)
     }
 
-    fun addBlackMove(move: String){
+    fun addBlackMove(move: String) {
         blackMovesData.add(move)
     }
 
-    fun clearMoves(){
+    fun clearMoves() {
         whiteMovesData.clear()
         blackMovesData.clear()
     }
 
-    fun createPGNString(): String{
+    fun createPGNString(): String {
         pgnData.clear()
         var index = 1
         for (notation in whiteMovesData) {
-            pgnData.append("${index}. $notation ${blackMovesData[index-1]} ")
+            pgnData.append("${index}. $notation ${blackMovesData[index - 1]} ")
             index++
         }
         return pgnData.toString()

@@ -8,7 +8,9 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.gomezdevlopment.chessnotationapp.model.HomeRepository
+import kotlinx.coroutines.launch
 import java.io.File
 
 class HomeViewModel(private val app: Application) : AndroidViewModel(app) {
@@ -66,8 +68,9 @@ class HomeViewModel(private val app: Application) : AndroidViewModel(app) {
         return homeRepository.createPGNString()
     }
 
-    fun addGameToUserGames(pgnString: String){
-        println(pgnString)
-        homeRepository.addGameToDatabase(app, pgnString)
+    private fun addGameToUserGames(pgnString: String){
+        viewModelScope.launch {
+            homeRepository.addGameToDatabase(app, pgnString)
+        }
     }
 }
