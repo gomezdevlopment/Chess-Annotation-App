@@ -2,6 +2,7 @@ package com.gomezdevlopment.chessnotationapp.view.home_screen
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -92,29 +93,30 @@ class HomeFragment : Fragment() {
             if (whiteMovesAdapter.itemCount != blackMovesAdapter.itemCount) {
                 homeViewModel.addBlackMove("")
             }
-            val filename = "chess_game.pgn"
-            val path = activity?.getExternalFilesDir(null)
-            val pgnFile = File(path, filename)
-            pgnFile.delete()
-            pgnFile.createNewFile()
-
-            val whiteMoves = homeViewModel.getWhiteMoves().value!!
-            val blackMoves = homeViewModel.getBlackMoves().value!!
-
-            for (notation in whiteMoves) {
-                val index = whiteMoves.indexOf(notation)
-                pgnFile.appendText("${index + 1}. $notation ${blackMoves[index]} ")
-            }
-            val uri = FileProvider.getUriForFile(
-                context,
-                activity?.applicationContext?.packageName.toString() + ".provider",
-                pgnFile
-            )
-            val sendIntent = Intent(Intent.ACTION_SEND)
-            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-            sendIntent.putExtra(Intent.EXTRA_STREAM, uri)
-            sendIntent.type = "text/pgn"
-            startActivity(Intent.createChooser(sendIntent, "SHARE"))
+            val uri = createPGNFile(context)
+            launchShareIntent(uri)
         }
+    }
+
+    private fun createPGNFile(context: Context): Uri {
+        val filename = "chess_game.pgn"
+        val path = activity?.getExternalFilesDir(null)
+        val pgnFile = File(path, filename)
+        pgnFile.delete()
+        pgnFile.createNewFile()
+        pgnFile.appendText(homeViewModel.createPGNString())
+        return FileProvider.getUriForFile(
+            context,
+            activity?.applicationContext?.packageName.toString() + ".provider",
+            pgnFile
+        )
+    }
+
+    private fun launchShareIntent(uri: Uri){
+        val sendIntent = Intent(Intent.ACTION_SEND)
+        sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        sendIntent.putExtra(Intent.EXTRA_STREAM, uri)
+        sendIntent.type = "text/pgn"
+        startActivity(Intent.createChooser(sendIntent, "SHARE"))
     }
 }

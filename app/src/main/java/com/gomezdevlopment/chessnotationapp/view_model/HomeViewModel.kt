@@ -4,12 +4,16 @@ import android.app.AlertDialog
 import android.app.Application
 import android.content.Context
 import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.gomezdevlopment.chessnotationapp.model.HomeRepository
+import kotlinx.coroutines.launch
+import java.io.File
 
-class HomeViewModel(application: Application) : AndroidViewModel(application) {
+class HomeViewModel(private val app: Application) : AndroidViewModel(app) {
     private lateinit var homeRepository: HomeRepository
     private lateinit var whiteMovesMutableLiveData: MutableLiveData<ArrayList<String>>
     private lateinit var blackMovesMutableLiveData: MutableLiveData<ArrayList<String>>
@@ -46,8 +50,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }else{
             val builder = AlertDialog.Builder(context)
             builder.setTitle("Create a new game?")
-            builder.setMessage("The current game will be deleted.")
+            builder.setMessage("The current game will be cleared and stored in the cloud.")
             builder.setPositiveButton("Yes") { _, _ ->
+                addGameToUserGames(createPGNString())
                 homeRepository.clearMoves()
                 val whiteMoves = whiteMovesMutableLiveData.value
                 whiteMovesMutableLiveData.postValue(whiteMoves)
@@ -59,4 +64,13 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun createPGNString(): String{
+        return homeRepository.createPGNString()
+    }
+
+    private fun addGameToUserGames(pgnString: String){
+        viewModelScope.launch {
+            homeRepository.addGameToDatabase(app, pgnString)
+        }
+    }
 }
