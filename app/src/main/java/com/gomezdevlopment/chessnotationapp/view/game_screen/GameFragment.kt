@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import com.gomezdevlopment.chessnotationapp.databinding.FragmentGameBinding
+import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 
 class GameFragment : Fragment() {
@@ -24,9 +25,10 @@ class GameFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val width = resources.configuration.screenWidthDp
+        val viewModel: GameViewModel = GameViewModel()
         return ComposeView(requireContext()).apply {
             setContent {
-                ChessCanvas(width)
+                ChessCanvas(width, viewModel)
             }
         }
         //binding = FragmentGameBinding.inflate(layoutInflater, container, false)

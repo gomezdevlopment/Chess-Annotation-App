@@ -1,7 +1,9 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen
 
+import android.app.Application
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -14,38 +16,20 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gomezdevlopment.chessnotationapp.R
+import com.gomezdevlopment.chessnotationapp.model.ChessPiece
+import com.gomezdevlopment.chessnotationapp.model.GameEvent
+import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable
-fun ChessCanvas(width: Int) {
+fun ChessCanvas(width: Int, viewModel: GameViewModel) {
+    val chessBoardVector: ImageVector =
+        ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
+    val pieces = viewModel.getPiecesOnBoard()
 
-    val font = FontFamily(
-        Font(R.font.alpha_chess_pieces)
-    )
 
-    val chessBoardVector: ImageVector = ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
-    val wr = ImageVector.vectorResource(id = R.drawable.ic_wr_alpha)
-    val wn = ImageVector.vectorResource(id = R.drawable.ic_wn_alpha)
-    val wb = ImageVector.vectorResource(id = R.drawable.ic_wb_alpha)
-    val wq = ImageVector.vectorResource(id = R.drawable.ic_wq_alpha)
-    val wk = ImageVector.vectorResource(id = R.drawable.ic_wk)
-    val wp = ImageVector.vectorResource(id = R.drawable.ic_wp_alpha)
-    val br = ImageVector.vectorResource(id = R.drawable.ic_br_alpha)
-    val bn = ImageVector.vectorResource(id = R.drawable.ic_bn_alpha)
-    val bb = ImageVector.vectorResource(id = R.drawable.ic_bb_alpha)
-    val bq = ImageVector.vectorResource(id = R.drawable.ic_bq_alpha)
-    val bk = ImageVector.vectorResource(id = R.drawable.ic_bk_alpha)
-    val bp = ImageVector.vectorResource(id = R.drawable.ic_bp_alpha)
-
-    val rank8 = mutableListOf(br, bn, bb, bq, bk, bb, bn, br)
-    val rank7 = mutableListOf(bp, bp, bp, bp, bp, bp, bp, bp)
-    val rank6 = mutableListOf<ImageVector>()
-    val rank5 = mutableListOf<ImageVector>()
-    val rank4 = mutableListOf<ImageVector>()
-    val rank3 = mutableListOf<ImageVector>()
-    val rank2 = mutableListOf(wp, wp, wp, wp, wp, wp, wp, wp)
-    val rank1 = mutableListOf(wr, wn, wb, wq, wk, wb, wn, wr)
-
+    val rowWidthAndHeight: Float = (width.toFloat() / 8F)
     Box(
         modifier = Modifier
             .width(width.dp)
@@ -59,137 +43,51 @@ fun ChessCanvas(width: Int) {
                 .fillMaxSize()
                 .aspectRatio(1f)
         )
-        val rowWidthAndHeight: Float = (width.toFloat() / 8F)
-        val rowPositionY = width.toFloat() - rowWidthAndHeight
-        println(width)
-        println(rowWidthAndHeight)
-
         Column() {
-            //rank8
-            LazyRow(modifier = Modifier
-                .fillMaxWidth()
-                .height(rowWidthAndHeight.dp)) {
+            ChessSquares(height = rowWidthAndHeight, pieces = pieces, viewModel = viewModel)
+        }
+    }
+}
 
-                items(rank8){square ->
+
+@Composable
+fun ChessSquares(height: Float, pieces: MutableList<ChessPiece>, viewModel: GameViewModel) {
+    val files = listOf(0, 1, 2, 3, 4, 5, 6, 7)
+    for (rank in 7 downTo 0) {
+        LazyRow(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(height.dp)
+        ) {
+
+            items(files) { file ->
+                var squareOccupied = false
+                var chessPiece: ChessPiece = pieces[0]
+                for (piece in pieces) {
+                    if (piece.square.file == file && piece.square.rank == rank) {
+                        squareOccupied = true
+                        chessPiece = piece
+                        break
+                    }
+                }
+                if (squareOccupied) {
                     Image(
-                        imageVector = square,
+                        imageVector = ImageVector.vectorResource(chessPiece.pieceDrawable),
                         contentDescription = "Chess Board",
                         modifier = Modifier
-                            .height(rowWidthAndHeight.dp)
+                            .height(height.dp)
                             .aspectRatio(1f)
                             .absoluteOffset(0.dp, 0.dp)
+                            .clickable {
+                                viewModel.onEvent(GameEvent.OnPieceClicked, chessPiece)
+                            }
                     )
-                }
-            }
-
-            //rank7
-            LazyRow(modifier = Modifier
-                .fillMaxWidth()
-                .height(rowWidthAndHeight.dp)) {
-
-                items(rank7){square ->
-                    Image(
-                        imageVector = square,
-                        contentDescription = "Chess Board",
+                } else {
+                    Box(
                         modifier = Modifier
-                            .height(rowWidthAndHeight.dp)
-                            .aspectRatio(1f)
-                    )
-                }
-            }
-            //rank6
-            LazyRow(modifier = Modifier
-                .fillMaxWidth()
-                .height(rowWidthAndHeight.dp)) {
-
-                items(rank6){square ->
-                    Image(
-                        imageVector = square,
-                        contentDescription = "Chess Board",
-                        modifier = Modifier
-                            .height(rowWidthAndHeight.dp)
+                            .height(height.dp)
                             .aspectRatio(1f)
                             .absoluteOffset(0.dp, 0.dp)
-                    )
-                }
-            }
-
-            //rank5
-            LazyRow(modifier = Modifier
-                .fillMaxWidth()
-                .height(rowWidthAndHeight.dp)) {
-
-                items(rank5){square ->
-                    Image(
-                        imageVector = square,
-                        contentDescription = "Chess Board",
-                        modifier = Modifier
-                            .height(rowWidthAndHeight.dp)
-                            .aspectRatio(1f)
-                    )
-                }
-            }
-            //rank4
-            LazyRow(modifier = Modifier
-                .fillMaxWidth()
-                .height(rowWidthAndHeight.dp)) {
-
-                items(rank4){square ->
-                    Image(
-                        imageVector = square,
-                        contentDescription = "Chess Board",
-                        modifier = Modifier
-                            .height(rowWidthAndHeight.dp)
-                            .aspectRatio(1f)
-                            .absoluteOffset(0.dp, 0.dp)
-                    )
-                }
-            }
-
-            //rank3
-            LazyRow(modifier = Modifier
-                .fillMaxWidth()
-                .height(rowWidthAndHeight.dp)) {
-
-                items(rank3){square ->
-                    Image(
-                        imageVector = square,
-                        contentDescription = "Chess Board",
-                        modifier = Modifier
-                            .height(rowWidthAndHeight.dp)
-                            .aspectRatio(1f)
-                    )
-                }
-            }
-            //rank2
-            LazyRow(modifier = Modifier
-                .fillMaxWidth()
-                .height(rowWidthAndHeight.dp)) {
-
-                items(rank2){square ->
-                    Image(
-                        imageVector = square,
-                        contentDescription = "Chess Board",
-                        modifier = Modifier
-                            .height(rowWidthAndHeight.dp)
-                            .aspectRatio(1f)
-                            .absoluteOffset(0.dp, 0.dp)
-                    )
-                }
-            }
-
-            //rank1
-            LazyRow(modifier = Modifier
-                .fillMaxWidth()
-                .height(rowWidthAndHeight.dp)) {
-
-                items(rank1){square ->
-                    Image(
-                        imageVector = square,
-                        contentDescription = "Chess Board",
-                        modifier = Modifier
-                            .height(rowWidthAndHeight.dp)
-                            .aspectRatio(1f)
                     )
                 }
             }
@@ -197,8 +95,8 @@ fun ChessCanvas(width: Int) {
     }
 }
 
-@Preview
-@Composable
-fun ChessCanvasPreview() {
-    ChessCanvas(350)
-}
+//@Preview
+//@Composable
+//fun ChessCanvasPreview() {
+//    ChessCanvas(350)
+//}
