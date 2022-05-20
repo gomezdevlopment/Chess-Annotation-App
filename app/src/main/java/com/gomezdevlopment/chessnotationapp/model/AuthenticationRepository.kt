@@ -92,10 +92,8 @@ class AuthenticationRepository(private val application: Application) {
         db.collection("users")
             .add(user)
             .addOnSuccessListener {
-                println("success")
             }
             .addOnFailureListener { e ->
-                println("error")
             }
     }
 }

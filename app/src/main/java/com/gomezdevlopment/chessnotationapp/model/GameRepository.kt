@@ -4,8 +4,9 @@ import androidx.lifecycle.ViewModel
 import com.gomezdevlopment.chessnotationapp.R
 
 
-class GameRepository(): ViewModel() {
+class GameRepository: ViewModel() {
     private val piecesOnBoard: MutableList<ChessPiece> = mutableListOf()
+    private val  hashMap : HashMap<Square, ChessPiece> = HashMap()
 
     init {
         piecesOnBoard.add(ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(0,0)))
@@ -41,9 +42,18 @@ class GameRepository(): ViewModel() {
         piecesOnBoard.add(ChessPiece("black", "pawn", R.drawable.ic_bp_alpha, Square(6,5)))
         piecesOnBoard.add(ChessPiece("black", "pawn", R.drawable.ic_bp_alpha, Square(6,6)))
         piecesOnBoard.add(ChessPiece("black", "pawn", R.drawable.ic_bp_alpha, Square(6,7)))
+
+        for(piece in piecesOnBoard){
+            hashMap[piece.square] = piece
+        }
+
     }
 
     fun getPiecesOnBoard(): MutableList<ChessPiece> {
         return piecesOnBoard
+    }
+
+    fun getHashMap(): HashMap<Square, ChessPiece> {
+        return hashMap
     }
 }

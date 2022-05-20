@@ -87,7 +87,6 @@ class HomeFragment : Fragment() {
 
     private fun exportGameFile(context: Context) {
         if (homeViewModel.getWhiteMoves().value.isNullOrEmpty()) {
-            println("Empty")
             Toast.makeText(context, "Cannot export game because there are no annotations!", Toast.LENGTH_SHORT).show()
         } else {
             if (whiteMovesAdapter.itemCount != blackMovesAdapter.itemCount) {

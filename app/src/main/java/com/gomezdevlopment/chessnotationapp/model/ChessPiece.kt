@@ -9,37 +9,95 @@ class ChessPiece(
     val square: Square
 ) {
 
-    fun checkLegalMoves(pieces: List<ChessPiece>){
+    fun checkLegalMoves(occupiedSquares: HashMap<Square, ChessPiece>): List<Square>{
+        var listOfMoves = mutableListOf<Square>()
         when (piece) {
             "pawn" -> {
-                pawnMoves(pieces)
+                listOfMoves = pawnMoves(occupiedSquares) as MutableList<Square>
+            }
+            "rook" -> {
+                listOfMoves = rookMoves(occupiedSquares) as MutableList<Square>
+            }
+            "knight" -> {
+                listOfMoves = knightMoves(occupiedSquares) as MutableList<Square>
             }
         }
+        return listOfMoves
     }
 
-    private fun pawnMoves(pieces: List<ChessPiece>){
+    private fun pawnMoves(occupiedSquares: HashMap<Square, ChessPiece>): List<Square>{
         val listOfMoves = mutableListOf<Square>()
-        var square = Square(square.rank+1, square.file)
-        val occupiedSquares = getPiecesOnBoard(pieces)
-        if(!occupiedSquares.contains(square)){
-            listOfMoves.add(square)
+        var moveSquare = Square(square.rank+1, square.file)
+        if(!illegalMove(moveSquare, occupiedSquares)){
+            listOfMoves.add(moveSquare)
         }
-        if(square.rank == 2){
-            square = Square(square.rank+2, square.file)
-            if(!occupiedSquares.contains(square)){
-                listOfMoves.add(square)
+        if(square.rank == 1){
+            moveSquare = Square(square.rank+2, square.file)
+            if(!illegalMove(moveSquare, occupiedSquares)){
+                listOfMoves.add(moveSquare)
             }
         }
-        println(listOfMoves[0].file)
-        println(listOfMoves[0].rank)
+        return listOfMoves
     }
 
-    private fun getPiecesOnBoard(pieces: List<ChessPiece>): MutableList<Square> {
-        val occupiedSquares = mutableListOf<Square>()
-        for(piece in pieces){
-            occupiedSquares.add(square)
+    private fun rookMoves(occupiedSquares: HashMap<Square, ChessPiece>): List<Square>{
+        val listOfMoves = mutableListOf<Square>()
+        var moveSquare: Square
+        for(rank in 0..7){
+            moveSquare = Square(rank, square.file)
+            if(!illegalMove(moveSquare, occupiedSquares)){
+                listOfMoves.add(moveSquare)
+            }
         }
-        return occupiedSquares
+        for(file in 0..7){
+            moveSquare = Square(square.rank, file)
+            if(!illegalMove(moveSquare, occupiedSquares)){
+                listOfMoves.add(moveSquare)
+            }
+        }
+        return listOfMoves
+    }
+
+    private fun knightMoves(occupiedSquares: HashMap<Square, ChessPiece>): List<Square> {
+        val listOfMoves = mutableListOf<Square>()
+        var moveSquare: Square = Square(square.rank+2, square.file+1)
+        if(!illegalMove(moveSquare, occupiedSquares)){
+            listOfMoves.add(moveSquare)
+        }
+        moveSquare = Square(square.rank+2, square.file-1)
+        if(!illegalMove(moveSquare, occupiedSquares)){
+            listOfMoves.add(moveSquare)
+        }
+        moveSquare = Square(square.rank-2, square.file+1)
+        if(!illegalMove(moveSquare, occupiedSquares)){
+            listOfMoves.add(moveSquare)
+        }
+        moveSquare = Square(square.rank-2, square.file-1)
+        if(!illegalMove(moveSquare, occupiedSquares)){
+            listOfMoves.add(moveSquare)
+        }
+        moveSquare = Square(square.rank+1, square.file+2)
+        if(!illegalMove(moveSquare, occupiedSquares)){
+            listOfMoves.add(moveSquare)
+        }
+        moveSquare = Square(square.rank-1, square.file+2)
+        if(!illegalMove(moveSquare, occupiedSquares)){
+            listOfMoves.add(moveSquare)
+        }
+        moveSquare = Square(square.rank+1, square.file-2)
+        if(!illegalMove(moveSquare, occupiedSquares)){
+            listOfMoves.add(moveSquare)
+        }
+        moveSquare = Square(square.rank-1, square.file-2)
+        if(!illegalMove(moveSquare, occupiedSquares)){
+            listOfMoves.add(moveSquare)
+        }
+        println(listOfMoves)
+        return listOfMoves
+    }
+
+    fun illegalMove(square: Square, occupiedSquares: HashMap<Square, ChessPiece>): Boolean {
+        return square.rank > 7 || square.rank < 0 || square.file > 7 || square.file < 0 || occupiedSquares.contains(square)
     }
 
 }

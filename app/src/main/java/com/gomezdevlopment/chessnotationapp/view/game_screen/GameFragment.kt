@@ -13,8 +13,6 @@ import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 class GameFragment : Fragment() {
 
-    private lateinit var binding: FragmentGameBinding
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -31,19 +29,9 @@ class GameFragment : Fragment() {
                 ChessCanvas(width, viewModel)
             }
         }
-        //binding = FragmentGameBinding.inflate(layoutInflater, container, false)
-        //return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-    }
-
-    fun pxFromDp(context: Context, dp: Float): Float {
-        return dp * context.resources.displayMetrics.density
-    }
-
-    fun dpFromPx(context: Context, px: Float): Float {
-        return px / context.resources.displayMetrics.density
     }
 }
