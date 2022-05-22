@@ -1,5 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.model
 
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.gomezdevlopment.chessnotationapp.R
 
@@ -7,6 +9,7 @@ import com.gomezdevlopment.chessnotationapp.R
 class GameRepository: ViewModel() {
     private val piecesOnBoard: MutableList<ChessPiece> = mutableListOf()
     private val  hashMap : MutableMap<Square, ChessPiece> = HashMap()
+    private var previousSquare : MutableState<Square> = mutableStateOf(Square(10,10))
 
     init {
         piecesOnBoard.add(ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(0,0)))
@@ -50,9 +53,11 @@ class GameRepository: ViewModel() {
     }
 
     fun changePiecePosition(newSquare: Square, piece: ChessPiece){
+        val previousSquare = piece.square
         hashMap.remove(piece.square)
         piece.square = newSquare
         hashMap[newSquare] = piece
+        setPreviousSquare(previousSquare)
     }
     fun getPiecesOnBoard(): MutableList<ChessPiece> {
         return piecesOnBoard
@@ -60,5 +65,13 @@ class GameRepository: ViewModel() {
 
     fun getHashMap(): MutableMap<Square, ChessPiece> {
         return hashMap
+    }
+
+    fun getPreviousSquare() : MutableState<Square> {
+        return previousSquare
+    }
+
+    private fun setPreviousSquare(square: Square){
+        previousSquare.value = square
     }
 }
