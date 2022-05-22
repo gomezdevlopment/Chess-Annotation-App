@@ -9,7 +9,7 @@ import com.gomezdevlopment.chessnotationapp.model.Square
 class GameViewModel: ViewModel() {
     private var gameRepository: GameRepository = GameRepository()
     private var piecesOnBoard: MutableList<ChessPiece> = mutableListOf()
-    private var  hashMap : HashMap<Square, ChessPiece> = HashMap()
+    private var  hashMap : MutableMap<Square, ChessPiece> = HashMap()
 
     init {
         piecesOnBoard = gameRepository.getPiecesOnBoard()
@@ -28,7 +28,11 @@ class GameViewModel: ViewModel() {
         }
     }
 
-    fun getHashMap(): HashMap<Square, ChessPiece> {
+    fun getHashMap(): MutableMap<Square, ChessPiece> {
         return hashMap
+    }
+
+    fun changePiecePosition(newSquare: Square, piece: ChessPiece){
+        gameRepository.changePiecePosition(newSquare, piece)
     }
 }

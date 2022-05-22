@@ -6,7 +6,7 @@ import com.gomezdevlopment.chessnotationapp.R
 
 class GameRepository: ViewModel() {
     private val piecesOnBoard: MutableList<ChessPiece> = mutableListOf()
-    private val  hashMap : HashMap<Square, ChessPiece> = HashMap()
+    private val  hashMap : MutableMap<Square, ChessPiece> = HashMap()
 
     init {
         piecesOnBoard.add(ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(0,0)))
@@ -49,11 +49,16 @@ class GameRepository: ViewModel() {
 
     }
 
+    fun changePiecePosition(newSquare: Square, piece: ChessPiece){
+        hashMap.remove(piece.square)
+        piece.square = newSquare
+        hashMap[newSquare] = piece
+    }
     fun getPiecesOnBoard(): MutableList<ChessPiece> {
         return piecesOnBoard
     }
 
-    fun getHashMap(): HashMap<Square, ChessPiece> {
+    fun getHashMap(): MutableMap<Square, ChessPiece> {
         return hashMap
     }
 }
