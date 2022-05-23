@@ -14,6 +14,7 @@ class GameViewModel: ViewModel() {
     private var  hashMap : MutableMap<Square, ChessPiece> = gameRepository.getHashMap()
     private var previousSquare : MutableState<Square> = gameRepository.getPreviousSquare()
 
+
     fun getPiecesOnBoard(): MutableList<ChessPiece> {
         return piecesOnBoard
     }
@@ -37,4 +38,13 @@ class GameViewModel: ViewModel() {
     fun getPreviousSquare(): MutableState<Square>{
         return previousSquare
     }
+
+    fun getCurrentSquare(): MutableState<Square>{
+        return gameRepository.getCurrentSquare()
+    }
+
+    fun getPlayerTurn(): String{
+        return gameRepository.getPlayerTurn().value
+    }
+
 }

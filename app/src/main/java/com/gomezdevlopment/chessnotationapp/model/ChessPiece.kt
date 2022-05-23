@@ -7,6 +7,8 @@ class ChessPiece(
     var square: Square
 ) {
 
+    private var enemyPieceBlocking = false
+
     fun checkLegalMoves(occupiedSquares: MutableMap<Square, ChessPiece>): List<Square>{
         var listOfMoves = mutableListOf<Square>()
         when (piece) {
@@ -40,15 +42,36 @@ class ChessPiece(
         }
         if(!illegalMove(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
+            if(square.rank == 1 && color == "white"){
+                moveSquare = Square(square.rank+2, square.file)
+                if(!illegalMove(moveSquare, occupiedSquares)){
+                    listOfMoves.add(moveSquare)
+                }
+            }else if(square.rank == 6 && color == "black"){
+                moveSquare = Square(square.rank-2, square.file)
+                if(!illegalMove(moveSquare, occupiedSquares)){
+                    listOfMoves.add(moveSquare)
+                }
+            }
         }
-        if(square.rank == 1 && color == "white"){
-            moveSquare = Square(square.rank+2, square.file)
-            if(!illegalMove(moveSquare, occupiedSquares)){
+        if(color == "white"){
+            //Check for captures
+            moveSquare = Square(square.rank+1, square.file-1)
+            if(isCapture(moveSquare, occupiedSquares)){
                 listOfMoves.add(moveSquare)
             }
-        }else if(square.rank == 6 && color == "black"){
-            moveSquare = Square(square.rank-2, square.file)
-            if(!illegalMove(moveSquare, occupiedSquares)){
+            moveSquare = Square(square.rank+1, square.file+1)
+            if(isCapture(moveSquare, occupiedSquares)){
+                listOfMoves.add(moveSquare)
+            }
+        }else{
+            //Check for captures
+            moveSquare = Square(square.rank-1, square.file-1)
+            if(isCapture(moveSquare, occupiedSquares)){
+                listOfMoves.add(moveSquare)
+            }
+            moveSquare = Square(square.rank-1, square.file+1)
+            if(isCapture(moveSquare, occupiedSquares)){
                 listOfMoves.add(moveSquare)
             }
         }
@@ -58,35 +81,43 @@ class ChessPiece(
     private fun rookMoves(occupiedSquares: HashMap<Square, ChessPiece>): List<Square>{
         val listOfMoves = mutableListOf<Square>()
         var moveSquare: Square
+        enemyPieceBlocking = false
         for(rank in square.rank+1..7){
             moveSquare = Square(rank, square.file)
             if(!illegalMove(moveSquare, occupiedSquares)){
                 listOfMoves.add(moveSquare)
-            }else{
+            }
+            else{
                 break
             }
         }
+        enemyPieceBlocking = false
         for(rank in square.rank-1 downTo 0){
             moveSquare = Square(rank, square.file)
             if(!illegalMove(moveSquare, occupiedSquares)){
                 listOfMoves.add(moveSquare)
-            }else{
+            }
+            else{
                 break
             }
         }
+        enemyPieceBlocking = false
         for(file in square.file+1..7){
             moveSquare = Square(square.rank, file)
             if(!illegalMove(moveSquare, occupiedSquares)){
                 listOfMoves.add(moveSquare)
-            }else{
+            }
+            else{
                 break
             }
         }
+        enemyPieceBlocking = false
         for(file in square.file-1 downTo 0){
             moveSquare = Square(square.rank, file)
             if(!illegalMove(moveSquare, occupiedSquares)){
                 listOfMoves.add(moveSquare)
-            }else{
+            }
+            else{
                 break
             }
         }
@@ -119,7 +150,7 @@ class ChessPiece(
         if(!illegalMove(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
-        moveSquare = Square(square.rank+1, square.file+1)
+        moveSquare = Square(square.rank-1, square.file-1)
         if(!illegalMove(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
@@ -135,6 +166,7 @@ class ChessPiece(
         var moveSquare: Square
 
         //Horizontal Moves
+        enemyPieceBlocking = false
         for(rank in square.rank+1..7){
             moveSquare = Square(rank, square.file)
             if(!illegalMove(moveSquare, occupiedSquares)){
@@ -143,6 +175,7 @@ class ChessPiece(
                 break
             }
         }
+        enemyPieceBlocking = false
         for(rank in square.rank-1 downTo 0){
             moveSquare = Square(rank, square.file)
             if(!illegalMove(moveSquare, occupiedSquares)){
@@ -151,6 +184,7 @@ class ChessPiece(
                 break
             }
         }
+        enemyPieceBlocking = false
         for(file in square.file+1..7){
             moveSquare = Square(square.rank, file)
             if(!illegalMove(moveSquare, occupiedSquares)){
@@ -159,6 +193,7 @@ class ChessPiece(
                 break
             }
         }
+        enemyPieceBlocking = false
         for(file in square.file-1 downTo 0){
             moveSquare = Square(square.rank, file)
             if(!illegalMove(moveSquare, occupiedSquares)){
@@ -169,6 +204,7 @@ class ChessPiece(
         }
 
         //Diagonal Moves
+        enemyPieceBlocking = false
         for(rank in square.rank+1..7){
             moveSquare = Square(rank, square.file+(rank-square.rank))
             if(!illegalMove(moveSquare, occupiedSquares)){
@@ -177,6 +213,7 @@ class ChessPiece(
                 break
             }
         }
+        enemyPieceBlocking = false
         for(rank in square.rank+1..7){
             moveSquare = Square(rank, square.file-(rank-square.rank))
             if(!illegalMove(moveSquare, occupiedSquares)){
@@ -185,6 +222,7 @@ class ChessPiece(
                 break
             }
         }
+        enemyPieceBlocking = false
         for(rank in square.rank-1 downTo 0){
             moveSquare = Square(rank, square.file+(rank-square.rank))
             if(!illegalMove(moveSquare, occupiedSquares)){
@@ -193,6 +231,7 @@ class ChessPiece(
                 break
             }
         }
+        enemyPieceBlocking = false
         for(rank in square.rank-1 downTo 0){
             moveSquare = Square(rank, square.file-(rank-square.rank))
             if(!illegalMove(moveSquare, occupiedSquares)){
@@ -208,7 +247,7 @@ class ChessPiece(
     private fun bishopMoves(occupiedSquares: HashMap<Square, ChessPiece>): List<Square>{
         val listOfMoves = mutableListOf<Square>()
         var moveSquare: Square
-
+        enemyPieceBlocking = false
         for(rank in square.rank+1..7){
             moveSquare = Square(rank, square.file+(rank-square.rank))
             if(!illegalMove(moveSquare, occupiedSquares)){
@@ -217,6 +256,7 @@ class ChessPiece(
                 break
             }
         }
+        enemyPieceBlocking = false
         for(rank in square.rank+1..7){
             moveSquare = Square(rank, square.file-(rank-square.rank))
             if(!illegalMove(moveSquare, occupiedSquares)){
@@ -225,6 +265,7 @@ class ChessPiece(
                 break
             }
         }
+        enemyPieceBlocking = false
         for(rank in square.rank-1 downTo 0){
             moveSquare = Square(rank, square.file+(rank-square.rank))
             if(!illegalMove(moveSquare, occupiedSquares)){
@@ -233,6 +274,7 @@ class ChessPiece(
                 break
             }
         }
+        enemyPieceBlocking = false
         for(rank in square.rank-1 downTo 0){
             moveSquare = Square(rank, square.file-(rank-square.rank))
             if(!illegalMove(moveSquare, occupiedSquares)){
@@ -246,7 +288,7 @@ class ChessPiece(
 
     private fun knightMoves(occupiedSquares: HashMap<Square, ChessPiece>): List<Square> {
         val listOfMoves = mutableListOf<Square>()
-        var moveSquare: Square = Square(square.rank+2, square.file+1)
+        var moveSquare = Square(square.rank+2, square.file+1)
         if(!illegalMove(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
@@ -281,10 +323,26 @@ class ChessPiece(
         return listOfMoves
     }
 
-    fun illegalMove(square: Square, occupiedSquares: HashMap<Square, ChessPiece>): Boolean {
-        return square.rank > 7 || square.rank < 0 || square.file > 7 || square.file < 0 || occupiedSquares.contains(square)
+    private fun illegalMove(square: Square, occupiedSquares: HashMap<Square, ChessPiece>): Boolean {
+        if(square.rank > 7 || square.rank < 0 || square.file > 7 || square.file < 0) return true
+        if(occupiedSquares.contains(square)){
+            return if(isCapture(square, occupiedSquares) && !enemyPieceBlocking){
+                enemyPieceBlocking = true
+                false
+            }else{
+                true
+            }
+        }
+        return false
     }
 
+    private fun isCapture(square: Square, occupiedSquares: HashMap<Square, ChessPiece>): Boolean{
+        var isEnemyPiece = false
+        if(occupiedSquares.containsKey(square)){
+            isEnemyPiece = occupiedSquares[square]?.color != color
+        }
+        return isEnemyPiece
+    }
 }
 
 

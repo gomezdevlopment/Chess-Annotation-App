@@ -10,6 +10,8 @@ class GameRepository: ViewModel() {
     private val piecesOnBoard: MutableList<ChessPiece> = mutableListOf()
     private val  hashMap : MutableMap<Square, ChessPiece> = HashMap()
     private var previousSquare : MutableState<Square> = mutableStateOf(Square(10,10))
+    private var currentSquare : MutableState<Square> = mutableStateOf(Square(10,10))
+    private var playerTurn : MutableState<String> = mutableStateOf("white")
 
     init {
         piecesOnBoard.add(ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(0,0)))
@@ -58,6 +60,13 @@ class GameRepository: ViewModel() {
         piece.square = newSquare
         hashMap[newSquare] = piece
         setPreviousSquare(previousSquare)
+        setCurrentSquare(newSquare)
+
+        if(piece.color == "white"){
+            setPlayerTurn("black")
+        }else{
+            setPlayerTurn("white")
+        }
     }
     fun getPiecesOnBoard(): MutableList<ChessPiece> {
         return piecesOnBoard
@@ -73,5 +82,21 @@ class GameRepository: ViewModel() {
 
     private fun setPreviousSquare(square: Square){
         previousSquare.value = square
+    }
+
+    fun getCurrentSquare() : MutableState<Square> {
+        return currentSquare
+    }
+
+    private fun setCurrentSquare(square: Square){
+        currentSquare.value = square
+    }
+
+    private fun setPlayerTurn(turn: String){
+        playerTurn.value = turn
+    }
+
+    fun getPlayerTurn(): MutableState<String>{
+        return playerTurn
     }
 }
