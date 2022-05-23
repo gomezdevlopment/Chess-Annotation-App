@@ -3,17 +3,14 @@ package com.gomezdevlopment.chessnotationapp.view_model
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.gomezdevlopment.chessnotationapp.model.ChessPiece
-import com.gomezdevlopment.chessnotationapp.model.GameEvent
-import com.gomezdevlopment.chessnotationapp.model.GameRepository
-import com.gomezdevlopment.chessnotationapp.model.Square
+import com.gomezdevlopment.chessnotationapp.model.*
 
 class GameViewModel: ViewModel() {
-    private var gameRepository: GameRepository = GameRepository()
+    private var gameRepository: GameRepository = GameRepository.getGameRepository()
     private var piecesOnBoard: MutableList<ChessPiece> = gameRepository.getPiecesOnBoard()
     private var  hashMap : MutableMap<Square, ChessPiece> = gameRepository.getHashMap()
     private var previousSquare : MutableState<Square> = gameRepository.getPreviousSquare()
-
+    private var chessPieceMovesRepository: ChessPieceMovesRepository = ChessPieceMovesRepository()
 
     fun getPiecesOnBoard(): MutableList<ChessPiece> {
         return piecesOnBoard
@@ -22,7 +19,8 @@ class GameViewModel: ViewModel() {
     fun onEvent(event: GameEvent, piece: ChessPiece): List<Square> {
         when(event) {
             GameEvent.OnPieceClicked -> {
-                return piece.checkLegalMoves(hashMap)
+                chessPieceMovesRepository.setSquaresToBlock(gameRepository.getSquaresToBlock())
+                return chessPieceMovesRepository.checkLegalMoves(hashMap, piece)
             }
         }
     }
@@ -45,6 +43,10 @@ class GameViewModel: ViewModel() {
 
     fun getPlayerTurn(): String{
         return gameRepository.getPlayerTurn().value
+    }
+
+    fun getSquaresToBlock(): ArrayList<Square>{
+        return gameRepository.getSquaresToBlock()
     }
 
 }

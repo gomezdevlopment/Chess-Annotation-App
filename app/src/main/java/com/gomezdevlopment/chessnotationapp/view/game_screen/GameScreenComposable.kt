@@ -109,7 +109,9 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
                         .aspectRatio(1f)
                         .offset(offsetX.dp, offsetY.dp)
                         .clickable {
+                            clicked.value = false
                             clickedPiece.value = chessPiece
+                            println(viewModel.getPlayerTurn())
                             if(viewModel.getPlayerTurn() == clickedPiece.value.color){
                                 clicked.value = true
                             }
