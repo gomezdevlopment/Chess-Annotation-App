@@ -127,35 +127,35 @@ class ChessPiece(
     private fun kingMoves(occupiedSquares: HashMap<Square, ChessPiece>): List<Square>{
         val listOfMoves = mutableListOf<Square>()
         var moveSquare: Square = Square(square.rank+1, square.file+1)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank+1, square.file-1)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank+1, square.file)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank-1, square.file)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank, square.file+1)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank, square.file-1)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank-1, square.file-1)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank-1, square.file+1)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         return listOfMoves
@@ -289,35 +289,35 @@ class ChessPiece(
     private fun knightMoves(occupiedSquares: HashMap<Square, ChessPiece>): List<Square> {
         val listOfMoves = mutableListOf<Square>()
         var moveSquare = Square(square.rank+2, square.file+1)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank+2, square.file-1)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank-2, square.file+1)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank-2, square.file-1)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank+1, square.file+2)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank-1, square.file+2)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank+1, square.file-2)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         moveSquare = Square(square.rank-1, square.file-2)
-        if(!illegalMove(moveSquare, occupiedSquares)){
+        if(!illegalMove(moveSquare, occupiedSquares) || isCapture(moveSquare, occupiedSquares)){
             listOfMoves.add(moveSquare)
         }
         return listOfMoves
