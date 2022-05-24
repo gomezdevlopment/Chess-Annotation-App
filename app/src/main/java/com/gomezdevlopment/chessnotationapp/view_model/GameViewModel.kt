@@ -10,7 +10,6 @@ class GameViewModel: ViewModel() {
     private var piecesOnBoard: MutableList<ChessPiece> = gameRepository.getPiecesOnBoard()
     private var  hashMap : MutableMap<Square, ChessPiece> = gameRepository.getHashMap()
     private var previousSquare : MutableState<Square> = gameRepository.getPreviousSquare()
-    private var chessPieceMovesRepository: ChessPieceMovesRepository = ChessPieceMovesRepository()
 
     fun getPiecesOnBoard(): MutableList<ChessPiece> {
         return piecesOnBoard
@@ -19,8 +18,7 @@ class GameViewModel: ViewModel() {
     fun onEvent(event: GameEvent, piece: ChessPiece): List<Square> {
         when(event) {
             GameEvent.OnPieceClicked -> {
-                chessPieceMovesRepository.setSquaresToBlock(gameRepository.getSquaresToBlock())
-                return chessPieceMovesRepository.checkLegalMoves(hashMap, piece)
+                return gameRepository.checkLegalMoves(hashMap, piece)
             }
         }
     }
@@ -45,8 +43,12 @@ class GameViewModel: ViewModel() {
         return gameRepository.getPlayerTurn().value
     }
 
-    fun getSquaresToBlock(): ArrayList<Square>{
+    fun getSquaresToBlock(): MutableList<Square> {
         return gameRepository.getSquaresToBlock()
+    }
+
+    fun getAttacks() : List<Square>{
+        return gameRepository.getAttacks()
     }
 
 }

@@ -2,8 +2,10 @@ package com.gomezdevlopment.chessnotationapp.model
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.os.persistableBundleOf
 import androidx.lifecycle.ViewModel
 import com.gomezdevlopment.chessnotationapp.R
+import com.gomezdevlopment.chessnotationapp.model.pieces.*
 
 
 class GameRepository : ViewModel() {
@@ -14,10 +16,9 @@ class GameRepository : ViewModel() {
     private var playerTurn: MutableState<String> = mutableStateOf("white")
     private var whiteAttacks: MutableList<Square> = mutableListOf()
     private var blackAttacks: MutableList<Square> = mutableListOf()
+    private var squaresToBlock: MutableList<Square> = mutableListOf()
     private var whiteKingSquare: MutableState<Square> = mutableStateOf(Square(0, 4))
     private var blackKingSquare: MutableState<Square> = mutableStateOf(Square(7, 3))
-
-    private var chessPieceMovesRepository: ChessPieceMovesRepository = ChessPieceMovesRepository()
 
     companion object {
         @Volatile
@@ -78,13 +79,13 @@ class GameRepository : ViewModel() {
         checkBlackAttacks()
     }
 
-    fun checkWhiteAttacks() {
+    private fun checkWhiteAttacks() {
         whiteAttacks.clear()
         for (piece in piecesOnBoard) {
             if (piece.color == "white") {
-                for (square in chessPieceMovesRepository.checkLegalMoves(hashMap, piece)) {
+                for (square in checkLegalMoves(hashMap, piece)) {
                     if (piece.piece == "pawn") {
-                        if (chessPieceMovesRepository.isCapture(
+                        if (isCapture(
                                 square,
                                 hashMap as HashMap,
                                 piece
@@ -100,13 +101,13 @@ class GameRepository : ViewModel() {
         }
     }
 
-    fun checkBlackAttacks() {
+    private fun checkBlackAttacks() {
         blackAttacks.clear()
         for (piece in piecesOnBoard) {
             if (piece.color == "black") {
-                for (square in chessPieceMovesRepository.checkLegalMoves(hashMap, piece)) {
+                for (square in checkLegalMoves(hashMap, piece)) {
                     if (piece.piece == "pawn") {
-                        if (chessPieceMovesRepository.isCapture(
+                        if (isCapture(
                                 square,
                                 hashMap as HashMap,
                                 piece
@@ -143,6 +144,7 @@ class GameRepository : ViewModel() {
             setPlayerTurn("white")
             checkBlackAttacks()
         }
+        setSquaresToBlock()
     }
 
     fun getPiecesOnBoard(): MutableList<ChessPiece> {
@@ -284,8 +286,8 @@ class GameRepository : ViewModel() {
         return squaresToBlock
     }
 
-    fun getSquaresToBlock(): ArrayList<Square> {
-        val squaresToBlock = arrayListOf<Square>()
+    fun setSquaresToBlock(): MutableList<Square> {
+        squaresToBlock.clear()
         if (playerTurn.value == "white") {
             squaresToBlock.addAll(
                 getAttackedSquaresNearKing(blackAttacks, whiteKingSquare.value)
@@ -298,4 +300,69 @@ class GameRepository : ViewModel() {
         return squaresToBlock
     }
 
+    fun getSquaresToBlock(): MutableList<Square> {
+        return squaresToBlock
+    }
+
+    fun getAttacks(): MutableList<Square> {
+        if(playerTurn.value == "white") return blackAttacks
+        return whiteAttacks
+    }
+
+    fun checkLegalMoves(occupiedSquares: MutableMap<Square, ChessPiece>, piece: ChessPiece): List<Square>{
+        var listOfMoves = mutableListOf<Square>()
+        when (piece.piece) {
+            "pawn" -> {
+                listOfMoves = pawnMoves(piece) as MutableList<Square>
+            }
+            "rook" -> {
+                listOfMoves = rookMoves(piece)
+            }
+            "knight" -> {
+                listOfMoves = knightMoves(piece) as MutableList<Square>
+            }
+            "bishop" -> {
+                listOfMoves = bishopMoves(piece)
+            }
+            "king" -> {
+                listOfMoves = kingMoves(piece) as MutableList<Square>
+            }
+            "queen" -> {
+                listOfMoves = queenMoves(piece)
+            }
+        }
+        return listOfMoves
+    }
+
+    private fun pawnMoves(piece: ChessPiece): MutableList<Square>{
+        return Pawn().moves(piece, hashMap, squaresToBlock)
+    }
+
+    private fun kingMoves(piece: ChessPiece): MutableList<Square>{
+        return King().moves(piece, hashMap, squaresToBlock)
+    }
+
+    private fun bishopMoves(piece: ChessPiece): MutableList<Square>{
+        return Bishop().moves(piece, hashMap, squaresToBlock)
+    }
+
+    private fun rookMoves(piece: ChessPiece) : MutableList<Square>{
+        return Rook().moves(piece, hashMap, squaresToBlock)
+    }
+
+    private fun queenMoves(piece: ChessPiece) : MutableList<Square>{
+        return Queen().moves(piece, hashMap, squaresToBlock)
+    }
+
+    private fun knightMoves(piece: ChessPiece) : MutableList<Square>{
+        return Knight().moves(piece, hashMap, squaresToBlock)
+    }
+
+    private fun isCapture(square: Square, occupiedSquares: HashMap<Square, ChessPiece>, piece: ChessPiece): Boolean{
+        var isLegalMove = true
+        if(occupiedSquares.containsKey(square)){
+            isLegalMove = occupiedSquares[square]?.color != piece.color
+        }
+        return isLegalMove
+    }
 }

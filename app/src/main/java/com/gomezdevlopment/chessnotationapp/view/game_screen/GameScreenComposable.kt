@@ -63,6 +63,10 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
         mutableStateOf(0)
     }
 
+    val attackedSquares = remember {
+        viewModel.getSquaresToBlock()
+    }
+
     @Composable
     fun ShowHighlightedSquares(height: Float, square: Square) {
         val offsetX = height * square.file
@@ -70,7 +74,7 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
         var color = Color.Black
         val circle: ImageVector =
             ImageVector.vectorResource(id = R.drawable.ic_legal_move_circle)
-        if(viewModel.getHashMap().containsKey(square)){
+        if (viewModel.getHashMap().containsKey(square)) {
             color = Color.Red
         }
         Icon(
@@ -95,11 +99,14 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
             val square = Square(rank, file)
             val offsetX = height * file
             val offsetY = (7 - rank) * height
+            if (attackedSquares.contains(square)) {
+                Highlight(height = height, square = square, color = Color.Red)
+            }
             if (hashMap.containsKey(square)) {
                 val chessPiece = hashMap[square]!!
                 val imageVector = ImageVector.vectorResource(chessPiece.pieceDrawable)
-                if(square == viewModel.getCurrentSquare().value){
-                    Highlight(height = height, square = square)
+                if (square == viewModel.getCurrentSquare().value) {
+                    Highlight(height = height, square = square, Color.Yellow)
                 }
                 Image(
                     imageVector = imageVector,
@@ -111,8 +118,7 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
                         .clickable {
                             clicked.value = false
                             clickedPiece.value = chessPiece
-                            println(viewModel.getPlayerTurn())
-                            if(viewModel.getPlayerTurn() == clickedPiece.value.color){
+                            if (viewModel.getPlayerTurn() == clickedPiece.value.color) {
                                 clicked.value = true
                             }
                         }
@@ -131,29 +137,35 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
     if (squareClicked.value) {
         clicked.value = false
         squareClicked.value = false
-        viewModel.changePiecePosition(Square(targetRank.value, targetFile.value), clickedPiece.value)
+        viewModel.changePiecePosition(
+            Square(targetRank.value, targetFile.value),
+            clickedPiece.value
+        )
     }
 
     val previousSquare = viewModel.getPreviousSquare().value
-    if(previousSquare.rank != 10){
-        Highlight(height = height, square = previousSquare)
+    if (previousSquare.rank != 10) {
+        Highlight(height = height, square = previousSquare, color = Color.Yellow)
         //ShowPreviousSquare(height = height, square = previousSquare)
     }
 }
 
 @Composable
-private fun Highlight(height: Float, square: Square
+private fun Highlight(
+    height: Float, square: Square, color: Color
 ) {
     val offsetX = height * square.file
     val offsetY = (7 - square.rank) * height
-    Canvas(modifier = Modifier
-        .height(height.dp)
-        .aspectRatio(1f)
-        .absoluteOffset(offsetX.dp, offsetY.dp)) {
+    Canvas(
+        modifier = Modifier
+            .height(height.dp)
+            .aspectRatio(1f)
+            .absoluteOffset(offsetX.dp, offsetY.dp)
+    ) {
         drawRect(
-            color = Color.Blue,
+            color = color,
             size = size,
-            alpha = 0.5f
+            alpha = .9f
         )
     }
 }
