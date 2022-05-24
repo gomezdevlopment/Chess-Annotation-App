@@ -14,6 +14,10 @@ class GameViewModel: ViewModel() {
         return piecesOnBoard
     }
 
+    fun resetGame() {
+        gameRepository.resetGame()
+    }
+
     fun onEvent(event: GameEvent, piece: ChessPiece): List<Square> {
         when(event) {
             GameEvent.OnPieceClicked -> {

@@ -38,6 +38,26 @@ class GameRepository : ViewModel() {
     }
 
     init {
+        addPieces()
+        checkWhiteAttacks()
+        checkBlackAttacks()
+    }
+
+    fun resetGame() {
+        piecesOnBoard.clear()
+        hashMap.clear()
+        addPieces()
+        playerTurn.value = "white"
+        squaresToBlock.clear()
+        whiteKingSquare.value = Square(0, 4)
+        blackKingSquare.value = Square(7, 3)
+        previousSquare.value = Square(10, 10)
+        currentSquare.value = Square(10, 10)
+        checkWhiteAttacks()
+        checkBlackAttacks()
+    }
+
+    private fun addPieces() {
         piecesOnBoard.add(ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(0, 0)))
         piecesOnBoard.add(ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(0, 7)))
         piecesOnBoard.add(ChessPiece("white", "knight", R.drawable.ic_wn_alpha, Square(0, 1)))
@@ -75,9 +95,8 @@ class GameRepository : ViewModel() {
         for (piece in piecesOnBoard) {
             hashMap[piece.square] = piece
         }
-        checkWhiteAttacks()
-        checkBlackAttacks()
     }
+
 
     private fun checkWhiteAttacks() {
         whiteAttacks.clear()
@@ -112,7 +131,7 @@ class GameRepository : ViewModel() {
 
     fun changePiecePosition(newSquare: Square, piece: ChessPiece) {
         //Remove Defender
-        if(hashMap.containsKey(newSquare)){
+        if (hashMap.containsKey(newSquare)) {
             piecesOnBoard.remove(hashMap[newSquare])
         }
         val previousSquare = piece.square

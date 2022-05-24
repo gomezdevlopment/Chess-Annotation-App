@@ -6,7 +6,9 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
 import androidx.compose.material.Icon
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -15,6 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.ChessPiece
@@ -29,6 +32,7 @@ fun ChessCanvas(width: Int, viewModel: GameViewModel) {
         ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
 
     val rowWidthAndHeight: Float = (width.toFloat() / 8F)
+
     Box(
         modifier = Modifier
             .width(width.dp)
@@ -43,8 +47,11 @@ fun ChessCanvas(width: Int, viewModel: GameViewModel) {
                 .aspectRatio(1f)
         )
         ChessSquaresV2(height = rowWidthAndHeight, viewModel = viewModel)
-
+        Button(onClick = { viewModel.resetGame() }, modifier = Modifier.offset((50).dp, (-50).dp), enabled = true) {
+            Text(text = "Reset Game")
+        }
     }
+
 }
 
 @Composable
@@ -182,9 +189,3 @@ private fun Highlight(
         )
     }
 }
-
-//@Preview
-//@Composable
-//fun ChessCanvasPreview() {
-//    ChessCanvas(350)
-//}
