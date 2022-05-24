@@ -1,7 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.view_model
 
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.gomezdevlopment.chessnotationapp.model.*
 
@@ -18,7 +17,7 @@ class GameViewModel: ViewModel() {
     fun onEvent(event: GameEvent, piece: ChessPiece): List<Square> {
         when(event) {
             GameEvent.OnPieceClicked -> {
-                return gameRepository.checkLegalMoves(hashMap, piece)
+                return gameRepository.checkLegalMoves(piece)
             }
         }
     }
@@ -47,8 +46,12 @@ class GameViewModel: ViewModel() {
         return gameRepository.getSquaresToBlock()
     }
 
-    fun getAttacks() : List<Square>{
-        return gameRepository.getAttacks()
+    fun getWhiteAttacks() : List<Square>{
+        return gameRepository.getWhiteAttacks()
+    }
+
+    fun getBlackAttacks() : List<Square>{
+        return gameRepository.getBlackAttacks()
     }
 
 }

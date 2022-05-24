@@ -27,7 +27,6 @@ import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 fun ChessCanvas(width: Int, viewModel: GameViewModel) {
     val chessBoardVector: ImageVector =
         ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
-    val pieces = viewModel.getPiecesOnBoard()
 
     val rowWidthAndHeight: Float = (width.toFloat() / 8F)
     Box(
@@ -67,6 +66,14 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
         viewModel.getSquaresToBlock()
     }
 
+    val whiteAttacks = remember {
+        viewModel.getWhiteAttacks()
+    }
+
+    val blackAttacks = remember {
+        viewModel.getBlackAttacks()
+    }
+
     @Composable
     fun ShowHighlightedSquares(height: Float, square: Square) {
         val offsetX = height * square.file
@@ -99,8 +106,14 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
             val square = Square(rank, file)
             val offsetX = height * file
             val offsetY = (7 - rank) * height
-            if (attackedSquares.contains(square)) {
-                Highlight(height = height, square = square, color = Color.Red)
+            if(viewModel.getPlayerTurn() == "white"){
+                if (blackAttacks.contains(square)) {
+                    Highlight(height = height, square = square, color = Color.Red)
+                }
+            }else{
+                if (whiteAttacks.contains(square)) {
+                    Highlight(height = height, square = square, color = Color.Red)
+                }
             }
             if (hashMap.containsKey(square)) {
                 val chessPiece = hashMap[square]!!

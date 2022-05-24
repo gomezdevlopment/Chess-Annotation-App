@@ -5,9 +5,10 @@ import com.gomezdevlopment.chessnotationapp.model.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
 
 class Pawn {
+    private val gameLogic = GameLogic()
+
     fun moves(piece: ChessPiece, hashMap: MutableMap<Square, ChessPiece>, squaresToBlock: MutableList<Square>): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
-        val gameLogic = GameLogic()
 
         var moveSquare = Square(piece.square.rank + 1, piece.square.file)
         if (piece.color == "black") {
@@ -53,5 +54,24 @@ class Pawn {
             }
         }
         return moves
+    }
+
+    fun pawnAttacks(piece: ChessPiece): MutableList<Square> {
+        val attacks = mutableListOf<Square>()
+        var moveSquare: Square
+        if (piece.color == "white") {
+            moveSquare = Square(piece.square.rank + 1, piece.square.file - 1)
+            attacks.add(moveSquare)
+            moveSquare = Square(piece.square.rank + 1, piece.square.file + 1)
+            attacks.add(moveSquare)
+
+
+        } else {
+            moveSquare = Square(piece.square.rank - 1, piece.square.file - 1)
+            attacks.add(moveSquare)
+            moveSquare = Square(piece.square.rank - 1, piece.square.file + 1)
+            attacks.add(moveSquare)
+        }
+        return attacks
     }
 }

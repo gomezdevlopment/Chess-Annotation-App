@@ -13,7 +13,6 @@ class Bishop {
         for (rank in piece.square.rank + 1..7) {
             moveSquare = Square(rank, piece.square.file + (rank - piece.square.rank))
             if (gameLogic.pieceInPath(hashMap, listOfMoves, moveSquare)) {
-                println("List of Moves result $listOfMoves")
                 break
             }
         }

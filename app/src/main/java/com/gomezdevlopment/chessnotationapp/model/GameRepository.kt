@@ -61,8 +61,8 @@ class GameRepository : ViewModel() {
         piecesOnBoard.add(ChessPiece("black", "knight", R.drawable.ic_bn_alpha, Square(7, 6)))
         piecesOnBoard.add(ChessPiece("black", "bishop", R.drawable.ic_bb_alpha, Square(7, 2)))
         piecesOnBoard.add(ChessPiece("black", "bishop", R.drawable.ic_bb_alpha, Square(7, 5)))
-        piecesOnBoard.add(ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(7, 4)))
-        piecesOnBoard.add(ChessPiece("black", "king", R.drawable.ic_bk_alpha, Square(7, 3)))
+        piecesOnBoard.add(ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(7, 3)))
+        piecesOnBoard.add(ChessPiece("black", "king", R.drawable.ic_bk_alpha, Square(7, 4)))
         piecesOnBoard.add(ChessPiece("black", "pawn", R.drawable.ic_bp_alpha, Square(6, 0)))
         piecesOnBoard.add(ChessPiece("black", "pawn", R.drawable.ic_bp_alpha, Square(6, 1)))
         piecesOnBoard.add(ChessPiece("black", "pawn", R.drawable.ic_bp_alpha, Square(6, 2)))
@@ -83,17 +83,10 @@ class GameRepository : ViewModel() {
         whiteAttacks.clear()
         for (piece in piecesOnBoard) {
             if (piece.color == "white") {
-                for (square in checkLegalMoves(hashMap, piece)) {
-                    if (piece.piece == "pawn") {
-                        if (isCapture(
-                                square,
-                                hashMap as HashMap,
-                                piece
-                            )
-                        ) {
-                            whiteAttacks.add(square)
-                        }
-                    } else {
+                if (piece.piece == "pawn") {
+                    whiteAttacks.addAll(Pawn().pawnAttacks(piece))
+                } else {
+                    for (square in checkLegalMoves(piece)) {
                         whiteAttacks.add(square)
                     }
                 }
@@ -105,25 +98,23 @@ class GameRepository : ViewModel() {
         blackAttacks.clear()
         for (piece in piecesOnBoard) {
             if (piece.color == "black") {
-                for (square in checkLegalMoves(hashMap, piece)) {
-                    if (piece.piece == "pawn") {
-                        if (isCapture(
-                                square,
-                                hashMap as HashMap,
-                                piece
-                            )
-                        ) {
-                            blackAttacks.add(square)
-                        }
-                    } else {
+                if (piece.piece == "pawn") {
+                    blackAttacks.addAll(Pawn().pawnAttacks(piece))
+                } else {
+                    for (square in checkLegalMoves(piece)) {
                         blackAttacks.add(square)
                     }
                 }
+
             }
         }
     }
 
     fun changePiecePosition(newSquare: Square, piece: ChessPiece) {
+        //Remove Defender
+        if(hashMap.containsKey(newSquare)){
+            piecesOnBoard.remove(hashMap[newSquare])
+        }
         val previousSquare = piece.square
         hashMap.remove(piece.square)
         piece.square = newSquare
@@ -179,14 +170,15 @@ class GameRepository : ViewModel() {
         return playerTurn
     }
 
-    private fun isEnemyPiece(square: Square): Boolean{
-        if(hashMap.containsKey(square)){
-            if(hashMap[square]?.color != playerTurn.value){
+    private fun isEnemyPiece(square: Square): Boolean {
+        if (hashMap.containsKey(square)) {
+            if (hashMap[square]?.color != playerTurn.value) {
                 return true
             }
         }
         return false
     }
+
     private fun getAttackedSquaresNearKing(
         attacks: MutableList<Square>,
         kingsSquare: Square
@@ -197,11 +189,10 @@ class GameRepository : ViewModel() {
                 val squareToBlock = Square(rank, kingsSquare.file)
                 if (attacks.contains(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
-                }else if(isEnemyPiece(squareToBlock)){
+                } else if (isEnemyPiece(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
                     break
-                }
-                else {
+                } else {
                     break
                 }
             }
@@ -209,7 +200,7 @@ class GameRepository : ViewModel() {
                 val squareToBlock = Square(rank, kingsSquare.file)
                 if (attacks.contains(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
-                }else if(isEnemyPiece(squareToBlock)){
+                } else if (isEnemyPiece(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
                     break
                 } else {
@@ -220,7 +211,7 @@ class GameRepository : ViewModel() {
                 val squareToBlock = Square(kingsSquare.rank, file)
                 if (attacks.contains(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
-                }else if(isEnemyPiece(squareToBlock)){
+                } else if (isEnemyPiece(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
                     break
                 } else {
@@ -231,51 +222,51 @@ class GameRepository : ViewModel() {
                 val squareToBlock = Square(kingsSquare.rank, file)
                 if (attacks.contains(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
-                }else if(isEnemyPiece(squareToBlock)){
+                } else if (isEnemyPiece(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
                     break
                 } else {
                     break
                 }
             }
-            for (rank in kingsSquare.rank+1..7) {
-                val squareToBlock = Square(rank, kingsSquare.file+(rank-kingsSquare.rank))
+            for (rank in kingsSquare.rank + 1..7) {
+                val squareToBlock = Square(rank, kingsSquare.file + (rank - kingsSquare.rank))
                 if (attacks.contains(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
-                }else if(isEnemyPiece(squareToBlock)){
+                } else if (isEnemyPiece(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
                     break
                 } else {
                     break
                 }
             }
-            for (rank in kingsSquare.rank+1..7) {
-                val squareToBlock = Square(rank, kingsSquare.file-(rank-kingsSquare.rank))
+            for (rank in kingsSquare.rank + 1..7) {
+                val squareToBlock = Square(rank, kingsSquare.file - (rank - kingsSquare.rank))
                 if (attacks.contains(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
-                }else if(isEnemyPiece(squareToBlock)){
+                } else if (isEnemyPiece(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
                     break
                 } else {
                     break
                 }
             }
-            for (rank in kingsSquare.rank-1 downTo 0) {
-                val squareToBlock = Square(rank, kingsSquare.file+(rank-kingsSquare.rank))
+            for (rank in kingsSquare.rank - 1 downTo 0) {
+                val squareToBlock = Square(rank, kingsSquare.file + (rank - kingsSquare.rank))
                 if (attacks.contains(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
-                }else if(isEnemyPiece(squareToBlock)){
+                } else if (isEnemyPiece(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
                     break
                 } else {
                     break
                 }
             }
-            for (rank in kingsSquare.rank-1 downTo 0) {
-                val squareToBlock = Square(rank, kingsSquare.file-(rank-kingsSquare.rank))
+            for (rank in kingsSquare.rank - 1 downTo 0) {
+                val squareToBlock = Square(rank, kingsSquare.file - (rank - kingsSquare.rank))
                 if (attacks.contains(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
-                }else if(isEnemyPiece(squareToBlock)){
+                } else if (isEnemyPiece(squareToBlock)) {
                     squaresToBlock.add(squareToBlock)
                     break
                 } else {
@@ -286,7 +277,7 @@ class GameRepository : ViewModel() {
         return squaresToBlock
     }
 
-    fun setSquaresToBlock(): MutableList<Square> {
+    private fun setSquaresToBlock(): MutableList<Square> {
         squaresToBlock.clear()
         if (playerTurn.value == "white") {
             squaresToBlock.addAll(
@@ -304,28 +295,31 @@ class GameRepository : ViewModel() {
         return squaresToBlock
     }
 
-    fun getAttacks(): MutableList<Square> {
-        if(playerTurn.value == "white") return blackAttacks
+    fun getBlackAttacks(): MutableList<Square> {
+        return blackAttacks
+    }
+
+    fun getWhiteAttacks(): MutableList<Square> {
         return whiteAttacks
     }
 
-    fun checkLegalMoves(occupiedSquares: MutableMap<Square, ChessPiece>, piece: ChessPiece): List<Square>{
+    fun checkLegalMoves(piece: ChessPiece): List<Square> {
         var listOfMoves = mutableListOf<Square>()
         when (piece.piece) {
             "pawn" -> {
-                listOfMoves = pawnMoves(piece) as MutableList<Square>
+                listOfMoves = pawnMoves(piece)
             }
             "rook" -> {
                 listOfMoves = rookMoves(piece)
             }
             "knight" -> {
-                listOfMoves = knightMoves(piece) as MutableList<Square>
+                listOfMoves = knightMoves(piece)
             }
             "bishop" -> {
                 listOfMoves = bishopMoves(piece)
             }
             "king" -> {
-                listOfMoves = kingMoves(piece) as MutableList<Square>
+                listOfMoves = kingMoves(piece)
             }
             "queen" -> {
                 listOfMoves = queenMoves(piece)
@@ -334,35 +328,27 @@ class GameRepository : ViewModel() {
         return listOfMoves
     }
 
-    private fun pawnMoves(piece: ChessPiece): MutableList<Square>{
+    private fun pawnMoves(piece: ChessPiece): MutableList<Square> {
         return Pawn().moves(piece, hashMap, squaresToBlock)
     }
 
-    private fun kingMoves(piece: ChessPiece): MutableList<Square>{
+    private fun kingMoves(piece: ChessPiece): MutableList<Square> {
         return King().moves(piece, hashMap, squaresToBlock)
     }
 
-    private fun bishopMoves(piece: ChessPiece): MutableList<Square>{
+    private fun bishopMoves(piece: ChessPiece): MutableList<Square> {
         return Bishop().moves(piece, hashMap, squaresToBlock)
     }
 
-    private fun rookMoves(piece: ChessPiece) : MutableList<Square>{
+    private fun rookMoves(piece: ChessPiece): MutableList<Square> {
         return Rook().moves(piece, hashMap, squaresToBlock)
     }
 
-    private fun queenMoves(piece: ChessPiece) : MutableList<Square>{
+    private fun queenMoves(piece: ChessPiece): MutableList<Square> {
         return Queen().moves(piece, hashMap, squaresToBlock)
     }
 
-    private fun knightMoves(piece: ChessPiece) : MutableList<Square>{
+    private fun knightMoves(piece: ChessPiece): MutableList<Square> {
         return Knight().moves(piece, hashMap, squaresToBlock)
-    }
-
-    private fun isCapture(square: Square, occupiedSquares: HashMap<Square, ChessPiece>, piece: ChessPiece): Boolean{
-        var isLegalMove = true
-        if(occupiedSquares.containsKey(square)){
-            isLegalMove = occupiedSquares[square]?.color != piece.color
-        }
-        return isLegalMove
     }
 }
