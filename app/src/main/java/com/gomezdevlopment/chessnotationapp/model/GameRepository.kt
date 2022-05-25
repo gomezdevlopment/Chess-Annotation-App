@@ -21,6 +21,13 @@ class GameRepository : ViewModel() {
     private var whiteKingSquare: MutableState<Square> = mutableStateOf(Square(0, 4))
     private var blackKingSquare: MutableState<Square> = mutableStateOf(Square(7, 3))
 
+    private var whiteKingMoved: MutableState<Boolean> = mutableStateOf(false)
+    private var blackKingMoved: MutableState<Boolean> = mutableStateOf(false)
+    private var whiteKingSideRookMoved: MutableState<Boolean> = mutableStateOf(false)
+    private var whiteQueenSideRookMoved: MutableState<Boolean> = mutableStateOf(false)
+    private var blackKingSideRookMoved: MutableState<Boolean> = mutableStateOf(false)
+    private var blackQueenSideRookMoved: MutableState<Boolean> = mutableStateOf(false)
+
     companion object {
         @Volatile
         private var INSTANCE: GameRepository? = null
@@ -130,12 +137,64 @@ class GameRepository : ViewModel() {
         }
     }
 
+    private fun checkIfKingOrRooksMoved(piece: ChessPiece) {
+        if (piece.color == "white") {
+            if (!whiteKingMoved.value) {
+                when (piece.piece) {
+                    "king" -> whiteKingMoved.value = true
+                    "rook" -> {
+                        when (piece.square) {
+                            Square(0, 0) -> whiteQueenSideRookMoved.value = true
+                            Square(0, 7) -> whiteKingSideRookMoved.value = true
+                        }
+                    }
+                }
+            }
+
+        } else {
+            if (!blackKingMoved.value) {
+                when (piece.piece) {
+                    "king" -> blackKingMoved.value = true
+                    "rook" -> {
+                        when (piece.square) {
+                            Square(7, 0) -> blackQueenSideRookMoved.value = true
+                            Square(7, 7) -> blackKingSideRookMoved.value = true
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     fun changePiecePosition(newSquare: Square, piece: ChessPiece) {
         val gameLogic = GameLogic()
+
+        //Castling
+        if(piece.piece == "king"){
+            if(newSquare.file == piece.square.file+2){
+                val rook: ChessPiece = hashMap[Square(newSquare.rank, newSquare.file+1)]!!
+                hashMap.remove(Square(newSquare.rank, newSquare.file+1))
+                rook.square = Square(newSquare.rank, newSquare.file-1)
+                hashMap[rook.square] = rook
+            }else if(newSquare.file == piece.square.file - 2){
+                val rook: ChessPiece = hashMap[Square(newSquare.rank, newSquare.file-2)]!!
+                hashMap.remove(Square(newSquare.rank, newSquare.file-2))
+                rook.square = Square(newSquare.rank, newSquare.file+1)
+                hashMap[rook.square] = rook
+            }
+        }
+
         //Remove Defender
         if (hashMap.containsKey(newSquare)) {
             piecesOnBoard.remove(hashMap[newSquare])
-        }else if(gameLogic.isEnPassant(previousSquare.value, currentSquare.value, newSquare, hashMap, piece)){
+        } else if (gameLogic.isEnPassant(
+                previousSquare.value,
+                currentSquare.value,
+                newSquare,
+                hashMap,
+                piece
+            )
+        ) {
             piecesOnBoard.remove(hashMap[currentSquare.value])
             hashMap.remove(currentSquare.value)
         }
@@ -160,6 +219,8 @@ class GameRepository : ViewModel() {
             checkBlackAttacks()
         }
         setSquaresToBlock()
+        //Check if King or Rooks Moved
+        checkIfKingOrRooksMoved(piece)
     }
 
     fun getPiecesOnBoard(): MutableList<ChessPiece> {
@@ -353,11 +414,36 @@ class GameRepository : ViewModel() {
     }
 
     private fun pawnMoves(piece: ChessPiece): MutableList<Square> {
-        return Pawn().moves(piece, hashMap, squaresToBlock, previousSquare.value, currentSquare.value)
+        return Pawn().moves(
+            piece,
+            hashMap,
+            squaresToBlock,
+            previousSquare.value,
+            currentSquare.value
+        )
     }
 
     private fun kingMoves(piece: ChessPiece): MutableList<Square> {
-        return King().moves(piece, hashMap, squaresToBlock)
+        if (piece.color == "white") {
+            return King().moves(
+                piece,
+                hashMap,
+                squaresToBlock,
+                blackAttacks,
+                whiteKingMoved.value,
+                whiteKingSideRookMoved.value,
+                whiteQueenSideRookMoved.value
+            )
+        }
+        return King().moves(
+            piece,
+            hashMap,
+            squaresToBlock,
+            whiteAttacks,
+            blackKingMoved.value,
+            blackKingSideRookMoved.value,
+            blackQueenSideRookMoved.value
+        )
     }
 
     private fun bishopMoves(piece: ChessPiece): MutableList<Square> {

@@ -26,7 +26,7 @@ class GameLogic {
         piece: ChessPiece,
         squaresToBlock: MutableList<Square>
     ): Boolean {
-        //prevent king from entering into check
+        //prevent king from entering into check when in check
         if (squaresToBlock.isNotEmpty()) {
             if (squaresToBlock.contains(square) && piece.piece == "king") return true
 
@@ -45,8 +45,8 @@ class GameLogic {
         var isLegalMove = true
         if (occupiedSquares.containsKey(square)) {
             isLegalMove = occupiedSquares[square]?.color != piece.color
-            if(piece.piece == "pawn"){
-                if(piece.square.file == square.file){
+            if (piece.piece == "pawn") {
+                if (piece.square.file == square.file) {
                     isLegalMove = false
                 }
             }
@@ -81,5 +81,41 @@ class GameLogic {
             }
         }
         return false
+    }
+
+    fun canKingSideCastle(
+        square: Square,
+        occupiedSquares: MutableMap<Square, ChessPiece>,
+        attackedSquares: MutableList<Square>,
+    ): Boolean {
+        if (
+            occupiedSquares.containsKey(Square(square.rank, square.file))
+            || occupiedSquares.containsKey(Square(square.rank, square.file - 1))
+            || attackedSquares.contains(Square(square.rank, square.file))
+            || attackedSquares.contains(Square(square.rank, square.file - 1))
+            || attackedSquares.contains(Square(square.rank, square.file - 2))
+        ) {
+            return false
+        }
+
+        return true
+    }
+
+    fun canQueenSideCastle(
+        square: Square,
+        occupiedSquares: MutableMap<Square, ChessPiece>,
+        attackedSquares: MutableList<Square>,
+    ): Boolean {
+        if (
+            occupiedSquares.containsKey(Square(square.rank, square.file))
+            || occupiedSquares.containsKey(Square(square.rank, square.file - 1))
+            || occupiedSquares.containsKey(Square(square.rank, square.file + 1))
+            || attackedSquares.contains(Square(square.rank, square.file))
+            || attackedSquares.contains(Square(square.rank, square.file + 1))
+            || attackedSquares.contains(Square(square.rank, square.file + 2))
+        ) {
+            return false
+        }
+        return true
     }
 }

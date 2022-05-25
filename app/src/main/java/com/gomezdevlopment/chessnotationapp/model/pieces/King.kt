@@ -10,7 +10,11 @@ class King {
     fun moves(
         piece: ChessPiece,
         hashMap: MutableMap<Square, ChessPiece>,
-        squaresToBlock: MutableList<Square>
+        squaresToBlock: MutableList<Square>,
+        attackedSquares: MutableList<Square>,
+        kingMoved: Boolean,
+        kingSideRookMoved: Boolean,
+        queenSideRookMoved: Boolean
     ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
         var moveSquare = Square(piece.square.rank + 1, piece.square.file + 1)
@@ -34,6 +38,20 @@ class King {
         for (move in listOfMoves) {
             if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock)) {
                 moves.add(move)
+            }
+        }
+        //King Side Castling
+        moveSquare = Square(piece.square.rank, piece.square.file + 2)
+        if(!kingMoved && !kingSideRookMoved){
+            if(gameLogic.canKingSideCastle(moveSquare, hashMap, attackedSquares)){
+                moves.add(moveSquare)
+            }
+        }
+        //Queen Side Castling
+        moveSquare = Square(piece.square.rank, piece.square.file - 2)
+        if(!kingMoved && !queenSideRookMoved){
+            if(gameLogic.canQueenSideCastle(moveSquare, hashMap, attackedSquares)){
+                moves.add(moveSquare)
             }
         }
         return moves

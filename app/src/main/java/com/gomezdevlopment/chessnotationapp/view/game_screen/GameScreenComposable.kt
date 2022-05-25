@@ -148,6 +148,7 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
     }
 
     if (clicked.value) {
+        println(clickedPiece.value.square)
         val legalMoves = viewModel.onEvent(GameEvent.OnPieceClicked, clickedPiece.value)
         for (move in legalMoves) {
             ShowHighlightedSquares(height = height, move)
