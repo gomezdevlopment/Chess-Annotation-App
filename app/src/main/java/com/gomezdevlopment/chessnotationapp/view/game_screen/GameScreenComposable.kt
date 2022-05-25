@@ -113,15 +113,15 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
             val square = Square(rank, file)
             val offsetX = height * file
             val offsetY = (7 - rank) * height
-            if(viewModel.getPlayerTurn() == "white"){
-                if (blackAttacks.contains(square)) {
-                    Highlight(height = height, square = square, color = Color.Red)
-                }
-            }else{
-                if (whiteAttacks.contains(square)) {
-                    Highlight(height = height, square = square, color = Color.Red)
-                }
-            }
+//            if(viewModel.getPlayerTurn() == "white"){
+//                if (blackAttacks.contains(square)) {
+//                    Highlight(height = height, square = square, color = Color.Red)
+//                }
+//            }else{
+//                if (whiteAttacks.contains(square)) {
+//                    Highlight(height = height, square = square, color = Color.Red)
+//                }
+//            }
             if (hashMap.containsKey(square)) {
                 val chessPiece = hashMap[square]!!
                 val imageVector = ImageVector.vectorResource(chessPiece.pieceDrawable)

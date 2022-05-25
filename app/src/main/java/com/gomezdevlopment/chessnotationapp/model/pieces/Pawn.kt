@@ -7,7 +7,13 @@ import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
 class Pawn {
     private val gameLogic = GameLogic()
 
-    fun moves(piece: ChessPiece, hashMap: MutableMap<Square, ChessPiece>, squaresToBlock: MutableList<Square>): MutableList<Square> {
+    fun moves(
+        piece: ChessPiece,
+        hashMap: MutableMap<Square, ChessPiece>,
+        squaresToBlock: MutableList<Square>,
+        previousSquare: Square,
+        currentSquare: Square
+    ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
 
         var moveSquare = Square(piece.square.rank + 1, piece.square.file)
@@ -27,29 +33,29 @@ class Pawn {
         //Check for Diagonal Captures
         if (piece.color == "white") {
             moveSquare = Square(piece.square.rank + 1, piece.square.file - 1)
-            if(hashMap.containsKey(moveSquare)) {
+            if (hashMap.containsKey(moveSquare) || gameLogic.isEnPassant(previousSquare, currentSquare, moveSquare, hashMap, piece)) {
                 listOfMoves.add(moveSquare)
             }
 
             moveSquare = Square(piece.square.rank + 1, piece.square.file + 1)
-            if(hashMap.containsKey(moveSquare)){
+            if (hashMap.containsKey(moveSquare) || gameLogic.isEnPassant(previousSquare, currentSquare, moveSquare, hashMap, piece)) {
                 listOfMoves.add(moveSquare)
             }
 
         } else {
             moveSquare = Square(piece.square.rank - 1, piece.square.file - 1)
-            if(hashMap.containsKey(moveSquare)){
+            if (hashMap.containsKey(moveSquare) || gameLogic.isEnPassant(previousSquare, currentSquare, moveSquare, hashMap, piece)) {
                 listOfMoves.add(moveSquare)
             }
             moveSquare = Square(piece.square.rank - 1, piece.square.file + 1)
-            if(hashMap.containsKey(moveSquare)){
+            if (hashMap.containsKey(moveSquare) || gameLogic.isEnPassant(previousSquare, currentSquare, moveSquare, hashMap, piece)) {
                 listOfMoves.add(moveSquare)
             }
         }
 
         val moves = mutableListOf<Square>()
-        for(move in listOfMoves){
-            if(!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock)){
+        for (move in listOfMoves) {
+            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock)) {
                 moves.add(move)
             }
         }

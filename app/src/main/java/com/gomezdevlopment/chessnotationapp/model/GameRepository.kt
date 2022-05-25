@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.os.persistableBundleOf
 import androidx.lifecycle.ViewModel
 import com.gomezdevlopment.chessnotationapp.R
+import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
 import com.gomezdevlopment.chessnotationapp.model.pieces.*
 
 
@@ -130,9 +131,13 @@ class GameRepository : ViewModel() {
     }
 
     fun changePiecePosition(newSquare: Square, piece: ChessPiece) {
+        val gameLogic = GameLogic()
         //Remove Defender
         if (hashMap.containsKey(newSquare)) {
             piecesOnBoard.remove(hashMap[newSquare])
+        }else if(gameLogic.isEnPassant(previousSquare.value, currentSquare.value, newSquare, hashMap, piece)){
+            piecesOnBoard.remove(hashMap[currentSquare.value])
+            hashMap.remove(currentSquare.value)
         }
         val previousSquare = piece.square
         hashMap.remove(piece.square)
@@ -348,7 +353,7 @@ class GameRepository : ViewModel() {
     }
 
     private fun pawnMoves(piece: ChessPiece): MutableList<Square> {
-        return Pawn().moves(piece, hashMap, squaresToBlock)
+        return Pawn().moves(piece, hashMap, squaresToBlock, previousSquare.value, currentSquare.value)
     }
 
     private fun kingMoves(piece: ChessPiece): MutableList<Square> {

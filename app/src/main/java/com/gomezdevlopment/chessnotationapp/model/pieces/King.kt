@@ -13,7 +13,7 @@ class King {
         squaresToBlock: MutableList<Square>
     ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
-        var moveSquare: Square = Square(piece.square.rank + 1, piece.square.file + 1)
+        var moveSquare = Square(piece.square.rank + 1, piece.square.file + 1)
         listOfMoves.add(moveSquare)
         moveSquare = Square(piece.square.rank + 1, piece.square.file - 1)
         listOfMoves.add(moveSquare)
