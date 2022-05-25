@@ -7,7 +7,7 @@ import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
 class Bishop {
     private val gameLogic = GameLogic()
 
-    fun moves(piece: ChessPiece, hashMap: MutableMap<Square, ChessPiece>, squaresToBlock: MutableList<Square>): MutableList<Square> {
+    fun moves(piece: ChessPiece, hashMap: MutableMap<Square, ChessPiece>, squaresToBlock: MutableList<Square>, checkDefendedPieces: Boolean): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
         var moveSquare: Square
         for (rank in piece.square.rank + 1..7) {
@@ -32,6 +32,9 @@ class Bishop {
         val moves = mutableListOf<Square>()
         for (move in listOfMoves) {
             if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock)) {
+                moves.add(move)
+            }
+            if(checkDefendedPieces && gameLogic.isDefending(move, hashMap)){
                 moves.add(move)
             }
         }

@@ -10,7 +10,8 @@ class Knight {
     fun moves(
         piece: ChessPiece,
         hashMap: MutableMap<Square, ChessPiece>,
-        squaresToBlock: MutableList<Square>
+        squaresToBlock: MutableList<Square>,
+        checkDefendedPieces: Boolean
     ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
         var moveSquare = Square(piece.square.rank + 2, piece.square.file + 1)
@@ -33,6 +34,9 @@ class Knight {
         val moves = mutableListOf<Square>()
         for (move in listOfMoves) {
             if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock)) {
+                moves.add(move)
+            }
+            if(checkDefendedPieces && gameLogic.isDefending(move, hashMap)){
                 moves.add(move)
             }
         }

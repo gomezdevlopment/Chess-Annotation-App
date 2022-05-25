@@ -21,7 +21,7 @@ class GameViewModel: ViewModel() {
     fun onEvent(event: GameEvent, piece: ChessPiece): List<Square> {
         when(event) {
             GameEvent.OnPieceClicked -> {
-                return gameRepository.checkLegalMoves(piece)
+                return gameRepository.checkLegalMoves(piece, false)
             }
         }
     }

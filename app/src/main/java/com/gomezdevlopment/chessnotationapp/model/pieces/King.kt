@@ -36,13 +36,15 @@ class King {
 
         val moves = mutableListOf<Square>()
         for (move in listOfMoves) {
-            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock)) {
+            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock) &&
+                !attackedSquares.contains(move)) {
                 moves.add(move)
             }
         }
+        
         //King Side Castling
         moveSquare = Square(piece.square.rank, piece.square.file + 2)
-        if(!kingMoved && !kingSideRookMoved){
+        if(!kingMoved && !kingSideRookMoved ){
             if(gameLogic.canKingSideCastle(moveSquare, hashMap, attackedSquares)){
                 moves.add(moveSquare)
             }

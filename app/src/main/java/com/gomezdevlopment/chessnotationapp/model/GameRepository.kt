@@ -19,7 +19,7 @@ class GameRepository : ViewModel() {
     private var blackAttacks: MutableList<Square> = mutableListOf()
     private var squaresToBlock: MutableList<Square> = mutableListOf()
     private var whiteKingSquare: MutableState<Square> = mutableStateOf(Square(0, 4))
-    private var blackKingSquare: MutableState<Square> = mutableStateOf(Square(7, 3))
+    private var blackKingSquare: MutableState<Square> = mutableStateOf(Square(7, 4))
 
     private var whiteKingMoved: MutableState<Boolean> = mutableStateOf(false)
     private var blackKingMoved: MutableState<Boolean> = mutableStateOf(false)
@@ -27,6 +27,8 @@ class GameRepository : ViewModel() {
     private var whiteQueenSideRookMoved: MutableState<Boolean> = mutableStateOf(false)
     private var blackKingSideRookMoved: MutableState<Boolean> = mutableStateOf(false)
     private var blackQueenSideRookMoved: MutableState<Boolean> = mutableStateOf(false)
+
+    private var kingInCheck: MutableState<Boolean> = mutableStateOf(false)
 
     companion object {
         @Volatile
@@ -113,7 +115,7 @@ class GameRepository : ViewModel() {
                 if (piece.piece == "pawn") {
                     whiteAttacks.addAll(Pawn().pawnAttacks(piece))
                 } else {
-                    for (square in checkLegalMoves(piece)) {
+                    for (square in checkLegalMoves(piece, true)) {
                         whiteAttacks.add(square)
                     }
                 }
@@ -128,7 +130,7 @@ class GameRepository : ViewModel() {
                 if (piece.piece == "pawn") {
                     blackAttacks.addAll(Pawn().pawnAttacks(piece))
                 } else {
-                    for (square in checkLegalMoves(piece)) {
+                    for (square in checkLegalMoves(piece, true)) {
                         blackAttacks.add(square)
                     }
                 }
@@ -170,16 +172,16 @@ class GameRepository : ViewModel() {
         val gameLogic = GameLogic()
 
         //Castling
-        if(piece.piece == "king"){
-            if(newSquare.file == piece.square.file+2){
-                val rook: ChessPiece = hashMap[Square(newSquare.rank, newSquare.file+1)]!!
-                hashMap.remove(Square(newSquare.rank, newSquare.file+1))
-                rook.square = Square(newSquare.rank, newSquare.file-1)
+        if (piece.piece == "king") {
+            if (newSquare.file == piece.square.file + 2) {
+                val rook: ChessPiece = hashMap[Square(newSquare.rank, newSquare.file + 1)]!!
+                hashMap.remove(Square(newSquare.rank, newSquare.file + 1))
+                rook.square = Square(newSquare.rank, newSquare.file - 1)
                 hashMap[rook.square] = rook
-            }else if(newSquare.file == piece.square.file - 2){
-                val rook: ChessPiece = hashMap[Square(newSquare.rank, newSquare.file-2)]!!
-                hashMap.remove(Square(newSquare.rank, newSquare.file-2))
-                rook.square = Square(newSquare.rank, newSquare.file+1)
+            } else if (newSquare.file == piece.square.file - 2) {
+                val rook: ChessPiece = hashMap[Square(newSquare.rank, newSquare.file - 2)]!!
+                hashMap.remove(Square(newSquare.rank, newSquare.file - 2))
+                rook.square = Square(newSquare.rank, newSquare.file + 1)
                 hashMap[rook.square] = rook
             }
         }
@@ -269,7 +271,11 @@ class GameRepository : ViewModel() {
         kingsSquare: Square
     ): ArrayList<Square> {
         val squaresToBlock = arrayListOf<Square>()
+        println(kingsSquare)
+        println(attacks)
         if (attacks.contains(kingsSquare)) {
+            println("king in check")
+            kingInCheck.value = true
             for (rank in kingsSquare.rank + 1..7) {
                 val squareToBlock = Square(rank, kingsSquare.file)
                 if (attacks.contains(squareToBlock)) {
@@ -358,6 +364,45 @@ class GameRepository : ViewModel() {
                     break
                 }
             }
+        } else {
+            kingInCheck.value = false
+        }
+        return squaresToBlock
+    }
+
+    private fun getSquaresNearKing(kingsSquare: Square): ArrayList<Square> {
+        val squaresToBlock = arrayListOf<Square>()
+        for (rank in kingsSquare.rank + 1..7) {
+            val squareToBlock = Square(rank, kingsSquare.file)
+            squaresToBlock.add(squareToBlock)
+        }
+        for (rank in kingsSquare.rank - 1 downTo 0) {
+            val squareToBlock = Square(rank, kingsSquare.file)
+            squaresToBlock.add(squareToBlock)
+        }
+        for (file in kingsSquare.file + 1..7) {
+            val squareToBlock = Square(kingsSquare.rank, file)
+            squaresToBlock.add(squareToBlock)
+        }
+        for (file in kingsSquare.file - 1 downTo 7) {
+            val squareToBlock = Square(kingsSquare.rank, file)
+            squaresToBlock.add(squareToBlock)
+        }
+        for (rank in kingsSquare.rank + 1..7) {
+            val squareToBlock = Square(rank, kingsSquare.file + (rank - kingsSquare.rank))
+            squaresToBlock.add(squareToBlock)
+        }
+        for (rank in kingsSquare.rank + 1..7) {
+            val squareToBlock = Square(rank, kingsSquare.file - (rank - kingsSquare.rank))
+            squaresToBlock.add(squareToBlock)
+        }
+        for (rank in kingsSquare.rank - 1 downTo 0) {
+            val squareToBlock = Square(rank, kingsSquare.file + (rank - kingsSquare.rank))
+            squaresToBlock.add(squareToBlock)
+        }
+        for (rank in kingsSquare.rank - 1 downTo 0) {
+            val squareToBlock = Square(rank, kingsSquare.file - (rank - kingsSquare.rank))
+            squaresToBlock.add(squareToBlock)
         }
         return squaresToBlock
     }
@@ -388,26 +433,26 @@ class GameRepository : ViewModel() {
         return whiteAttacks
     }
 
-    fun checkLegalMoves(piece: ChessPiece): List<Square> {
+    fun checkLegalMoves(piece: ChessPiece, checkDefendedPieces: Boolean): List<Square> {
         var listOfMoves = mutableListOf<Square>()
         when (piece.piece) {
             "pawn" -> {
                 listOfMoves = pawnMoves(piece)
             }
             "rook" -> {
-                listOfMoves = rookMoves(piece)
+                listOfMoves = rookMoves(piece, checkDefendedPieces)
             }
             "knight" -> {
-                listOfMoves = knightMoves(piece)
+                listOfMoves = knightMoves(piece, checkDefendedPieces)
             }
             "bishop" -> {
-                listOfMoves = bishopMoves(piece)
+                listOfMoves = bishopMoves(piece, checkDefendedPieces)
             }
             "king" -> {
                 listOfMoves = kingMoves(piece)
             }
             "queen" -> {
-                listOfMoves = queenMoves(piece)
+                listOfMoves = queenMoves(piece, checkDefendedPieces)
             }
         }
         return listOfMoves
@@ -446,19 +491,19 @@ class GameRepository : ViewModel() {
         )
     }
 
-    private fun bishopMoves(piece: ChessPiece): MutableList<Square> {
-        return Bishop().moves(piece, hashMap, squaresToBlock)
+    private fun bishopMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
+        return Bishop().moves(piece, hashMap, squaresToBlock, checkDefendedPieces)
     }
 
-    private fun rookMoves(piece: ChessPiece): MutableList<Square> {
-        return Rook().moves(piece, hashMap, squaresToBlock)
+    private fun rookMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
+        return Rook().moves(piece, hashMap, squaresToBlock, checkDefendedPieces)
     }
 
-    private fun queenMoves(piece: ChessPiece): MutableList<Square> {
-        return Queen().moves(piece, hashMap, squaresToBlock)
+    private fun queenMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
+        return Queen().moves(piece, hashMap, squaresToBlock, checkDefendedPieces)
     }
 
-    private fun knightMoves(piece: ChessPiece): MutableList<Square> {
-        return Knight().moves(piece, hashMap, squaresToBlock)
+    private fun knightMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
+        return Knight().moves(piece, hashMap, squaresToBlock, checkDefendedPieces)
     }
 }
