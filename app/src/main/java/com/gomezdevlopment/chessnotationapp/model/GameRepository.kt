@@ -212,7 +212,8 @@ class GameRepository : ViewModel() {
                 currentSquare.value,
                 newSquare,
                 hashMap,
-                piece
+                piece,
+                getKingSquare()
             )
         ) {
             piecesOnBoard.remove(hashMap[currentSquare.value])

@@ -3,8 +3,7 @@ package com.gomezdevlopment.chessnotationapp.model.game_logic
 import androidx.compose.runtime.mutableStateOf
 import com.gomezdevlopment.chessnotationapp.model.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.Square
-import com.gomezdevlopment.chessnotationapp.model.pieces.Bishop
-import com.gomezdevlopment.chessnotationapp.model.pieces.King
+import com.gomezdevlopment.chessnotationapp.model.pieces.*
 
 class GameLogic {
     fun isPieceInPath(hashMap: MutableMap<Square, ChessPiece>, square: Square): Boolean {
@@ -29,7 +28,7 @@ class GameLogic {
         piece: ChessPiece,
         squaresToBlock: MutableList<Square>,
         xRayAttacks: MutableList<Square>,
-        kingSquare:Square
+        kingSquare: Square
     ): Boolean {
         //prevent king from entering into check when in check
         if (squaresToBlock.isNotEmpty()) {
@@ -41,7 +40,7 @@ class GameLogic {
         }
         if (square.rank > 7 || square.rank < 0 || square.file > 7 || square.file < 0) return true
         if (!isCapture(square, occupiedSquares, piece)) return true
-        if(isPinned(square, xRayAttacks, piece, kingSquare)) return true
+        if (isPinned(square, xRayAttacks, piece, kingSquare)) return true
         return false
     }
 
@@ -51,40 +50,42 @@ class GameLogic {
         piece: ChessPiece,
         kingSquare: Square
     ): Boolean {
-        if (xRayAttacks.contains(kingSquare) && xRayAttacks.contains(piece.square)) {
+        if (xRayAttacks.contains(kingSquare) && xRayAttacks.contains(piece.square) && piece.piece != "king") {
+            println("pawn and king in xray")
             //Pinned Vertically
             if (kingSquare.file == piece.square.file) {
-                if(kingSquare.file != square.file){
+                if (kingSquare.file != square.file) {
                     return true
                 }
             }
             //Pinned Horizontally
-            else if(kingSquare.rank == piece.square.rank){
-                if(square.rank != kingSquare.rank){
+            else if (kingSquare.rank == piece.square.rank) {
+                if (square.rank != kingSquare.rank) {
                     return true
                 }
             }
             //Pinned Upper Left Diagonal
-            else if(piece.square.rank > kingSquare.rank && piece.square.file < square.file){
-                if(square.rank-kingSquare.rank != kingSquare.file-square.file){
+            else if (piece.square.rank > kingSquare.rank && piece.square.file < kingSquare.file) {
+                if (square.rank - kingSquare.rank != kingSquare.file - square.file) {
                     return true
                 }
             }
             //Pinned Upper Right Diagonal
-            else if(piece.square.rank > kingSquare.rank && piece.square.file > square.file){
-                if(square.rank-kingSquare.rank != square.file-kingSquare.file){
+            else if (piece.square.rank > kingSquare.rank && piece.square.file > kingSquare.file) {
+                println("pawn pinned")
+                if (square.rank - kingSquare.rank != square.file - kingSquare.file) {
                     return true
                 }
             }
             //Pinned Lower Left Diagonal
-            else if(piece.square.rank < kingSquare.rank && piece.square.file < square.file){
-                if(kingSquare.rank-square.rank != kingSquare.file-square.file){
+            else if (piece.square.rank < kingSquare.rank && piece.square.file < kingSquare.file) {
+                if (kingSquare.rank - square.rank != kingSquare.file - square.file) {
                     return true
                 }
             }
             //Pinned Lower Right Diagonal
-            else if(piece.square.rank < kingSquare.rank && piece.square.file > square.file){
-                if(kingSquare.rank-square.rank != square.file-kingSquare.file) {
+            else if (piece.square.rank < kingSquare.rank && piece.square.file > kingSquare.file) {
+                if (kingSquare.rank - square.rank != square.file - kingSquare.file) {
                     return true
                 }
             }
@@ -125,13 +126,16 @@ class GameLogic {
         currentSquare: Square,
         square: Square,
         occupiedSquares: MutableMap<Square, ChessPiece>,
-        piece: ChessPiece
+        piece: ChessPiece,
+        kingSquare: Square
     ): Boolean {
         if (piece.color == "white") {
             if (previousSquare.rank == 6 && currentSquare.rank == 4) {
                 if (square.rank == currentSquare.rank + 1 && square.file == currentSquare.file) {
                     if (occupiedSquares[currentSquare]?.piece == "pawn" && occupiedSquares[currentSquare]?.color == "black") {
-                        return true
+                        if(!kingInCheckIfEnPassant(piece, occupiedSquares, kingSquare)){
+                            return true
+                        }
                     }
                 }
             }
@@ -140,7 +144,9 @@ class GameLogic {
                 if (previousSquare.rank == 1 && currentSquare.rank == 3) {
                     if (square.rank == currentSquare.rank - 1 && square.file == currentSquare.file) {
                         if (occupiedSquares[currentSquare]?.piece == "pawn" && occupiedSquares[currentSquare]?.color == "white") {
-                            return true
+                            if(!kingInCheckIfEnPassant(piece, occupiedSquares, kingSquare)){
+                                return true
+                            }
                         }
                     }
                 }
@@ -199,5 +205,28 @@ class GameLogic {
     fun addXRayMoves(listOfXRays: MutableList<Square>, listOfMoves: MutableList<Square>) {
         listOfXRays.addAll(listOfMoves)
         listOfMoves.clear()
+    }
+
+    fun kingInCheckIfEnPassant(
+        pawn: ChessPiece,
+        hashMap: MutableMap<Square, ChessPiece>,
+        kingSquare: Square
+    ): Boolean {
+        val xRayAttacksIfEnPassant = mutableListOf<Square>()
+        val hashMapIfEnPassant = hashMap as HashMap
+        hashMapIfEnPassant.remove(pawn.square)
+        val iterator = hashMap.keys.iterator()
+        while (iterator.hasNext()) {
+            val square = iterator.next()
+            val piece = hashMap[square]
+            if (piece?.color != pawn.color) {
+                when (piece?.piece) {
+                    "queen" -> { xRayAttacksIfEnPassant.addAll(Queen().xRayAttacks(piece, hashMapIfEnPassant))}
+                    "rook" -> { xRayAttacksIfEnPassant.addAll(Rook().xRayAttacks(piece, hashMapIfEnPassant)) }
+                    "bishop" -> { xRayAttacksIfEnPassant.addAll(Bishop().xRayAttacks(piece, hashMapIfEnPassant))}
+                }
+            }
+        }
+        return xRayAttacksIfEnPassant.contains(kingSquare)
     }
 }
