@@ -3,10 +3,11 @@ package com.gomezdevlopment.chessnotationapp.model.game_logic
 import androidx.compose.runtime.mutableStateOf
 import com.gomezdevlopment.chessnotationapp.model.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.Square
+import com.gomezdevlopment.chessnotationapp.model.pieces.Bishop
 import com.gomezdevlopment.chessnotationapp.model.pieces.King
 
 class GameLogic {
-    private fun isPieceInPath(hashMap: MutableMap<Square, ChessPiece>, square: Square): Boolean {
+    fun isPieceInPath(hashMap: MutableMap<Square, ChessPiece>, square: Square): Boolean {
         if (hashMap.contains(square)) {
             return true
         }
@@ -26,7 +27,9 @@ class GameLogic {
         square: Square,
         occupiedSquares: MutableMap<Square, ChessPiece>,
         piece: ChessPiece,
-        squaresToBlock: MutableList<Square>
+        squaresToBlock: MutableList<Square>,
+        xRayAttacks: MutableList<Square>,
+        kingSquare:Square
     ): Boolean {
         //prevent king from entering into check when in check
         if (squaresToBlock.isNotEmpty()) {
@@ -38,47 +41,55 @@ class GameLogic {
         }
         if (square.rank > 7 || square.rank < 0 || square.file > 7 || square.file < 0) return true
         if (!isCapture(square, occupiedSquares, piece)) return true
-        //if(isPinned(occupiedSquares, piece, kingSquare)) return true
+        if(isPinned(square, xRayAttacks, piece, kingSquare)) return true
         return false
     }
 
-    private fun isPinned(
+    fun isPinned(
         square: Square,
-        occupiedSquares: MutableMap<Square, ChessPiece>,
+        xRayAttacks: MutableList<Square>,
         piece: ChessPiece,
         kingSquare: Square
-    ) : Boolean{
-
-        var pinned = mutableStateOf(false)
-        //if(squaresToBlock.contains())
-        if(kingSquare.rank == piece.square.rank){
-            //Pinned left side
-            if(kingSquare.file > piece.square.file){
-                var attacked = mutableStateOf(false)
-                for(file in 0 until kingSquare.file){
-                    val square = Square(kingSquare.rank, file)
-                    if(occupiedSquares.containsKey(square)){
-                        if(occupiedSquares[square] == piece && !attacked.value){
-                            pinned.value = false
-                            break
-                        }else if(occupiedSquares[square] == piece && attacked.value){
-                            pinned.value = true
-                        }else if((occupiedSquares[square]?.piece == "queen" || occupiedSquares[square]?.piece == "rook") && occupiedSquares[square]?.color != piece.color){
-                            attacked.value = true
-                        }else{
-                            pinned.value = false
-                        }
-                    }
+    ): Boolean {
+        if (xRayAttacks.contains(kingSquare) && xRayAttacks.contains(piece.square)) {
+            //Pinned Vertically
+            if (kingSquare.file == piece.square.file) {
+                if(kingSquare.file != square.file){
+                    return true
                 }
-                if(pinned.value){
-                    if(square.rank == kingSquare.rank){
-                        return false
-                    }
+            }
+            //Pinned Horizontally
+            else if(kingSquare.rank == piece.square.rank){
+                if(square.rank != kingSquare.rank){
+                    return true
+                }
+            }
+            //Pinned Upper Left Diagonal
+            else if(piece.square.rank > kingSquare.rank && piece.square.file < square.file){
+                if(square.rank-kingSquare.rank != kingSquare.file-square.file){
+                    return true
+                }
+            }
+            //Pinned Upper Right Diagonal
+            else if(piece.square.rank > kingSquare.rank && piece.square.file > square.file){
+                if(square.rank-kingSquare.rank != square.file-kingSquare.file){
+                    return true
+                }
+            }
+            //Pinned Lower Left Diagonal
+            else if(piece.square.rank < kingSquare.rank && piece.square.file < square.file){
+                if(kingSquare.rank-square.rank != kingSquare.file-square.file){
+                    return true
+                }
+            }
+            //Pinned Lower Right Diagonal
+            else if(piece.square.rank < kingSquare.rank && piece.square.file > square.file){
+                if(kingSquare.rank-square.rank != square.file-kingSquare.file) {
+                    return true
                 }
             }
         }
-
-        return pinned.value
+        return false
     }
 
     private fun isCapture(
@@ -172,5 +183,21 @@ class GameLogic {
             return false
         }
         return true
+    }
+
+    fun squareContainsEnemyKing(
+        hashMap: MutableMap<Square, ChessPiece>,
+        square: Square,
+        piece: ChessPiece
+    ): Boolean {
+        if (hashMap[square]?.piece == "king" && hashMap[square]?.color != piece.color) {
+            return true
+        }
+        return false
+    }
+
+    fun addXRayMoves(listOfXRays: MutableList<Square>, listOfMoves: MutableList<Square>) {
+        listOfXRays.addAll(listOfMoves)
+        listOfMoves.clear()
     }
 }

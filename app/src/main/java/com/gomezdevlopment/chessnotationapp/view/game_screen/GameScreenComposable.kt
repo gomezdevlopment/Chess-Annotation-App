@@ -14,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
@@ -47,7 +49,11 @@ fun ChessCanvas(width: Int, viewModel: GameViewModel) {
                 .aspectRatio(1f)
         )
         ChessSquaresV2(height = rowWidthAndHeight, viewModel = viewModel)
-        Button(onClick = { viewModel.resetGame() }, modifier = Modifier.offset((50).dp, (-50).dp), enabled = true) {
+        Button(
+            onClick = { viewModel.resetGame() },
+            modifier = Modifier.offset((50).dp, (-50).dp),
+            enabled = true
+        ) {
             Text(text = "Reset Game")
         }
     }
@@ -69,44 +75,22 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
         mutableStateOf(0)
     }
 
-    val attackedSquares = remember {
-        viewModel.getSquaresToBlock()
+    val xRays = remember {
+        viewModel.xRays()
     }
+    println(xRays)
 
-    val whiteAttacks = remember {
-        viewModel.getWhiteAttacks()
-    }
-
-    val blackAttacks = remember {
-        viewModel.getBlackAttacks()
-    }
-
-    @Composable
-    fun ShowHighlightedSquares(height: Float, square: Square) {
-        val offsetX = height * square.file
-        val offsetY = (7 - square.rank) * height
-        var color = Color.Black
-        val circle: ImageVector =
-            ImageVector.vectorResource(id = R.drawable.ic_legal_move_circle)
-        if (viewModel.getHashMap().containsKey(square)) {
-            color = Color.Red
-        }
-        Icon(
-            tint = color,
-            imageVector = circle,
-            contentDescription = "Chess Board",
-            modifier = Modifier
-                .height(height.dp)
-                .aspectRatio(1f)
-                .absoluteOffset(offsetX.dp, offsetY.dp)
-                .padding(10.dp)
-                .clickable {
-                    targetRank.value = square.rank
-                    targetFile.value = square.file
-                    squareClicked.value = true
-                }
-        )
-    }
+//    val attackedSquares = remember {
+//        viewModel.getSquaresToBlock()
+//    }
+//
+//    val whiteAttacks = remember {
+//        viewModel.getWhiteAttacks()
+//    }
+//
+//    val blackAttacks = remember {
+//        viewModel.getBlackAttacks()
+//    }
 
     for (rank in 7 downTo 0) {
         for (file in 0..7) {
@@ -116,20 +100,27 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
 //            if(attackedSquares.contains(square)){
 //                Highlight(height = height, square = square, Color.Blue)
 //            }
-            if(viewModel.getPlayerTurn() == "white"){
-                if (blackAttacks.contains(square)) {
-                    Highlight(height = height, square = square, color = Color.Red)
-                }
-            }else{
-                if (whiteAttacks.contains(square)) {
-                    Highlight(height = height, square = square, color = Color.Red)
-                }
+            if(xRays.contains(square)){
+                Outline(height = height, square = square, Color.Yellow)
             }
+//            if(viewModel.getPlayerTurn() == "white"){
+//                if (blackAttacks.contains(square)) {
+//                    Highlight(height = height, square = square, color = Color.Red)
+//                }
+//            }else{
+//                if (whiteAttacks.contains(square)) {
+//                    Highlight(height = height, square = square, color = Color.Red)
+//                }
+//            }
             if (hashMap.containsKey(square)) {
                 val chessPiece = hashMap[square]!!
                 val imageVector = ImageVector.vectorResource(chessPiece.pieceDrawable)
                 if (square == viewModel.getCurrentSquare().value) {
-                    Highlight(height = height, square = square, Color.Yellow)
+                    //Outline(height = height, square = square, Color.Blue)
+                    Highlight(height = height, square = square, Color.Blue)
+                }
+                if(viewModel.kingInCheck() && square == viewModel.kingSquare()){
+                    Outline(height = height, square = square, Color.Red)
                 }
                 Image(
                     imageVector = imageVector,
@@ -151,10 +142,13 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
     }
 
     if (clicked.value) {
-        println(clickedPiece.value.square)
         val legalMoves = viewModel.onEvent(GameEvent.OnPieceClicked, clickedPiece.value)
         for (move in legalMoves) {
-            ShowHighlightedSquares(height = height, move)
+            if (viewModel.getHashMap().containsKey(move)) {
+                PossibleCapture(height, move, targetRank, targetFile, squareClicked)
+            }else{
+                PossibleMove(height, move, targetRank, targetFile, squareClicked)
+            }
         }
     }
 
@@ -169,8 +163,8 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
 
     val previousSquare = viewModel.getPreviousSquare().value
     if (previousSquare.rank != 10) {
-        Highlight(height = height, square = previousSquare, color = Color.Yellow)
-        //ShowPreviousSquare(height = height, square = previousSquare)
+        //Outline(height = height, square = previousSquare, Color.Blue)
+        Highlight(height = height, square = previousSquare, color = Color.Blue)
     }
 }
 
@@ -189,7 +183,91 @@ private fun Highlight(
         drawRect(
             color = color,
             size = size,
+            alpha = .5f
+        )
+    }
+}
+
+@Composable
+private fun PossibleMove(
+    height: Float,
+    square: Square,
+    targetRank: MutableState<Int>,
+    targetFile: MutableState<Int>,
+    squareClicked: MutableState<Boolean>
+) {
+    val offsetX = height * square.file
+    val offsetY = (7 - square.rank) * height
+    Canvas(
+        modifier = Modifier
+            .height(height.dp)
+            .aspectRatio(1f)
+            .absoluteOffset(offsetX.dp, offsetY.dp)
+            .clickable {
+                targetRank.value = square.rank
+                targetFile.value = square.file
+                squareClicked.value = true
+            }
+    ) {
+        drawCircle(
+            color = Color.Black,
+            radius = height / 4,
             alpha = .75f
+        )
+    }
+}
+
+@Composable
+private fun PossibleCapture(
+    height: Float,
+    square: Square,
+    targetRank: MutableState<Int>,
+    targetFile: MutableState<Int>,
+    squareClicked: MutableState<Boolean>
+) {
+    val offsetX = height * square.file
+    val offsetY = (7 - square.rank) * height
+    Canvas(
+        modifier = Modifier
+            .height(height.dp)
+            .aspectRatio(1f)
+            .absoluteOffset(offsetX.dp, offsetY.dp)
+            .clickable {
+                targetRank.value = square.rank
+                targetFile.value = square.file
+                squareClicked.value = true
+            }
+    ) {
+        drawCircle(
+            color = Color.Red,
+            radius = height*.8f,
+            alpha = .5f,
+            style = Stroke(5f)
+        )
+    }
+}
+
+@Composable
+private fun Outline(
+    height: Float,
+    square: Square,
+    color: Color
+) {
+    val offsetX = height * square.file
+    val offsetY = (7 - square.rank) * height
+    Canvas(
+        modifier = Modifier
+            .height(height.dp)
+            .aspectRatio(1f)
+            .absoluteOffset(offsetX.dp, offsetY.dp)
+            .padding(1.dp)
+
+    ) {
+        drawRect(
+            color = color,
+            size = size,
+            alpha = 1f,
+            style = Stroke(5f)
         )
     }
 }

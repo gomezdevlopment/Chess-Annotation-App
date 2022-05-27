@@ -7,7 +7,14 @@ import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
 class Bishop {
     private val gameLogic = GameLogic()
 
-    fun moves(piece: ChessPiece, hashMap: MutableMap<Square, ChessPiece>, squaresToBlock: MutableList<Square>, checkDefendedPieces: Boolean): MutableList<Square> {
+    fun moves(
+        piece: ChessPiece,
+        hashMap: MutableMap<Square, ChessPiece>,
+        squaresToBlock: MutableList<Square>,
+        checkDefendedPieces: Boolean,
+        xRayAttacks: MutableList<Square>,
+        kingSquare:Square
+    ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
         var moveSquare: Square
         for (rank in piece.square.rank + 1..7) {
@@ -31,13 +38,82 @@ class Bishop {
 
         val moves = mutableListOf<Square>()
         for (move in listOfMoves) {
-            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock)) {
+            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock, xRayAttacks, kingSquare)) {
                 moves.add(move)
             }
-            if(checkDefendedPieces && gameLogic.isDefending(move, hashMap)){
+            if (checkDefendedPieces && gameLogic.isDefending(move, hashMap)) {
                 moves.add(move)
             }
         }
         return moves
+    }
+
+    fun xRayAttacks(
+        piece: ChessPiece,
+        hashMap: MutableMap<Square, ChessPiece>
+    ): MutableList<Square> {
+        val listOfMoves = mutableListOf<Square>()
+        val listOfXRays = mutableListOf<Square>()
+        var moveSquare: Square
+        var firstPieceAlreadyFound = false
+        for (rank in piece.square.rank + 1..7) {
+            moveSquare = Square(rank, piece.square.file + (rank - piece.square.rank))
+            if (gameLogic.pieceInPath(hashMap, listOfMoves, moveSquare)) {
+                if (firstPieceAlreadyFound) {
+                    if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
+                        gameLogic.addXRayMoves(listOfXRays, listOfMoves)
+                    }
+                    break
+                } else {
+                    firstPieceAlreadyFound = true
+                }
+            }
+        }
+        listOfMoves.clear()
+        firstPieceAlreadyFound = false
+        for (rank in piece.square.rank + 1..7) {
+            moveSquare = Square(rank, piece.square.file - (rank - piece.square.rank))
+            if (gameLogic.pieceInPath(hashMap, listOfMoves, moveSquare)) {
+                if (firstPieceAlreadyFound) {
+                    if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
+                        gameLogic.addXRayMoves(listOfXRays, listOfMoves)
+                    }
+                    break
+                } else {
+                    firstPieceAlreadyFound = true
+                }
+            }
+        }
+        listOfMoves.clear()
+        firstPieceAlreadyFound = false
+        for (rank in piece.square.rank - 1 downTo 0) {
+            moveSquare = Square(rank, piece.square.file + (rank - piece.square.rank))
+            if (gameLogic.pieceInPath(hashMap, listOfMoves, moveSquare)) {
+                if (firstPieceAlreadyFound) {
+                    if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
+                        gameLogic.addXRayMoves(listOfXRays, listOfMoves)
+                    }
+                    break
+                } else {
+                    firstPieceAlreadyFound = true
+                }
+            }
+        }
+        listOfMoves.clear()
+        firstPieceAlreadyFound = false
+        for (rank in piece.square.rank - 1 downTo 0) {
+            moveSquare = Square(rank, piece.square.file - (rank - piece.square.rank))
+            if (gameLogic.pieceInPath(hashMap, listOfMoves, moveSquare)) {
+                if (firstPieceAlreadyFound) {
+                    if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
+                        gameLogic.addXRayMoves(listOfXRays, listOfMoves)
+                    }
+                    break
+                } else {
+                    firstPieceAlreadyFound = true
+                }
+            }
+        }
+        return listOfXRays
     }
 }

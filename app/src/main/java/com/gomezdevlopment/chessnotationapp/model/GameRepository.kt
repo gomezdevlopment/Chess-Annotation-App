@@ -20,6 +20,7 @@ class GameRepository : ViewModel() {
     private var squaresToBlock: MutableList<Square> = mutableListOf()
     private var whiteKingSquare: MutableState<Square> = mutableStateOf(Square(0, 4))
     private var blackKingSquare: MutableState<Square> = mutableStateOf(Square(7, 4))
+    private var xRayAttacks: MutableList<Square> = mutableListOf()
 
     private var whiteKingMoved: MutableState<Boolean> = mutableStateOf(false)
     private var blackKingMoved: MutableState<Boolean> = mutableStateOf(false)
@@ -51,6 +52,7 @@ class GameRepository : ViewModel() {
         addPieces()
         checkWhiteAttacks()
         checkBlackAttacks()
+        setXRayAttacks()
     }
 
     fun resetGame() {
@@ -65,8 +67,19 @@ class GameRepository : ViewModel() {
         currentSquare.value = Square(10, 10)
         checkWhiteAttacks()
         checkBlackAttacks()
+        setXRayAttacks()
     }
 
+    fun kingInCheck(): MutableState<Boolean> {
+        return kingInCheck
+    }
+
+    fun kingSquare(): MutableState<Square>{
+        if(playerTurn.value == "white"){
+            return whiteKingSquare
+        }
+        return blackKingSquare
+    }
     private fun addPieces() {
         piecesOnBoard.add(ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(0, 0)))
         piecesOnBoard.add(ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(0, 7)))
@@ -108,6 +121,12 @@ class GameRepository : ViewModel() {
     }
 
 
+    fun getKingSquare(): Square {
+        if(playerTurn.value == "white"){
+            return whiteKingSquare.value
+        }
+        return blackKingSquare.value
+    }
     private fun checkWhiteAttacks() {
         whiteAttacks.clear()
         for (piece in piecesOnBoard) {
@@ -170,7 +189,6 @@ class GameRepository : ViewModel() {
 
     fun changePiecePosition(newSquare: Square, piece: ChessPiece) {
         val gameLogic = GameLogic()
-
         //Castling
         if (piece.piece == "king") {
             if (newSquare.file == piece.square.file + 2) {
@@ -223,6 +241,7 @@ class GameRepository : ViewModel() {
         setSquaresToBlock()
         //Check if King or Rooks Moved
         checkIfKingOrRooksMoved(piece)
+        setXRayAttacks()
     }
 
     fun getPiecesOnBoard(): MutableList<ChessPiece> {
@@ -271,10 +290,7 @@ class GameRepository : ViewModel() {
         kingsSquare: Square
     ): ArrayList<Square> {
         val squaresToBlock = arrayListOf<Square>()
-        println(kingsSquare)
-        println(attacks)
         if (attacks.contains(kingsSquare)) {
-            println("king in check")
             kingInCheck.value = true
             for (rank in kingsSquare.rank + 1..7) {
                 val squareToBlock = Square(rank, kingsSquare.file)
@@ -368,6 +384,29 @@ class GameRepository : ViewModel() {
             kingInCheck.value = false
         }
         return squaresToBlock
+    }
+
+    fun getXRayAttacks(): MutableList<Square> {
+        return xRayAttacks
+    }
+
+    fun setXRayAttacks(){
+        xRayAttacks.clear()
+        for (piece in piecesOnBoard) {
+            if (piece.color != playerTurn.value) {
+                when (piece.piece){
+                    "queen" -> {
+                        xRayAttacks.addAll(Queen().xRayAttacks(piece, hashMap))
+                    }
+                    "rook" -> {
+                        xRayAttacks.addAll(Rook().xRayAttacks(piece, hashMap))
+                    }
+                    "bishop" -> {
+                        xRayAttacks.addAll(Bishop().xRayAttacks(piece, hashMap))
+                    }
+                }
+            }
+        }
     }
 
     private fun getSquaresNearKing(kingsSquare: Square): ArrayList<Square> {
@@ -464,7 +503,9 @@ class GameRepository : ViewModel() {
             hashMap,
             squaresToBlock,
             previousSquare.value,
-            currentSquare.value
+            currentSquare.value,
+            xRayAttacks,
+            getKingSquare()
         )
     }
 
@@ -477,7 +518,9 @@ class GameRepository : ViewModel() {
                 blackAttacks,
                 whiteKingMoved.value,
                 whiteKingSideRookMoved.value,
-                whiteQueenSideRookMoved.value
+                whiteQueenSideRookMoved.value,
+                xRayAttacks,
+                getKingSquare()
             )
         }
         return King().moves(
@@ -487,23 +530,25 @@ class GameRepository : ViewModel() {
             whiteAttacks,
             blackKingMoved.value,
             blackKingSideRookMoved.value,
-            blackQueenSideRookMoved.value
+            blackQueenSideRookMoved.value,
+            xRayAttacks,
+            getKingSquare()
         )
     }
 
     private fun bishopMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
-        return Bishop().moves(piece, hashMap, squaresToBlock, checkDefendedPieces)
+        return Bishop().moves(piece, hashMap, squaresToBlock, checkDefendedPieces, xRayAttacks, getKingSquare())
     }
 
     private fun rookMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
-        return Rook().moves(piece, hashMap, squaresToBlock, checkDefendedPieces)
+        return Rook().moves(piece, hashMap, squaresToBlock, checkDefendedPieces, xRayAttacks, getKingSquare())
     }
 
     private fun queenMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
-        return Queen().moves(piece, hashMap, squaresToBlock, checkDefendedPieces)
+        return Queen().moves(piece, hashMap, squaresToBlock, checkDefendedPieces, xRayAttacks, getKingSquare())
     }
 
     private fun knightMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
-        return Knight().moves(piece, hashMap, squaresToBlock, checkDefendedPieces)
+        return Knight().moves(piece, hashMap, squaresToBlock, checkDefendedPieces, xRayAttacks, getKingSquare())
     }
 }

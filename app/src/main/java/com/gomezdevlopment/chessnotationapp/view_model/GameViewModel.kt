@@ -46,6 +46,17 @@ class GameViewModel: ViewModel() {
         return gameRepository.getPlayerTurn().value
     }
 
+    fun kingSquare(): Square{
+        return gameRepository.kingSquare().value
+    }
+
+    fun kingInCheck(): Boolean{
+        return gameRepository.kingInCheck().value
+    }
+
+    fun xRays(): MutableList<Square>{
+        return gameRepository.getXRayAttacks()
+    }
     fun getSquaresToBlock(): MutableList<Square> {
         return gameRepository.getSquaresToBlock()
     }

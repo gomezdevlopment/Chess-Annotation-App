@@ -12,23 +12,44 @@ class Pawn {
         hashMap: MutableMap<Square, ChessPiece>,
         squaresToBlock: MutableList<Square>,
         previousSquare: Square,
-        currentSquare: Square
+        currentSquare: Square,
+        xRayAttacks: MutableList<Square>,
+        kingSquare:Square
     ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
 
-        var moveSquare = Square(piece.square.rank + 1, piece.square.file)
+        var moveSquare: Square
+
+        if (piece.color == "white") {
+            moveSquare = Square(piece.square.rank + 1, piece.square.file)
+            if(!gameLogic.isPieceInPath(hashMap, moveSquare)){
+                listOfMoves.add(moveSquare)
+                if (piece.square.rank == 1) {
+                    moveSquare = Square(piece.square.rank + 2, piece.square.file)
+                    listOfMoves.add(moveSquare)
+                }
+            }
+        }
+
         if (piece.color == "black") {
             moveSquare = Square(piece.square.rank - 1, piece.square.file)
+            if(!gameLogic.isPieceInPath(hashMap, moveSquare)){
+                listOfMoves.add(moveSquare)
+                if (piece.square.rank == 6) {
+                    moveSquare = Square(piece.square.rank - 2, piece.square.file)
+                    listOfMoves.add(moveSquare)
+                }
+            }
         }
-        listOfMoves.add(moveSquare)
 
-        if (piece.square.rank == 1 && piece.color == "white") {
-            moveSquare = Square(piece.square.rank + 2, piece.square.file)
-            listOfMoves.add(moveSquare)
-        } else if (piece.square.rank == 6 && piece.color == "black") {
-            moveSquare = Square(piece.square.rank - 2, piece.square.file)
-            listOfMoves.add(moveSquare)
-        }
+
+//        if (piece.square.rank == 1 && piece.color == "white") {
+//            moveSquare = Square(piece.square.rank + 2, piece.square.file)
+//            listOfMoves.add(moveSquare)
+//        } else if (piece.square.rank == 6 && piece.color == "black") {
+//            moveSquare = Square(piece.square.rank - 2, piece.square.file)
+//            listOfMoves.add(moveSquare)
+//        }
 
         //Check for Diagonal Captures
         if (piece.color == "white") {
@@ -55,7 +76,7 @@ class Pawn {
 
         val moves = mutableListOf<Square>()
         for (move in listOfMoves) {
-            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock)) {
+            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock, xRayAttacks, kingSquare)) {
                 moves.add(move)
             }
         }
@@ -70,8 +91,6 @@ class Pawn {
             attacks.add(moveSquare)
             moveSquare = Square(piece.square.rank + 1, piece.square.file + 1)
             attacks.add(moveSquare)
-
-
         } else {
             moveSquare = Square(piece.square.rank - 1, piece.square.file - 1)
             attacks.add(moveSquare)
