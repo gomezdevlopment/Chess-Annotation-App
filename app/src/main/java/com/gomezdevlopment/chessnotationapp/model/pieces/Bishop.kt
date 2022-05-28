@@ -13,7 +13,8 @@ class Bishop {
         squaresToBlock: MutableList<Square>,
         checkDefendedPieces: Boolean,
         xRayAttacks: MutableList<Square>,
-        kingSquare:Square
+        kingSquare:Square,
+        piecesCheckingKing: MutableList<Square>
     ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
         var moveSquare: Square
@@ -38,7 +39,7 @@ class Bishop {
 
         val moves = mutableListOf<Square>()
         for (move in listOfMoves) {
-            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock, xRayAttacks, kingSquare)) {
+            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock, xRayAttacks, kingSquare, piecesCheckingKing)) {
                 moves.add(move)
             }
             if (checkDefendedPieces && gameLogic.isDefending(move, hashMap)) {
@@ -50,14 +51,20 @@ class Bishop {
 
     fun xRayAttacks(
         piece: ChessPiece,
-        hashMap: MutableMap<Square, ChessPiece>
+        hashMap: MutableMap<Square, ChessPiece>,
+        isKingInCheck: Boolean
     ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
         val listOfXRays = mutableListOf<Square>()
         var moveSquare: Square
         var firstPieceAlreadyFound = false
+        var kingFound = false
         for (rank in piece.square.rank + 1..7) {
             moveSquare = Square(rank, piece.square.file + (rank - piece.square.rank))
+            if(kingFound && isKingInCheck){
+                listOfXRays.add(moveSquare)
+                continue
+            }
             if (gameLogic.pieceInPath(hashMap, listOfMoves, moveSquare)) {
                 if (firstPieceAlreadyFound) {
                     if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
@@ -66,13 +73,26 @@ class Bishop {
                     break
                 } else {
                     firstPieceAlreadyFound = true
+                    if(isKingInCheck){
+                        if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
+                            gameLogic.addXRayMoves(listOfXRays, listOfMoves)
+                            kingFound = true
+                        }else{
+                            break
+                        }
+                    }
                 }
             }
         }
         listOfMoves.clear()
         firstPieceAlreadyFound = false
+        kingFound = false
         for (rank in piece.square.rank + 1..7) {
             moveSquare = Square(rank, piece.square.file - (rank - piece.square.rank))
+            if(kingFound && isKingInCheck){
+                listOfXRays.add(moveSquare)
+                continue
+            }
             if (gameLogic.pieceInPath(hashMap, listOfMoves, moveSquare)) {
                 if (firstPieceAlreadyFound) {
                     if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
@@ -81,13 +101,26 @@ class Bishop {
                     break
                 } else {
                     firstPieceAlreadyFound = true
+                    if(isKingInCheck){
+                        if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
+                            gameLogic.addXRayMoves(listOfXRays, listOfMoves)
+                            kingFound = true
+                        }else{
+                            break
+                        }
+                    }
                 }
             }
         }
         listOfMoves.clear()
         firstPieceAlreadyFound = false
+        kingFound = false
         for (rank in piece.square.rank - 1 downTo 0) {
             moveSquare = Square(rank, piece.square.file + (rank - piece.square.rank))
+            if(kingFound && isKingInCheck){
+                listOfXRays.add(moveSquare)
+                continue
+            }
             if (gameLogic.pieceInPath(hashMap, listOfMoves, moveSquare)) {
                 if (firstPieceAlreadyFound) {
                     if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
@@ -96,13 +129,26 @@ class Bishop {
                     break
                 } else {
                     firstPieceAlreadyFound = true
+                    if(isKingInCheck){
+                        if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
+                            gameLogic.addXRayMoves(listOfXRays, listOfMoves)
+                            kingFound = true
+                        }else{
+                            break
+                        }
+                    }
                 }
             }
         }
         listOfMoves.clear()
         firstPieceAlreadyFound = false
+        kingFound = false
         for (rank in piece.square.rank - 1 downTo 0) {
             moveSquare = Square(rank, piece.square.file - (rank - piece.square.rank))
+            if(kingFound && isKingInCheck){
+                listOfXRays.add(moveSquare)
+                continue
+            }
             if (gameLogic.pieceInPath(hashMap, listOfMoves, moveSquare)) {
                 if (firstPieceAlreadyFound) {
                     if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
@@ -111,6 +157,14 @@ class Bishop {
                     break
                 } else {
                     firstPieceAlreadyFound = true
+                    if(isKingInCheck){
+                        if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
+                            gameLogic.addXRayMoves(listOfXRays, listOfMoves)
+                            kingFound = true
+                        }else{
+                            break
+                        }
+                    }
                 }
             }
         }

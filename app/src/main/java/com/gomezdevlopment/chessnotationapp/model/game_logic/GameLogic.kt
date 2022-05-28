@@ -28,13 +28,24 @@ class GameLogic {
         piece: ChessPiece,
         squaresToBlock: MutableList<Square>,
         xRayAttacks: MutableList<Square>,
-        kingSquare: Square
+        kingSquare: Square,
+        piecesCheckingKing: MutableList<Square>
     ): Boolean {
         //prevent king from entering into check when in check
-        if (squaresToBlock.isNotEmpty()) {
-            if (squaresToBlock.contains(square) && piece.piece == "king") return true
+        if (piecesCheckingKing.isNotEmpty()) {
+            if (squaresToBlock.contains(square) && piece.piece == "king"){
+                println("King cant go in check")
+                return true
+            }
 
-            if (!squaresToBlock.contains(square) && piece.piece != "king") return true
+            if (!squaresToBlock.contains(square) && !piecesCheckingKing.contains(square) && piece.piece != "king") {
+                println("Piece must block or capture attacking piece")
+                return true
+            }
+
+            if(piecesCheckingKing.size > 1 && piece.piece != "king"){
+                println("King is checked twice, must move")
+                return true }
 
             //if(isPinned()) return true
         }
@@ -207,7 +218,7 @@ class GameLogic {
         listOfMoves.clear()
     }
 
-    fun kingInCheckIfEnPassant(
+    private fun kingInCheckIfEnPassant(
         pawn: ChessPiece,
         hashMap: MutableMap<Square, ChessPiece>,
         kingSquare: Square
@@ -221,9 +232,9 @@ class GameLogic {
             val piece = hashMap[square]
             if (piece?.color != pawn.color) {
                 when (piece?.piece) {
-                    "queen" -> { xRayAttacksIfEnPassant.addAll(Queen().xRayAttacks(piece, hashMapIfEnPassant))}
-                    "rook" -> { xRayAttacksIfEnPassant.addAll(Rook().xRayAttacks(piece, hashMapIfEnPassant)) }
-                    "bishop" -> { xRayAttacksIfEnPassant.addAll(Bishop().xRayAttacks(piece, hashMapIfEnPassant))}
+                    "queen" -> { xRayAttacksIfEnPassant.addAll(Queen().xRayAttacks(piece, hashMapIfEnPassant, false))}
+                    "rook" -> { xRayAttacksIfEnPassant.addAll(Rook().xRayAttacks(piece, hashMapIfEnPassant, false)) }
+                    "bishop" -> { xRayAttacksIfEnPassant.addAll(Bishop().xRayAttacks(piece, hashMapIfEnPassant, false))}
                 }
             }
         }

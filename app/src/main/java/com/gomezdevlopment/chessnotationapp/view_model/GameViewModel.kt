@@ -10,12 +10,18 @@ class GameViewModel: ViewModel() {
     private var  hashMap : MutableMap<Square, ChessPiece> = gameRepository.getHashMap()
     private var previousSquare : MutableState<Square> = gameRepository.getPreviousSquare()
 
+    private lateinit var pieceTemp: ChessPiece
+    private lateinit var originalSquare: Square
+    private lateinit var currentSquare: Square
+    private lateinit var previousSquareTemp: Square
+    private lateinit var kingSquare: Square
+
     fun getPiecesOnBoard(): MutableList<ChessPiece> {
         return piecesOnBoard
     }
 
     fun resetGame() {
-        gameRepository.resetGame()
+        gameRepository.undoChangePiecePosition(pieceTemp, originalSquare, currentSquare, previousSquareTemp, kingSquare, gameRepository.getCurrentSquare().value)
     }
 
     fun onEvent(event: GameEvent, piece: ChessPiece): List<Square> {
@@ -31,6 +37,11 @@ class GameViewModel: ViewModel() {
     }
 
     fun changePiecePosition(newSquare: Square, piece: ChessPiece){
+        pieceTemp = piece
+        originalSquare = piece.square
+        currentSquare = gameRepository.getCurrentSquare().value
+        previousSquareTemp = gameRepository.getPreviousSquare().value
+        kingSquare = gameRepository.kingSquare().value
         gameRepository.changePiecePosition(newSquare, piece)
     }
 
@@ -55,18 +66,22 @@ class GameViewModel: ViewModel() {
     }
 
     fun xRays(): MutableList<Square>{
-        return gameRepository.getXRayAttacks()
+        return gameRepository.getChecksOnKing()
     }
     fun getSquaresToBlock(): MutableList<Square> {
         return gameRepository.getSquaresToBlock()
     }
 
-    fun getWhiteAttacks() : List<Square>{
-        return gameRepository.getWhiteAttacks()
+    fun getAttacks(): MutableList<Square> {
+        return gameRepository.getAttacks()
     }
 
-    fun getBlackAttacks() : List<Square>{
-        return gameRepository.getBlackAttacks()
-    }
+//    fun getWhiteAttacks() : List<Square>{
+//        return gameRepository.getWhiteAttacks()
+//    }
+//
+//    fun getBlackAttacks() : List<Square>{
+//        return gameRepository.getBlackAttacks()
+//    }
 
 }

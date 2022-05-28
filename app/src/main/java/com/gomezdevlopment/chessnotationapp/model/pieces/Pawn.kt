@@ -14,7 +14,8 @@ class Pawn {
         previousSquare: Square,
         currentSquare: Square,
         xRayAttacks: MutableList<Square>,
-        kingSquare:Square
+        kingSquare:Square,
+        piecesCheckingKing: MutableList<Square>
     ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
 
@@ -76,7 +77,7 @@ class Pawn {
 
         val moves = mutableListOf<Square>()
         for (move in listOfMoves) {
-            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock, xRayAttacks, kingSquare)) {
+            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock, xRayAttacks, kingSquare, piecesCheckingKing)) {
                 moves.add(move)
             }
         }

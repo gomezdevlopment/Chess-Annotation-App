@@ -13,7 +13,8 @@ class Knight {
         squaresToBlock: MutableList<Square>,
         checkDefendedPieces: Boolean,
         xRayAttacks: MutableList<Square>,
-        kingSquare:Square
+        kingSquare:Square,
+        piecesCheckingKing: MutableList<Square>
     ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
         var moveSquare = Square(piece.square.rank + 2, piece.square.file + 1)
@@ -35,7 +36,7 @@ class Knight {
 
         val moves = mutableListOf<Square>()
         for (move in listOfMoves) {
-            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock, xRayAttacks, kingSquare)) {
+            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock, xRayAttacks, kingSquare, piecesCheckingKing)) {
                 moves.add(move)
             }
             if(checkDefendedPieces && gameLogic.isDefending(move, hashMap)){

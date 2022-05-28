@@ -16,7 +16,9 @@ class King {
         kingSideRookMoved: Boolean,
         queenSideRookMoved: Boolean,
         xRayAttacks: MutableList<Square>,
-        kingSquare:Square
+        kingSquare:Square,
+        checksOnKing: MutableList<Square>,
+        piecesCheckingKing: MutableList<Square>
     ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
         var moveSquare = Square(piece.square.rank + 1, piece.square.file + 1)
@@ -38,8 +40,9 @@ class King {
 
         val moves = mutableListOf<Square>()
         for (move in listOfMoves) {
-            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock, xRayAttacks, kingSquare) &&
+            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock, xRayAttacks, kingSquare, piecesCheckingKing) &&
                 !attackedSquares.contains(move)) {
+                if(attackedSquares.contains(kingSquare) && checksOnKing.contains(move)) break
                 moves.add(move)
             }
         }

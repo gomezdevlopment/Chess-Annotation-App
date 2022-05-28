@@ -50,7 +50,7 @@ fun ChessCanvas(width: Int, viewModel: GameViewModel) {
         )
         ChessSquaresV2(height = rowWidthAndHeight, viewModel = viewModel)
         Button(
-            onClick = { viewModel.resetGame() },
+            onClick = { viewModel.resetGame()},
             modifier = Modifier.offset((50).dp, (-50).dp),
             enabled = true
         ) {
@@ -78,40 +78,30 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
     val xRays = remember {
         viewModel.xRays()
     }
-    println(xRays)
 
-//    val attackedSquares = remember {
-//        viewModel.getSquaresToBlock()
-//    }
-//
-//    val whiteAttacks = remember {
-//        viewModel.getWhiteAttacks()
-//    }
-//
-//    val blackAttacks = remember {
-//        viewModel.getBlackAttacks()
-//    }
+    val attackedSquares = remember {
+        viewModel.getSquaresToBlock()
+    }
+
+    val attacks = remember {
+        viewModel.getAttacks()
+    }
 
     for (rank in 7 downTo 0) {
         for (file in 0..7) {
             val square = Square(rank, file)
             val offsetX = height * file
             val offsetY = (7 - rank) * height
-//            if(attackedSquares.contains(square)){
-//                Highlight(height = height, square = square, Color.Blue)
-//            }
+            if(attackedSquares.contains(square)){
+                Highlight(height = height, square = square, Color.Blue)
+            }
             if(xRays.contains(square)){
                 Outline(height = height, square = square, Color.Yellow)
             }
-//            if(viewModel.getPlayerTurn() == "white"){
-//                if (blackAttacks.contains(square)) {
-//                    Highlight(height = height, square = square, color = Color.Red)
-//                }
-//            }else{
-//                if (whiteAttacks.contains(square)) {
-//                    Highlight(height = height, square = square, color = Color.Red)
-//                }
-//            }
+            if(attacks.contains(square)){
+                Attack(height = height, square = square)
+            }
+
             if (hashMap.containsKey(square)) {
                 val chessPiece = hashMap[square]!!
                 val imageVector = ImageVector.vectorResource(chessPiece.pieceDrawable)
@@ -133,6 +123,7 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
                             clicked.value = false
                             clickedPiece.value = chessPiece
                             if (viewModel.getPlayerTurn() == clickedPiece.value.color) {
+                                clickedPiece.value.square
                                 clicked.value = true
                             }
                         }
@@ -237,6 +228,29 @@ private fun PossibleCapture(
                 targetFile.value = square.file
                 squareClicked.value = true
             }
+    ) {
+        drawCircle(
+            color = Color.Red,
+            radius = height*.8f,
+            alpha = .5f,
+            style = Stroke(5f)
+        )
+    }
+}
+
+@Composable
+private fun Attack(
+    height: Float,
+    square: Square
+) {
+    val offsetX = height * square.file
+    val offsetY = (7 - square.rank) * height
+    Canvas(
+        modifier = Modifier
+            .height(height.dp)
+            .aspectRatio(1f)
+            .absoluteOffset(offsetX.dp, offsetY.dp)
+
     ) {
         drawCircle(
             color = Color.Red,
