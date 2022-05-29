@@ -21,6 +21,11 @@ class GameViewModel: ViewModel() {
     }
 
     fun resetGame() {
+        //gameRepository.undoChangePiecePosition(pieceTemp, originalSquare, currentSquare, previousSquareTemp, kingSquare, gameRepository.getCurrentSquare().value)
+        gameRepository.resetGame()
+    }
+
+    fun undoMove() {
         gameRepository.undoChangePiecePosition(pieceTemp, originalSquare, currentSquare, previousSquareTemp, kingSquare, gameRepository.getCurrentSquare().value)
     }
 
@@ -75,13 +80,4 @@ class GameViewModel: ViewModel() {
     fun getAttacks(): MutableList<Square> {
         return gameRepository.getAttacks()
     }
-
-//    fun getWhiteAttacks() : List<Square>{
-//        return gameRepository.getWhiteAttacks()
-//    }
-//
-//    fun getBlackAttacks() : List<Square>{
-//        return gameRepository.getBlackAttacks()
-//    }
-
 }

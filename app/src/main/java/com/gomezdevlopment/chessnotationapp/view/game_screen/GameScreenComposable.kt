@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen
 
+import android.app.Activity
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -17,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PaintingStyle.Companion.Stroke
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -27,6 +29,15 @@ import com.gomezdevlopment.chessnotationapp.model.GameEvent
 import com.gomezdevlopment.chessnotationapp.model.Square
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
+@Composable
+fun HomePage() {
+    val activity = (LocalContext.current as? Activity)
+    Button(onClick = {
+        activity?.finish()
+    }) {
+        Text("Exit")
+    }
+}
 
 @Composable
 fun ChessCanvas(width: Int, viewModel: GameViewModel) {
@@ -50,11 +61,20 @@ fun ChessCanvas(width: Int, viewModel: GameViewModel) {
         )
         ChessSquaresV2(height = rowWidthAndHeight, viewModel = viewModel)
         Button(
-            onClick = { viewModel.resetGame()},
+            onClick =
+            { viewModel.resetGame() },
             modifier = Modifier.offset((50).dp, (-50).dp),
             enabled = true
         ) {
             Text(text = "Reset Game")
+        }
+        Button(
+            onClick =
+            { viewModel.undoMove() },
+            modifier = Modifier.offset((200).dp, (-50).dp),
+            enabled = true
+        ) {
+            Text(text = "Undo Move")
         }
     }
 

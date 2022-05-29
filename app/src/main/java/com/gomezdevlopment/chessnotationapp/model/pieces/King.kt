@@ -12,9 +12,8 @@ class King {
         hashMap: MutableMap<Square, ChessPiece>,
         squaresToBlock: MutableList<Square>,
         attackedSquares: MutableList<Square>,
-        kingMoved: Boolean,
-        kingSideRookMoved: Boolean,
-        queenSideRookMoved: Boolean,
+        kingCanCastleKingSide: Boolean,
+        kingCanCastleQueenSide: Boolean,
         xRayAttacks: MutableList<Square>,
         kingSquare:Square,
         checksOnKing: MutableList<Square>,
@@ -49,14 +48,14 @@ class King {
         
         //King Side Castling
         moveSquare = Square(piece.square.rank, piece.square.file + 2)
-        if(!kingMoved && !kingSideRookMoved ){
+        if(kingCanCastleKingSide){
             if(gameLogic.canKingSideCastle(moveSquare, hashMap, attackedSquares)){
                 moves.add(moveSquare)
             }
         }
         //Queen Side Castling
         moveSquare = Square(piece.square.rank, piece.square.file - 2)
-        if(!kingMoved && !queenSideRookMoved){
+        if(kingCanCastleQueenSide){
             if(gameLogic.canQueenSideCastle(moveSquare, hashMap, attackedSquares)){
                 moves.add(moveSquare)
             }

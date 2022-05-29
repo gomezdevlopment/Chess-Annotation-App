@@ -34,17 +34,17 @@ class GameLogic {
         //prevent king from entering into check when in check
         if (piecesCheckingKing.isNotEmpty()) {
             if (squaresToBlock.contains(square) && piece.piece == "king"){
-                println("King cant go in check")
+                //println("King cant go in check")
                 return true
             }
 
             if (!squaresToBlock.contains(square) && !piecesCheckingKing.contains(square) && piece.piece != "king") {
-                println("Piece must block or capture attacking piece")
+                //println("Piece must block or capture attacking piece")
                 return true
             }
 
             if(piecesCheckingKing.size > 1 && piece.piece != "king"){
-                println("King is checked twice, must move")
+                //println("King is checked twice, must move")
                 return true }
 
             //if(isPinned()) return true
@@ -62,7 +62,7 @@ class GameLogic {
         kingSquare: Square
     ): Boolean {
         if (xRayAttacks.contains(kingSquare) && xRayAttacks.contains(piece.square) && piece.piece != "king") {
-            println("pawn and king in xray")
+            //println("pawn and king in xray")
             //Pinned Vertically
             if (kingSquare.file == piece.square.file) {
                 if (kingSquare.file != square.file) {
@@ -83,7 +83,7 @@ class GameLogic {
             }
             //Pinned Upper Right Diagonal
             else if (piece.square.rank > kingSquare.rank && piece.square.file > kingSquare.file) {
-                println("pawn pinned")
+                //println("pawn pinned")
                 if (square.rank - kingSquare.rank != square.file - kingSquare.file) {
                     return true
                 }
@@ -140,23 +140,25 @@ class GameLogic {
         piece: ChessPiece,
         kingSquare: Square
     ): Boolean {
-        if (piece.color == "white") {
-            if (previousSquare.rank == 6 && currentSquare.rank == 4) {
-                if (square.rank == currentSquare.rank + 1 && square.file == currentSquare.file) {
-                    if (occupiedSquares[currentSquare]?.piece == "pawn" && occupiedSquares[currentSquare]?.color == "black") {
-                        if(!kingInCheckIfEnPassant(piece, occupiedSquares, kingSquare)){
-                            return true
+        if(piece.piece == "pawn"){
+            if (piece.color == "white") {
+                if (previousSquare.rank == 6 && currentSquare.rank == 4) {
+                    if (square.rank == currentSquare.rank + 1 && square.file == currentSquare.file) {
+                        if (occupiedSquares[currentSquare]?.piece == "pawn" && occupiedSquares[currentSquare]?.color == "black") {
+                            if(!kingInCheckIfEnPassant(piece, occupiedSquares, kingSquare)){
+                                return true
+                            }
                         }
                     }
                 }
-            }
-        } else {
-            if (piece.color == "black") {
-                if (previousSquare.rank == 1 && currentSquare.rank == 3) {
-                    if (square.rank == currentSquare.rank - 1 && square.file == currentSquare.file) {
-                        if (occupiedSquares[currentSquare]?.piece == "pawn" && occupiedSquares[currentSquare]?.color == "white") {
-                            if(!kingInCheckIfEnPassant(piece, occupiedSquares, kingSquare)){
-                                return true
+            } else {
+                if (piece.color == "black") {
+                    if (previousSquare.rank == 1 && currentSquare.rank == 3) {
+                        if (square.rank == currentSquare.rank - 1 && square.file == currentSquare.file) {
+                            if (occupiedSquares[currentSquare]?.piece == "pawn" && occupiedSquares[currentSquare]?.color == "white") {
+                                if(!kingInCheckIfEnPassant(piece, occupiedSquares, kingSquare)){
+                                    return true
+                                }
                             }
                         }
                     }
