@@ -24,7 +24,9 @@ class GameRepositoryTest {
             if (piece.color == playerTurn) {
                 val originalPieceSquare = piece.square
                 for (legalMove in gameRepository.checkLegalMoves(piece, false)) {
-                    //println("${piece.piece} ${squareInAlgebraicNotation(legalMove)}")
+                    if(depth == 1){
+                        println("${piece.piece} ${squareInAlgebraicNotation(legalMove)}")
+                    }
                     //val originalSquare = piece.square
 //                    val kingSquare = gameRepository.kingSquare().value
 //                    val castleKingSide = gameRepository.castleKingSide()
@@ -131,6 +133,25 @@ class GameRepositoryTest {
     }
 
     @Test
+    fun testPositionKiwiDepth3() {
+        gameRepository.testPositionKiwipete()
+        val numberOfPositions = analyzePositions(3)
+        println(numberOfPositions)
+        println("Number of Pieces on Board: ${gameRepository.getPiecesOnBoard().size}")
+        println("Number of Occupied Squares on Board: ${gameRepository.getHashMap().size}")
+        println("Number of Captures: ${gameRepository.getCaptures()}")
+        println("Number of Checks: ${gameRepository.getChecks()}")
+        println("Number of Castles: ${gameRepository.getCastles()}")
+        println("Number of EnPassants: ${gameRepository.getEnPassants()}")
+        assert(numberOfPositions == 97862)
+        assert(gameRepository.getCaptures() == 17102)
+        assert(gameRepository.getChecks() == 993)
+        assert(gameRepository.getCastles() == 3162)
+        assert(gameRepository.getEnPassants() == 45)
+    }
+
+
+    @Test
     fun testPosition3Depth1() {
         gameRepository.testPosition3()
         val numberOfPositions = analyzePositions(1)
@@ -164,5 +185,39 @@ class GameRepositoryTest {
         assert(gameRepository.getChecks() == 10)
         assert(gameRepository.getCastles() == 0)
         assert(gameRepository.getEnPassants() == 0)
+    }
+
+    @Test
+    fun testPosition3Depth3() {
+        gameRepository.testPosition3()
+        val numberOfPositions = analyzePositions(3)
+        println(numberOfPositions)
+        println("Number of Captures: ${gameRepository.getCaptures()}")
+        println("Number of Checks: ${gameRepository.getChecks()}")
+        println("Number of Castles: ${gameRepository.getCastles()}")
+        println("Number of EnPassants: ${gameRepository.getEnPassants()}")
+        assert(numberOfPositions == 2812)
+        assert(gameRepository.getCaptures() == 209)
+        assert(gameRepository.getChecks() == 267)
+        assert(gameRepository.getCastles() == 0)
+        assert(gameRepository.getEnPassants() == 2)
+    }
+
+    @Test
+    fun testPosition3Depth4() {
+        gameRepository.testPosition3()
+        val numberOfPositions = analyzePositions(4)
+        println(numberOfPositions)
+        println("Number of Pieces on Board: ${gameRepository.getPiecesOnBoard().size}")
+        println("Number of Occupied Squares on Board: ${gameRepository.getHashMap().size}")
+        println("Number of Captures: ${gameRepository.getCaptures()}")
+        println("Number of Checks: ${gameRepository.getChecks()}")
+        println("Number of Castles: ${gameRepository.getCastles()}")
+        println("Number of EnPassants: ${gameRepository.getEnPassants()}")
+        assert(numberOfPositions == 43238)
+        assert(gameRepository.getCaptures() == 3348)
+        assert(gameRepository.getChecks() == 1680)
+        assert(gameRepository.getCastles() == 0)
+        assert(gameRepository.getEnPassants() == 123)
     }
 }

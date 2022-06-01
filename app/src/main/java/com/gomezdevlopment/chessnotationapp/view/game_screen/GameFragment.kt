@@ -1,13 +1,11 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
-import com.gomezdevlopment.chessnotationapp.databinding.FragmentGameBinding
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 
@@ -22,7 +20,7 @@ class GameFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val width = resources.configuration.screenWidthDp
+        val width = resources.configuration.screenWidthDp.toFloat()
         val viewModel: GameViewModel = GameViewModel()
         return ComposeView(requireContext()).apply {
             setContent {

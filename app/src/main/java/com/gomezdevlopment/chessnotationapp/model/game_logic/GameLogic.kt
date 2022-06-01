@@ -34,17 +34,14 @@ class GameLogic {
         //prevent king from entering into check when in check
         if (piecesCheckingKing.isNotEmpty()) {
             if (squaresToBlock.contains(square) && piece.piece == "king"){
-                //println("King cant go in check")
                 return true
             }
 
             if (!squaresToBlock.contains(square) && !piecesCheckingKing.contains(square) && piece.piece != "king") {
-                //println("Piece must block or capture attacking piece")
                 return true
             }
 
             if(piecesCheckingKing.size > 1 && piece.piece != "king"){
-                //println("King is checked twice, must move")
                 return true }
 
             //if(isPinned()) return true
@@ -62,7 +59,6 @@ class GameLogic {
         kingSquare: Square
     ): Boolean {
         if (xRayAttacks.contains(kingSquare) && xRayAttacks.contains(piece.square) && piece.piece != "king") {
-            //println("pawn and king in xray")
             //Pinned Vertically
             if (kingSquare.file == piece.square.file) {
                 if (kingSquare.file != square.file) {
@@ -226,7 +222,8 @@ class GameLogic {
         kingSquare: Square
     ): Boolean {
         val xRayAttacksIfEnPassant = mutableListOf<Square>()
-        val hashMapIfEnPassant = hashMap as HashMap
+        val hashMapIfEnPassant: MutableMap<Square, ChessPiece> = HashMap()
+        hashMapIfEnPassant.putAll(hashMap)
         hashMapIfEnPassant.remove(pawn.square)
         val iterator = hashMap.keys.iterator()
         while (iterator.hasNext()) {
@@ -240,6 +237,6 @@ class GameLogic {
                 }
             }
         }
-        return xRayAttacksIfEnPassant.contains(kingSquare)
+        return xRayAttacksIfEnPassant.contains(kingSquare) && xRayAttacksIfEnPassant.contains(pawn.square)
     }
 }

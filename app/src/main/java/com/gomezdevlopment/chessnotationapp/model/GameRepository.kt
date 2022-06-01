@@ -492,7 +492,7 @@ class GameRepository : ViewModel() {
 //    }
 
     fun changePiecePosition(newSquare: Square, piece: ChessPiece, depth: Int) {
-        testDepth = depth
+        //testDepth = depth
         if(previousGameStates.isEmpty()){
             previousGameStates.add(GameState(previousSquare.value, currentSquare.value, getGameStateAsFEN()))
         }
@@ -505,7 +505,7 @@ class GameRepository : ViewModel() {
                     hashMap.remove(Square(newSquare.rank, newSquare.file + 1))
                     rook.square = Square(newSquare.rank, newSquare.file - 1)
                     hashMap[rook.square] = rook
-                    if(testDepth == 1){
+                    if(depth == 1){
                         castles.value+=1
                     }
                 }
@@ -516,17 +516,17 @@ class GameRepository : ViewModel() {
                     hashMap.remove(Square(newSquare.rank, newSquare.file - 2))
                     rook.square = Square(newSquare.rank, newSquare.file + 1)
                     hashMap[rook.square] = rook
-                    if(testDepth == 1){
+                    if(depth == 1){
                         castles.value+=1
                     }
                 }
             }
         }
         checkIfKingOrRooksMoved(piece)
-        previousMoveWasEnPassant.value = false
+       // previousMoveWasEnPassant.value = false
         //Remove Defender
         if (hashMap.containsKey(newSquare)) {
-            if(testDepth == 1){
+            if(depth == 1){
                 captures.value+=1
             }
             hashMap[newSquare]?.let {
@@ -544,8 +544,8 @@ class GameRepository : ViewModel() {
             )
         ) {
             println("--------------------en passant--------------------")
-            previousMoveWasEnPassant.value = true
-            if(testDepth == 1){
+            //previousMoveWasEnPassant.value = true
+            if(depth == 1){
                 enPassants.value+=1
                 captures.value+=1
             }
@@ -576,7 +576,7 @@ class GameRepository : ViewModel() {
         setXRayAttacks()
         previousGameStates.add(GameState(previousSquare.value, currentSquare.value, getGameStateAsFEN()))
         setPositionFromFen(getGameStateAsFEN())
-        if(kingInCheck.value && testDepth == 1){
+        if(kingInCheck.value && depth == 1){
             checks.value+=1
         }
     }

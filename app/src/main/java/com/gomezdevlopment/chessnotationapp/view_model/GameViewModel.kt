@@ -7,29 +7,8 @@ import com.gomezdevlopment.chessnotationapp.model.*
 
 class GameViewModel: ViewModel() {
     private var gameRepository: GameRepository = GameRepository.getGameRepository()
-    private var piecesOnBoard: MutableList<ChessPiece> = gameRepository.getPiecesOnBoard()
     private var  hashMap : MutableMap<Square, ChessPiece> = gameRepository.getHashMap()
     private var previousSquare : MutableState<Square> = gameRepository.getPreviousSquare()
-
-    private lateinit var pieceTemp: ChessPiece
-    private lateinit var originalSquare: Square
-    private lateinit var currentSquare: Square
-    private lateinit var previousSquareTemp: Square
-    private lateinit var kingSquare: Square
-    var gameState = gameRepository.getCurrentGameState()
-    var fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 "
-
-    fun getPiecesOnBoard(): MutableList<ChessPiece> {
-        return piecesOnBoard
-    }
-
-    fun getGameStateAsFen(){
-        gameRepository.getGameStateAsFEN()
-    }
-
-    fun setGameState(fen: String){
-        gameRepository.setPositionFromFen(fen)
-    }
 
     fun resetGame() {
         //gameRepository.undoChangePiecePosition(pieceTemp, originalSquare, currentSquare, previousSquareTemp, kingSquare, gameRepository.getCurrentSquare().value)
@@ -61,9 +40,6 @@ class GameViewModel: ViewModel() {
 //        currentSquare = gameRepository.getCurrentSquare().value
 //        previousSquareTemp = gameRepository.getPreviousSquare().value
 //        kingSquare = gameRepository.kingSquare().value
-        currentSquare = gameRepository.getCurrentSquare().value
-        previousSquareTemp = gameRepository.getPreviousSquare().value
-        fen = gameRepository.getGameStateAsFEN()
         gameRepository.changePiecePosition(newSquare, piece, 0)
     }
 
