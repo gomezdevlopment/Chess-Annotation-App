@@ -7,9 +7,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -136,7 +134,7 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
                 }
                 Image(
                     imageVector = imageVector,
-                    contentDescription = "Chess Board",
+                    contentDescription = "Chess Piece",
                     modifier = Modifier
                         .height(height.dp)
                         .aspectRatio(1f)
@@ -166,12 +164,19 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
     }
 
     if (squareClicked.value) {
-        clicked.value = false
-        squareClicked.value = false
-        viewModel.changePiecePosition(
-            Square(targetRank.value, targetFile.value),
-            clickedPiece.value
-        )
+
+        if(clickedPiece.value.piece == "pawn" && (targetRank.value == 7 || targetRank.value == 0)){
+            Promotion(height, clickedPiece.value, squareClicked, targetRank.value, targetFile.value, viewModel)
+            //clicked.value = false
+            //squareClicked.value = false
+        }else{
+            viewModel.changePiecePosition(
+                Square(targetRank.value, targetFile.value),
+                clickedPiece.value
+            )
+            clicked.value = false
+            squareClicked.value = false
+        }
     }
 
     val previousSquare = viewModel.getPreviousSquare().value
@@ -306,5 +311,56 @@ private fun Outline(
             alpha = 1f,
             style = Stroke(size.width*.05f)
         )
+    }
+}
+
+@Composable
+private fun Promotion(width: Float, chessPiece: ChessPiece, squareClicked: MutableState<Boolean>, rank: Int, file: Int, viewModel: GameViewModel) {
+    val pieces = mutableListOf<ChessPiece>()
+    val blackPieceImages = listOf(
+        ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(rank, file)),
+        ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(rank, file)),
+        ChessPiece("black", "bishop",  R.drawable.ic_bb_alpha, Square(rank, file)),
+        ChessPiece("black", "knight", R.drawable.ic_bn_alpha, Square(rank, file)))
+
+    val whitePieceImages = listOf(
+        ChessPiece("white", "queen", R.drawable.ic_wq_alpha, Square(rank, file)),
+        ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(rank, file)),
+        ChessPiece("white", "bishop",  R.drawable.ic_wb_alpha, Square(rank, file)),
+        ChessPiece("white", "knight", R.drawable.ic_wn_alpha, Square(rank, file)))
+
+    if(chessPiece.color == "white"){
+        pieces.addAll(whitePieceImages)
+    }else{
+        pieces.addAll(blackPieceImages)
+    }
+
+    val offsetX = width * file
+    val offsetY = (7 - rank) * width
+
+    Box(modifier = Modifier
+        .width(width.dp)
+        .absoluteOffset(offsetX.dp, offsetY.dp)) {
+        DropdownMenu(
+            expanded = squareClicked.value,
+            onDismissRequest = { },
+            modifier = Modifier
+                .width(width.dp)
+        ) {
+            pieces.forEach { selectedPiece ->
+                DropdownMenuItem(onClick = {
+                    squareClicked.value = false
+                    viewModel.promotion(Square(rank, file), chessPiece, selectedPiece)
+                }) {
+                    Image(
+                        imageVector = ImageVector.vectorResource(selectedPiece.pieceDrawable),
+                        contentDescription = "Chess Piece",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                    )
+                }
+            }
+        }
     }
 }

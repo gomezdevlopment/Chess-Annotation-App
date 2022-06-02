@@ -43,6 +43,10 @@ class GameViewModel: ViewModel() {
         gameRepository.changePiecePosition(newSquare, piece, 0)
     }
 
+    fun promotion(newSquare: Square, piece: ChessPiece, promotionSelection: ChessPiece){
+        gameRepository.promotion(newSquare, piece, promotionSelection)
+    }
+
     fun getPreviousSquare(): MutableState<Square>{
         return previousSquare
     }

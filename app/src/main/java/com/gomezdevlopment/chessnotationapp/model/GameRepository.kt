@@ -1,7 +1,15 @@
 package com.gomezdevlopment.chessnotationapp.model
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.width
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.dp
 import androidx.core.os.persistableBundleOf
 import androidx.lifecycle.ViewModel
 import com.gomezdevlopment.chessnotationapp.R
@@ -491,8 +499,77 @@ class GameRepository : ViewModel() {
 //        setXRayAttacks()
 //    }
 
+    @Composable
+    private fun Promotion(width: Float, chessPiece: ChessPiece) {
+        var expanded by remember { mutableStateOf(false) }
+        val pieces = mutableListOf<ChessPiece>()
+        val blackPieceImages = listOf(
+            ChessPiece("black", "queen", R.drawable.ic_bq_alpha, chessPiece.square),
+            ChessPiece("black", "rook", R.drawable.ic_br_alpha, chessPiece.square),
+            ChessPiece("black", "bishop",  R.drawable.ic_bb_alpha, chessPiece.square),
+            ChessPiece("black", "knight", R.drawable.ic_bn_alpha, chessPiece.square))
+
+        val whitePieceImages = listOf(
+            ChessPiece("white", "queen", R.drawable.ic_wq_alpha, chessPiece.square),
+            ChessPiece("white", "rook", R.drawable.ic_wr_alpha, chessPiece.square),
+            ChessPiece("white", "bishop",  R.drawable.ic_wb_alpha, chessPiece.square),
+            ChessPiece("white", "knight", R.drawable.ic_wn_alpha, chessPiece.square))
+
+        if(chessPiece.color == "white"){
+            pieces.addAll(whitePieceImages)
+        }else{
+            pieces.addAll(blackPieceImages)
+        }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.width(width.dp)
+        ) {
+            pieces.forEach { piece ->
+                DropdownMenuItem(onClick = {
+                    expanded = false
+
+                }) {
+                    Image(
+                        imageVector = ImageVector.vectorResource(piece.pieceDrawable),
+                        contentDescription = "Chess Piece",
+                        modifier = Modifier
+                            .width(width.dp)
+                            .aspectRatio(1f)
+                    )
+                }
+            }
+        }
+    }
+
+    fun promotion(newSquare: Square, piece: ChessPiece, promotionSelection: ChessPiece){
+        if(previousGameStates.isEmpty()){
+            previousGameStates.add(GameState(previousSquare.value, currentSquare.value, getGameStateAsFEN()))
+        }
+
+        val previousPieceSquare = piece.square
+        //hashMap.remove(piece.square)
+        //piece.square = newSquare
+        //hashMap[newSquare] = piece
+
+        piecesOnBoard.remove(piece)
+        hashMap.remove(piece.square)
+        hashMap[newSquare] = promotionSelection
+        setPreviousSquare(previousPieceSquare)
+        setCurrentSquare(newSquare)
+
+        if (piece.color == "white") {
+            setPlayerTurn("black")
+        } else {
+            setPlayerTurn("white")
+        }
+        checkAttacks()
+        setXRayAttacks()
+        previousGameStates.add(GameState(previousSquare.value, currentSquare.value, getGameStateAsFEN()))
+        //setPositionFromFen(getGameStateAsFEN())
+    }
+
     fun changePiecePosition(newSquare: Square, piece: ChessPiece, depth: Int) {
-        //testDepth = depth
         if(previousGameStates.isEmpty()){
             previousGameStates.add(GameState(previousSquare.value, currentSquare.value, getGameStateAsFEN()))
         }
@@ -553,6 +630,9 @@ class GameRepository : ViewModel() {
             piecesOnBoard.remove(hashMap[currentSquare.value])
             hashMap.remove(currentSquare.value)
         }
+
+        //Check Promotion
+
         val previousPieceSquare = piece.square
         hashMap.remove(piece.square)
         piece.square = newSquare
