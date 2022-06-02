@@ -15,7 +15,8 @@ class Pawn {
         currentSquare: Square,
         xRayAttacks: MutableList<Square>,
         kingSquare:Square,
-        piecesCheckingKing: MutableList<Square>
+        piecesCheckingKing: MutableList<Square>,
+        checkDefendedPieces: Boolean
     ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
 

@@ -43,8 +43,12 @@ class GameViewModel: ViewModel() {
         gameRepository.changePiecePosition(newSquare, piece, 0)
     }
 
-    fun promotion(newSquare: Square, piece: ChessPiece, promotionSelection: ChessPiece){
-        gameRepository.promotion(newSquare, piece, promotionSelection)
+    fun promotion(newSquare: Square, promotionSelection: ChessPiece){
+        gameRepository.promotion(newSquare, promotionSelection)
+    }
+
+    fun movePiece(newSquare: Square, piece: ChessPiece){
+        gameRepository.movePiece(newSquare, piece)
     }
 
     fun getPreviousSquare(): MutableState<Square>{
@@ -76,5 +80,25 @@ class GameViewModel: ViewModel() {
 
     fun getAttacks(): MutableList<Square> {
         return gameRepository.getAttacks()
+    }
+
+    fun getCheckmate(): MutableState<Boolean> {
+        return gameRepository.getCheckmate()
+    }
+
+    fun getStalemate(): MutableState<Boolean> {
+        return gameRepository.getStalemate()
+    }
+
+    fun getInsufficientMaterial(): MutableState<Boolean> {
+        return gameRepository.getInsufficientMaterial()
+    }
+
+    fun getThreeFoldRepetition(): MutableState<Boolean> {
+        return gameRepository.getThreeFoldRepetition()
+    }
+
+    fun getFiftyMoveRule(): MutableState<Boolean> {
+        return gameRepository.getFiftyMoveRule()
     }
 }

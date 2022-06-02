@@ -28,6 +28,7 @@ class GameRepository : ViewModel() {
     private var blackKingSquare: MutableState<Square> = mutableStateOf(Square(7, 4))
     private var xRayAttacks: MutableList<Square> = mutableListOf()
     private var attacks: MutableList<Square> = mutableListOf()
+    private var allLegalMoves: MutableList<Square> = mutableListOf()
     private var whiteKingCanCastleKingSide: MutableState<Boolean> = mutableStateOf(true)
     private var whiteKingCanCastleQueenSide: MutableState<Boolean> = mutableStateOf(true)
     private var blackKingCanCastleKingSide: MutableState<Boolean> = mutableStateOf(true)
@@ -44,7 +45,31 @@ class GameRepository : ViewModel() {
     private var previousGameStates = mutableListOf<GameState>()
     private var gameState = GameState(previousSquare.value, currentSquare.value, gameStateAsFEN)
     private var previousGameState = mutableStateOf(GameState(previousSquare.value, currentSquare.value, gameStateAsFEN))
-    private var testDepth = 0
+    private var checkmate: MutableState<Boolean> = mutableStateOf(false)
+    private var stalemate: MutableState<Boolean> = mutableStateOf(false)
+    private var insufficientMaterial: MutableState<Boolean> = mutableStateOf(false)
+    private var threeFoldRepetition: MutableState<Boolean> = mutableStateOf(false)
+    private var fiftyMoveRule: MutableState<Boolean> = mutableStateOf(false)
+
+    fun getCheckmate(): MutableState<Boolean> {
+        return checkmate
+    }
+
+    fun getStalemate(): MutableState<Boolean> {
+        return stalemate
+    }
+
+    fun getInsufficientMaterial(): MutableState<Boolean> {
+        return insufficientMaterial
+    }
+
+    fun getThreeFoldRepetition(): MutableState<Boolean> {
+        return threeFoldRepetition
+    }
+
+    fun getFiftyMoveRule(): MutableState<Boolean> {
+        return fiftyMoveRule
+    }
 
     fun getChecks(): Int {
         return checks.value
@@ -80,11 +105,12 @@ class GameRepository : ViewModel() {
     }
 
     init {
+        //promotionPosition()
         //addPieces()
         //testPositionKiwipete()
-        testPosition3()
+       // testPosition3()
 //        previousGameStates.add(GameState(previousSquare.value, currentSquare.value, gameStateAsFEN))
-        //initialPosition()
+        initialPosition()
     }
 
     fun getGameStateAsFEN(): String{
@@ -255,6 +281,10 @@ class GameRepository : ViewModel() {
     }
     fun initialPosition(){
         setPositionFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ")
+        gameState.fenPosition = getGameStateAsFEN()
+    }
+    fun promotionPosition(){
+        setPositionFromFen("2r5/KP6/8/8/8/8/6pk/8 w - - 0 1")
         gameState.fenPosition = getGameStateAsFEN()
     }
 
@@ -499,66 +529,94 @@ class GameRepository : ViewModel() {
 //        setXRayAttacks()
 //    }
 
-    @Composable
-    private fun Promotion(width: Float, chessPiece: ChessPiece) {
-        var expanded by remember { mutableStateOf(false) }
-        val pieces = mutableListOf<ChessPiece>()
-        val blackPieceImages = listOf(
-            ChessPiece("black", "queen", R.drawable.ic_bq_alpha, chessPiece.square),
-            ChessPiece("black", "rook", R.drawable.ic_br_alpha, chessPiece.square),
-            ChessPiece("black", "bishop",  R.drawable.ic_bb_alpha, chessPiece.square),
-            ChessPiece("black", "knight", R.drawable.ic_bn_alpha, chessPiece.square))
+    fun checkAllLegalMoves(){
+        allLegalMoves.clear()
 
-        val whitePieceImages = listOf(
-            ChessPiece("white", "queen", R.drawable.ic_wq_alpha, chessPiece.square),
-            ChessPiece("white", "rook", R.drawable.ic_wr_alpha, chessPiece.square),
-            ChessPiece("white", "bishop",  R.drawable.ic_wb_alpha, chessPiece.square),
-            ChessPiece("white", "knight", R.drawable.ic_wn_alpha, chessPiece.square))
-
-        if(chessPiece.color == "white"){
-            pieces.addAll(whitePieceImages)
-        }else{
-            pieces.addAll(blackPieceImages)
+            for(piece in piecesOnBoard){
+                if(piece.color == playerTurn.value){
+                    for(move in checkLegalMoves(piece, false)){
+                        allLegalMoves.add(move)
+                    }
+                }
+            }
+    }
+    fun checkCheckmate(){
+        if(allLegalMoves.isEmpty() && kingInCheck().value){
+            checkmate.value = true
         }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-            modifier = Modifier.width(width.dp)
-        ) {
-            pieces.forEach { piece ->
-                DropdownMenuItem(onClick = {
-                    expanded = false
+    }
 
-                }) {
-                    Image(
-                        imageVector = ImageVector.vectorResource(piece.pieceDrawable),
-                        contentDescription = "Chess Piece",
-                        modifier = Modifier
-                            .width(width.dp)
-                            .aspectRatio(1f)
-                    )
+    fun checkStalemate(){
+        if(allLegalMoves.isEmpty() && !kingInCheck().value){
+            stalemate.value = true
+        }
+    }
+
+    fun checkInsufficientMaterial(){
+        if(piecesOnBoard.size == 2){
+            insufficientMaterial.value = (piecesOnBoard.size == 2)
+        }else{
+            var blackBishopsAndKnights = 0
+            var whiteBishopsAndKnights = 0
+            var onlyKnightsOrBishops = true
+            if(piecesOnBoard.size < 5){
+                for(piece in piecesOnBoard){
+                    when(piece.color){
+                        "white" -> {
+                            whiteBishopsAndKnights += when(piece.piece){
+                                "bishop" -> 1
+                                "knight" -> 1
+                                "king" -> 0
+                                else -> {
+                                    onlyKnightsOrBishops = false
+                                    break
+                                }
+                            }
+                        }
+                        "black" -> {
+                            blackBishopsAndKnights += when(piece.piece){
+                                "bishop" -> 1
+                                "knight" -> 1
+                                "king" -> 0
+                                else -> {
+                                    onlyKnightsOrBishops = false
+                                    break
+                                }
+                            }
+                        }
+                    }
+                }
+                if(whiteBishopsAndKnights < 2 && blackBishopsAndKnights < 2 && onlyKnightsOrBishops){
+                    insufficientMaterial.value = true
                 }
             }
         }
     }
 
-    fun promotion(newSquare: Square, piece: ChessPiece, promotionSelection: ChessPiece){
+    fun movePiece(newSquare: Square, piece: ChessPiece){
         if(previousGameStates.isEmpty()){
             previousGameStates.add(GameState(previousSquare.value, currentSquare.value, getGameStateAsFEN()))
         }
 
-        val previousPieceSquare = piece.square
-        //hashMap.remove(piece.square)
-        //piece.square = newSquare
-        //hashMap[newSquare] = piece
+        if (hashMap.containsKey(newSquare)) {
+            hashMap[newSquare]?.let {
+                capturedPieces.add(it)
+            }
+            piecesOnBoard.remove(hashMap[newSquare])
+        }
 
-        piecesOnBoard.remove(piece)
+        val previousPieceSquare = Square(piece.square.rank, piece.square.file)
         hashMap.remove(piece.square)
-        hashMap[newSquare] = promotionSelection
+        piecesOnBoard.remove(piece)
         setPreviousSquare(previousPieceSquare)
         setCurrentSquare(newSquare)
+    }
 
-        if (piece.color == "white") {
+    fun promotion(newSquare: Square, promotionSelection: ChessPiece){
+        hashMap[newSquare] = promotionSelection
+        piecesOnBoard.add(promotionSelection)
+        //setCurrentSquare(piece.square)
+        if (playerTurn.value == "white") {
             setPlayerTurn("black")
         } else {
             setPlayerTurn("white")
@@ -566,6 +624,10 @@ class GameRepository : ViewModel() {
         checkAttacks()
         setXRayAttacks()
         previousGameStates.add(GameState(previousSquare.value, currentSquare.value, getGameStateAsFEN()))
+        checkAllLegalMoves()
+        checkCheckmate()
+        checkStalemate()
+        checkInsufficientMaterial()
         //setPositionFromFen(getGameStateAsFEN())
     }
 
@@ -659,6 +721,11 @@ class GameRepository : ViewModel() {
         if(kingInCheck.value && depth == 1){
             checks.value+=1
         }
+
+        checkAllLegalMoves()
+        checkCheckmate()
+        checkStalemate()
+        checkInsufficientMaterial()
     }
 
     fun getGameState(): GameState {
@@ -839,7 +906,7 @@ class GameRepository : ViewModel() {
         var listOfMoves = mutableListOf<Square>()
         when (piece.piece) {
             "pawn" -> {
-                listOfMoves = pawnMoves(piece)
+                listOfMoves = pawnMoves(piece, checkDefendedPieces)
             }
             "rook" -> {
                 listOfMoves = rookMoves(piece, checkDefendedPieces)
@@ -851,7 +918,7 @@ class GameRepository : ViewModel() {
                 listOfMoves = bishopMoves(piece, checkDefendedPieces)
             }
             "king" -> {
-                listOfMoves = kingMoves(piece)
+                listOfMoves = kingMoves(piece, checkDefendedPieces)
             }
             "queen" -> {
                 listOfMoves = queenMoves(piece, checkDefendedPieces)
@@ -860,7 +927,7 @@ class GameRepository : ViewModel() {
         return listOfMoves
     }
 
-    private fun pawnMoves(piece: ChessPiece): MutableList<Square> {
+    private fun pawnMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
         return Pawn().moves(
             piece,
             hashMap,
@@ -869,11 +936,12 @@ class GameRepository : ViewModel() {
             currentSquare.value,
             xRayAttacks,
             getKingSquare(),
-            piecesCheckingKing
+            piecesCheckingKing,
+            checkDefendedPieces
         )
     }
 
-    private fun kingMoves(piece: ChessPiece): MutableList<Square> {
+    private fun kingMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
         if (piece.color == "white") {
             return King().moves(
                 piece,
@@ -885,7 +953,8 @@ class GameRepository : ViewModel() {
                 xRayAttacks,
                 getKingSquare(),
                 getChecksOnKing(),
-                piecesCheckingKing
+                piecesCheckingKing,
+                checkDefendedPieces
             )
         }
         return King().moves(
@@ -898,7 +967,8 @@ class GameRepository : ViewModel() {
             xRayAttacks,
             getKingSquare(),
             getChecksOnKing(),
-            piecesCheckingKing
+            piecesCheckingKing,
+            checkDefendedPieces
         )
     }
 

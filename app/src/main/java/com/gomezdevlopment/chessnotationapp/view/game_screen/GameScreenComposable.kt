@@ -7,9 +7,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -19,8 +23,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.GameEvent
@@ -28,19 +34,9 @@ import com.gomezdevlopment.chessnotationapp.model.Square
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable
-fun HomePage() {
-    val activity = (LocalContext.current as? Activity)
-    Button(onClick = {
-        activity?.finish()
-    }) {
-        Text("Exit")
-    }
-}
-
-@Composable
 fun ChessCanvas(width: Float, viewModel: GameViewModel) {
     val chessBoardVector: ImageVector =
-        ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
+        ImageVector.vectorResource(id = R.drawable.ic_chess_board_blue_outlined)
 
     val rowWidthAndHeight: Float = (width/ 8f)
     println(rowWidthAndHeight)
@@ -95,6 +91,17 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
         mutableStateOf(0)
     }
 
+    val checkmate = remember {
+        viewModel.getCheckmate()
+    }
+
+    val stalemate = remember {
+        viewModel.getStalemate()
+    }
+
+    val insufficientMaterial = remember {
+        viewModel.getInsufficientMaterial()
+    }
 //    val xRays = remember {
 //        viewModel.xRays()
 //    }
@@ -103,9 +110,9 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
 //        viewModel.getSquaresToBlock()
 //    }
 //
-//    val attacks = remember {
-//        viewModel.getAttacks()
-//    }
+    val attacks = remember {
+        viewModel.getAttacks()
+    }
 
     for (rank in 7 downTo 0) {
         for (file in 0..7) {
@@ -119,7 +126,7 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
 //                Outline(height = height, square = square, Color.Yellow)
 //            }
 //            if(attacks.contains(square)){
-//                Attack(height = height, square = square)
+//                Highlight(height = height, square = square, Color.Blue)
 //            }
 
             if (hashMap.containsKey(square)) {
@@ -140,11 +147,14 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
                         .aspectRatio(1f)
                         .offset(offsetX.dp, offsetY.dp)
                         .clickable {
-                            clicked.value = false
-                            clickedPiece.value = chessPiece
-                            if (viewModel.getPlayerTurn() == clickedPiece.value.color) {
-                                clickedPiece.value.square
-                                clicked.value = true
+
+                            if (!squareClicked.value) {
+                                clicked.value = false
+                                clickedPiece.value = chessPiece
+                                if (viewModel.getPlayerTurn() == clickedPiece.value.color) {
+                                    clickedPiece.value.square
+                                    clicked.value = true
+                                }
                             }
                         }
                 )
@@ -166,7 +176,8 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
     if (squareClicked.value) {
 
         if(clickedPiece.value.piece == "pawn" && (targetRank.value == 7 || targetRank.value == 0)){
-            Promotion(height, clickedPiece.value, squareClicked, targetRank.value, targetFile.value, viewModel)
+            viewModel.movePiece(Square(targetRank.value, targetFile.value), clickedPiece.value)
+            PromotionV2(height, clickedPiece.value, squareClicked, targetRank.value, targetFile.value, viewModel)
             //clicked.value = false
             //squareClicked.value = false
         }else{
@@ -183,6 +194,23 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
     if (previousSquare.rank != 10) {
         //Outline(height = height, square = previousSquare, Color.Blue)
         Highlight(height = height, square = previousSquare, color = Color.Blue)
+    }
+
+
+    if(checkmate.value){
+        var winner = "White"
+        if(viewModel.getPlayerTurn() == "white"){
+            winner = "Black"
+        }
+        EndOfGameCard(message = "Checkmate - $winner Wins!")
+    }
+
+    if(insufficientMaterial.value){
+        EndOfGameCard(message = "Draw by Insufficient Material")
+    }
+
+    if(stalemate.value){
+        EndOfGameCard(message = "Stalemate")
     }
 }
 
@@ -265,30 +293,6 @@ private fun PossibleCapture(
     }
 }
 
-//@Composable
-//private fun Attack(
-//    height: Float,
-//    square: Square
-//) {
-//    val offsetX = height * square.file
-//    val offsetY = (7 - square.rank) * height
-//    Canvas(
-//        modifier = Modifier
-//            .height(height.dp)
-//            .aspectRatio(1f)
-//            .absoluteOffset(offsetX.dp, offsetY.dp)
-//
-//    ) {
-//        println(height/2f)
-//        drawCircle(
-//            color = Color.Red,
-//            radius = height/2f,
-//            alpha = .5f,
-//            style = Stroke(5f)
-//        )
-//    }
-//}
-
 @Composable
 private fun Outline(
     height: Float,
@@ -315,7 +319,7 @@ private fun Outline(
 }
 
 @Composable
-private fun Promotion(width: Float, chessPiece: ChessPiece, squareClicked: MutableState<Boolean>, rank: Int, file: Int, viewModel: GameViewModel) {
+private fun PromotionV2(width: Float, chessPiece: ChessPiece, squareClicked: MutableState<Boolean>, rank: Int, file: Int, viewModel: GameViewModel) {
     val pieces = mutableListOf<ChessPiece>()
     val blackPieceImages = listOf(
         ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(rank, file)),
@@ -336,30 +340,62 @@ private fun Promotion(width: Float, chessPiece: ChessPiece, squareClicked: Mutab
     }
 
     val offsetX = width * file
-    val offsetY = (7 - rank) * width
+    var offsetY = (7 - rank) * width
+    if(rank == 0){
+        offsetY = 4 * width
+    }
 
     Box(modifier = Modifier
-        .width(width.dp)
-        .absoluteOffset(offsetX.dp, offsetY.dp)) {
-        DropdownMenu(
-            expanded = squareClicked.value,
-            onDismissRequest = { },
-            modifier = Modifier
-                .width(width.dp)
-        ) {
-            pieces.forEach { selectedPiece ->
-                DropdownMenuItem(onClick = {
-                    squareClicked.value = false
-                    viewModel.promotion(Square(rank, file), chessPiece, selectedPiece)
-                }) {
+        .fillMaxWidth()
+        .fillMaxHeight()
+        .background(colorResource(id = R.color.transparentBlack))
+        .zIndex(2f))
+    {
+        Card(modifier = Modifier
+            .width(width.dp)
+            .height((width * 4).dp)
+            .absoluteOffset(offsetX.dp, offsetY.dp),
+            elevation = 5.dp,
+            shape = RoundedCornerShape(10.dp)
+            ){
+            Column(Modifier.fillMaxWidth()){
+                pieces.forEach {selectedPiece ->
                     Image(
                         imageVector = ImageVector.vectorResource(selectedPiece.pieceDrawable),
                         contentDescription = "Chess Piece",
                         modifier = Modifier
                             .fillMaxWidth()
                             .aspectRatio(1f)
+                            .padding(5.dp)
+                            .clickable {
+                                squareClicked.value = false
+                                viewModel.promotion(Square(rank, file), selectedPiece)
+                            }
                     )
                 }
+            }
+        }
+
+    }
+}
+
+@Composable
+private fun EndOfGameCard(message: String) {
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .fillMaxHeight()
+        .background(colorResource(id = R.color.transparentBlack))
+        .zIndex(2f))
+    {
+        Card(modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(50.dp),
+            elevation = 10.dp,
+            shape = RoundedCornerShape(20.dp)
+        ){
+            Column(Modifier.fillMaxWidth()){
+                Text(text = message, textAlign = TextAlign.Center)
             }
         }
     }
