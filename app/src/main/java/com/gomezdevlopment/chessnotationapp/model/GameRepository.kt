@@ -44,12 +44,14 @@ class GameRepository : ViewModel() {
     private var gameStateAsFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 "
     private var previousGameStates = mutableListOf<GameState>()
     private var gameState = GameState(previousSquare.value, currentSquare.value, gameStateAsFEN)
-    private var previousGameState = mutableStateOf(GameState(previousSquare.value, currentSquare.value, gameStateAsFEN))
+    private var previousGameState =
+        mutableStateOf(GameState(previousSquare.value, currentSquare.value, gameStateAsFEN))
     private var checkmate: MutableState<Boolean> = mutableStateOf(false)
     private var stalemate: MutableState<Boolean> = mutableStateOf(false)
     private var insufficientMaterial: MutableState<Boolean> = mutableStateOf(false)
     private var threeFoldRepetition: MutableState<Boolean> = mutableStateOf(false)
     private var fiftyMoveRule: MutableState<Boolean> = mutableStateOf(false)
+    private var fiftyMoveCount = mutableStateOf(0)
 
     fun getCheckmate(): MutableState<Boolean> {
         return checkmate
@@ -108,92 +110,100 @@ class GameRepository : ViewModel() {
         //promotionPosition()
         //addPieces()
         //testPositionKiwipete()
-       // testPosition3()
+        // testPosition3()
 //        previousGameStates.add(GameState(previousSquare.value, currentSquare.value, gameStateAsFEN))
         initialPosition()
     }
 
-    fun getGameStateAsFEN(): String{
+    fun getGameStateAsFEN(): String {
         val fenString = StringBuilder()
-        for(rank in 7 downTo 0){
+        for (rank in 7 downTo 0) {
             var emptySquares = 0
-            for(file in 0..7){
-                if(hashMap.containsKey(Square(rank, file))){
-                    if(emptySquares != 0){
+            for (file in 0..7) {
+                if (hashMap.containsKey(Square(rank, file))) {
+                    if (emptySquares != 0) {
                         fenString.append(emptySquares)
                     }
                     emptySquares = 0
                     val piece = hashMap[Square(rank, file)]
-                    when(piece?.piece){
+                    when (piece?.piece) {
                         "rook" -> {
-                            if(piece.color == "white") {
+                            if (piece.color == "white") {
                                 fenString.append("R")
-                            }else{
+                            } else {
                                 fenString.append("r")
                             }
                         }
                         "knight" -> {
-                            if(piece.color == "white") {
+                            if (piece.color == "white") {
                                 fenString.append("N")
-                            }else{
+                            } else {
                                 fenString.append("n")
                             }
                         }
                         "bishop" -> {
-                            if(piece.color == "white") {
+                            if (piece.color == "white") {
                                 fenString.append("B")
-                            }else{
+                            } else {
                                 fenString.append("b")
                             }
                         }
                         "queen" -> {
-                            if(piece.color == "white") {
+                            if (piece.color == "white") {
                                 fenString.append("Q")
-                            }else{
+                            } else {
                                 fenString.append("q")
                             }
                         }
                         "king" -> {
-                            if(piece.color == "white") {
+                            if (piece.color == "white") {
                                 fenString.append("K")
-                            }else{
+                            } else {
                                 fenString.append("k")
                             }
                         }
                         "pawn" -> {
-                            if(piece.color == "white") {
+                            if (piece.color == "white") {
                                 fenString.append("P")
-                            }else{
+                            } else {
                                 fenString.append("p")
                             }
                         }
                     }
-                }else{
-                    emptySquares+=1
-                    if(file == 7){
-                        if(emptySquares != 0){
+                } else {
+                    emptySquares += 1
+                    if (file == 7) {
+                        if (emptySquares != 0) {
                             fenString.append(emptySquares)
                         }
                     }
                 }
             }
-            if(rank!=0){
+            if (rank != 0) {
                 fenString.append("/")
             }
         }
         fenString.append(" ")
-        when(playerTurn.value){
+        when (playerTurn.value) {
             "white" -> fenString.append("w ")
             "black" -> fenString.append("b ")
         }
 
-        if(!whiteKingCanCastleKingSide.value && !whiteKingCanCastleQueenSide.value && !blackKingCanCastleKingSide.value && !blackKingCanCastleQueenSide.value){
+        if (!whiteKingCanCastleKingSide.value && !whiteKingCanCastleQueenSide.value && !blackKingCanCastleKingSide.value && !blackKingCanCastleQueenSide.value) {
             fenString.append("- ")
-        }else{
-            if(whiteKingCanCastleKingSide.value) {fenString.append("K")}
-            if(whiteKingCanCastleQueenSide.value) {fenString.append("Q")}
-            if(blackKingCanCastleKingSide.value) {fenString.append("k")}
-            if(blackKingCanCastleQueenSide.value) {fenString.append("q")}
+        } else {
+            if (whiteKingCanCastleKingSide.value) {
+                fenString.append("K")
+            }
+            if (whiteKingCanCastleQueenSide.value) {
+                fenString.append("Q")
+            }
+            if (blackKingCanCastleKingSide.value) {
+                fenString.append("k")
+            }
+            if (blackKingCanCastleQueenSide.value) {
+                fenString.append("q")
+            }
             fenString.append(" ")
         }
         return fenString.toString()
@@ -204,45 +214,149 @@ class GameRepository : ViewModel() {
         val splitFen = fen.split(" ")
         val piecePositions = splitFen[0].split("/")
         var rank = 8
-        for(string in piecePositions){
+        for (string in piecePositions) {
             rank--
             var file = 0
-            for(char in string){
-                if(char.isDigit()){
-                    file+=char.digitToInt()
-                }else{
-                    when(char) {
-                        'r' -> {pieces.add(ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(rank, file)))}
-                        'n' -> {pieces.add(ChessPiece("black", "knight", R.drawable.ic_bn_alpha, Square(rank, file)))}
-                        'b' -> {pieces.add(ChessPiece("black", "bishop", R.drawable.ic_bb_alpha, Square(rank, file)))}
-                        'q' -> {pieces.add(ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(rank, file)))}
+            for (char in string) {
+                if (char.isDigit()) {
+                    file += char.digitToInt()
+                } else {
+                    when (char) {
+                        'r' -> {
+                            pieces.add(
+                                ChessPiece(
+                                    "black",
+                                    "rook",
+                                    R.drawable.ic_br_alpha,
+                                    Square(rank, file)
+                                )
+                            )
+                        }
+                        'n' -> {
+                            pieces.add(
+                                ChessPiece(
+                                    "black",
+                                    "knight",
+                                    R.drawable.ic_bn_alpha,
+                                    Square(rank, file)
+                                )
+                            )
+                        }
+                        'b' -> {
+                            pieces.add(
+                                ChessPiece(
+                                    "black",
+                                    "bishop",
+                                    R.drawable.ic_bb_alpha,
+                                    Square(rank, file)
+                                )
+                            )
+                        }
+                        'q' -> {
+                            pieces.add(
+                                ChessPiece(
+                                    "black",
+                                    "queen",
+                                    R.drawable.ic_bq_alpha,
+                                    Square(rank, file)
+                                )
+                            )
+                        }
                         'k' -> {
-                            pieces.add(ChessPiece("black", "king", R.drawable.ic_bk_alpha, Square(rank, file)))
+                            pieces.add(
+                                ChessPiece(
+                                    "black",
+                                    "king",
+                                    R.drawable.ic_bk_alpha,
+                                    Square(rank, file)
+                                )
+                            )
                             blackKingSquare.value = Square(rank, file)
                         }
-                        'p' -> {pieces.add(ChessPiece("black", "pawn", R.drawable.ic_bp_alpha, Square(rank, file)))}
-                        'R' -> {pieces.add(ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(rank, file)))}
-                        'N' -> {pieces.add(ChessPiece("white", "knight", R.drawable.ic_wn_alpha, Square(rank, file)))}
-                        'B' -> {pieces.add(ChessPiece("white", "bishop", R.drawable.ic_wb_alpha, Square(rank, file)))}
-                        'Q' -> {pieces.add(ChessPiece("white", "queen", R.drawable.ic_wq_alpha, Square(rank, file)))}
+                        'p' -> {
+                            pieces.add(
+                                ChessPiece(
+                                    "black",
+                                    "pawn",
+                                    R.drawable.ic_bp_alpha,
+                                    Square(rank, file)
+                                )
+                            )
+                        }
+                        'R' -> {
+                            pieces.add(
+                                ChessPiece(
+                                    "white",
+                                    "rook",
+                                    R.drawable.ic_wr_alpha,
+                                    Square(rank, file)
+                                )
+                            )
+                        }
+                        'N' -> {
+                            pieces.add(
+                                ChessPiece(
+                                    "white",
+                                    "knight",
+                                    R.drawable.ic_wn_alpha,
+                                    Square(rank, file)
+                                )
+                            )
+                        }
+                        'B' -> {
+                            pieces.add(
+                                ChessPiece(
+                                    "white",
+                                    "bishop",
+                                    R.drawable.ic_wb_alpha,
+                                    Square(rank, file)
+                                )
+                            )
+                        }
+                        'Q' -> {
+                            pieces.add(
+                                ChessPiece(
+                                    "white",
+                                    "queen",
+                                    R.drawable.ic_wq_alpha,
+                                    Square(rank, file)
+                                )
+                            )
+                        }
                         'K' -> {
-                            pieces.add(ChessPiece("white", "king", R.drawable.ic_wk, Square(rank, file)))
+                            pieces.add(
+                                ChessPiece(
+                                    "white",
+                                    "king",
+                                    R.drawable.ic_wk,
+                                    Square(rank, file)
+                                )
+                            )
                             whiteKingSquare.value = Square(rank, file)
                         }
-                        'P' -> {pieces.add(ChessPiece("white", "pawn", R.drawable.ic_wp_alpha, Square(rank, file)))}
+                        'P' -> {
+                            pieces.add(
+                                ChessPiece(
+                                    "white",
+                                    "pawn",
+                                    R.drawable.ic_wp_alpha,
+                                    Square(rank, file)
+                                )
+                            )
+                        }
                     }
                     file++
                 }
             }
         }
 
-        when(splitFen[1]){
+        when (splitFen[1]) {
             "w" -> playerTurn.value = "white"
             "b" -> playerTurn.value = "black"
         }
 
-        for(char in splitFen[2]){
-            when(char) {
+        for (char in splitFen[2]) {
+            when (char) {
                 'K' -> whiteKingCanCastleKingSide.value = true
                 'Q' -> whiteKingCanCastleQueenSide.value = true
                 'k' -> blackKingCanCastleKingSide.value = true
@@ -258,7 +372,7 @@ class GameRepository : ViewModel() {
         return pieces
     }
 
-    fun setPositionFromFen(fen: String){
+    fun setPositionFromFen(fen: String) {
         piecesOnBoard.clear()
         hashMap.clear()
         piecesOnBoard.addAll(parseFEN(fen))
@@ -270,20 +384,22 @@ class GameRepository : ViewModel() {
         //gameState.value.fenPosition = getGameStateAsFEN()
     }
 
-    fun testPositionKiwipete(){
+    fun testPositionKiwipete() {
         setPositionFromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ")
         gameState.fenPosition = getGameStateAsFEN()
     }
 
-    fun testPosition3(){
+    fun testPosition3() {
         setPositionFromFen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -")
         gameState.fenPosition = getGameStateAsFEN()
     }
-    fun initialPosition(){
+
+    fun initialPosition() {
         setPositionFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ")
         gameState.fenPosition = getGameStateAsFEN()
     }
-    fun promotionPosition(){
+
+    fun promotionPosition() {
         setPositionFromFen("2r5/KP6/8/8/8/8/6pk/8 w - - 0 1")
         gameState.fenPosition = getGameStateAsFEN()
     }
@@ -420,25 +536,25 @@ class GameRepository : ViewModel() {
 
     val previousMoveWasEnPassant = mutableStateOf(false)
     fun castleKingSide(): Boolean {
-        if(playerTurn.value == "white"){
+        if (playerTurn.value == "white") {
             return whiteKingCanCastleKingSide.value
         }
         return blackKingCanCastleKingSide.value
     }
 
     fun castleQueenSide(): Boolean {
-        if(playerTurn.value == "white"){
+        if (playerTurn.value == "white") {
             return whiteKingCanCastleQueenSide.value
         }
         return blackKingCanCastleQueenSide.value
     }
 
-    fun previousGameState(){
-        if(previousGameStates.size>1){
-            previousGameStates.removeAt(previousGameStates.size-1)
-            setPositionFromFen(previousGameStates[previousGameStates.size-1].fenPosition)
-            currentSquare.value = previousGameStates[previousGameStates.size-1].currentSquare
-            previousSquare.value = previousGameStates[previousGameStates.size-1].previousSquare
+    fun previousGameState() {
+        if (previousGameStates.size > 1) {
+            previousGameStates.removeAt(previousGameStates.size - 1)
+            setPositionFromFen(previousGameStates[previousGameStates.size - 1].fenPosition)
+            currentSquare.value = previousGameStates[previousGameStates.size - 1].currentSquare
+            previousSquare.value = previousGameStates[previousGameStates.size - 1].previousSquare
         }
 
     }
@@ -529,41 +645,73 @@ class GameRepository : ViewModel() {
 //        setXRayAttacks()
 //    }
 
-    fun checkAllLegalMoves(){
+    fun checkAllLegalMoves() {
         allLegalMoves.clear()
 
-            for(piece in piecesOnBoard){
-                if(piece.color == playerTurn.value){
-                    for(move in checkLegalMoves(piece, false)){
-                        allLegalMoves.add(move)
-                    }
+        for (piece in piecesOnBoard) {
+            if (piece.color == playerTurn.value) {
+                for (move in checkLegalMoves(piece, false)) {
+                    allLegalMoves.add(move)
                 }
             }
+        }
     }
-    fun checkCheckmate(){
-        if(allLegalMoves.isEmpty() && kingInCheck().value){
+
+    fun checkCheckmate() {
+        if (allLegalMoves.isEmpty() && kingInCheck().value) {
             checkmate.value = true
         }
     }
 
-    fun checkStalemate(){
-        if(allLegalMoves.isEmpty() && !kingInCheck().value){
+    fun checkStalemate() {
+        if (allLegalMoves.isEmpty() && !kingInCheck().value) {
             stalemate.value = true
         }
     }
 
-    fun checkInsufficientMaterial(){
-        if(piecesOnBoard.size == 2){
+    fun checkFiftyMoveCount() {
+        if (allLegalMoves.isNotEmpty()) {
+            if (fiftyMoveCount.value == 100) {
+                fiftyMoveRule.value = true
+            }
+        }
+    }
+
+    fun checkThreefoldRepetition() {
+        val fenPositions = arrayListOf<String>()
+        for (gameState in previousGameStates) {
+            fenPositions.add(gameState.fenPosition)
+        }
+        var duplicatePositions: Int
+        for(position in fenPositions.asReversed()){
+            duplicatePositions = 0
+            for(positionToCompare in fenPositions.asReversed()){
+                if(position == positionToCompare){
+                    duplicatePositions++
+                    if(duplicatePositions == 3){
+                        threeFoldRepetition.value = true
+                        break
+                    }
+                }
+            }
+            if(threeFoldRepetition.value){
+                break
+            }
+        }
+    }
+
+    fun checkInsufficientMaterial() {
+        if (piecesOnBoard.size == 2) {
             insufficientMaterial.value = (piecesOnBoard.size == 2)
-        }else{
+        } else {
             var blackBishopsAndKnights = 0
             var whiteBishopsAndKnights = 0
             var onlyKnightsOrBishops = true
-            if(piecesOnBoard.size < 5){
-                for(piece in piecesOnBoard){
-                    when(piece.color){
+            if (piecesOnBoard.size < 5) {
+                for (piece in piecesOnBoard) {
+                    when (piece.color) {
                         "white" -> {
-                            whiteBishopsAndKnights += when(piece.piece){
+                            whiteBishopsAndKnights += when (piece.piece) {
                                 "bishop" -> 1
                                 "knight" -> 1
                                 "king" -> 0
@@ -574,7 +722,7 @@ class GameRepository : ViewModel() {
                             }
                         }
                         "black" -> {
-                            blackBishopsAndKnights += when(piece.piece){
+                            blackBishopsAndKnights += when (piece.piece) {
                                 "bishop" -> 1
                                 "knight" -> 1
                                 "king" -> 0
@@ -586,16 +734,23 @@ class GameRepository : ViewModel() {
                         }
                     }
                 }
-                if(whiteBishopsAndKnights < 2 && blackBishopsAndKnights < 2 && onlyKnightsOrBishops){
+                if (whiteBishopsAndKnights < 2 && blackBishopsAndKnights < 2 && onlyKnightsOrBishops) {
                     insufficientMaterial.value = true
                 }
             }
         }
     }
 
-    fun movePiece(newSquare: Square, piece: ChessPiece){
-        if(previousGameStates.isEmpty()){
-            previousGameStates.add(GameState(previousSquare.value, currentSquare.value, getGameStateAsFEN()))
+    fun movePiece(newSquare: Square, piece: ChessPiece) {
+        fiftyMoveCount.value = 0
+        if (previousGameStates.isEmpty()) {
+            previousGameStates.add(
+                GameState(
+                    previousSquare.value,
+                    currentSquare.value,
+                    getGameStateAsFEN()
+                )
+            )
         }
 
         if (hashMap.containsKey(newSquare)) {
@@ -612,7 +767,7 @@ class GameRepository : ViewModel() {
         setCurrentSquare(newSquare)
     }
 
-    fun promotion(newSquare: Square, promotionSelection: ChessPiece){
+    fun promotion(newSquare: Square, promotionSelection: ChessPiece) {
         hashMap[newSquare] = promotionSelection
         piecesOnBoard.add(promotionSelection)
         //setCurrentSquare(piece.square)
@@ -623,57 +778,76 @@ class GameRepository : ViewModel() {
         }
         checkAttacks()
         setXRayAttacks()
-        previousGameStates.add(GameState(previousSquare.value, currentSquare.value, getGameStateAsFEN()))
+        previousGameStates.add(
+            GameState(
+                previousSquare.value,
+                currentSquare.value,
+                getGameStateAsFEN()
+            )
+        )
         checkAllLegalMoves()
         checkCheckmate()
         checkStalemate()
         checkInsufficientMaterial()
+        checkFiftyMoveCount()
+        checkThreefoldRepetition()
         //setPositionFromFen(getGameStateAsFEN())
     }
 
     fun changePiecePosition(newSquare: Square, piece: ChessPiece, depth: Int) {
-        if(previousGameStates.isEmpty()){
-            previousGameStates.add(GameState(previousSquare.value, currentSquare.value, getGameStateAsFEN()))
+        fiftyMoveCount.value += 1
+        if (previousGameStates.isEmpty()) {
+            previousGameStates.add(
+                GameState(
+                    previousSquare.value,
+                    currentSquare.value,
+                    getGameStateAsFEN()
+                )
+            )
         }
         val gameLogic = GameLogic()
+
+        if (piece.piece == "pawn") {
+            fiftyMoveCount.value = 0
+        }
         //Castling
         if (piece.piece == "king") {
-            if(castleKingSide()){
+            if (castleKingSide()) {
                 if (newSquare.file == piece.square.file + 2) {
                     val rook: ChessPiece = hashMap[Square(newSquare.rank, newSquare.file + 1)]!!
                     hashMap.remove(Square(newSquare.rank, newSquare.file + 1))
                     rook.square = Square(newSquare.rank, newSquare.file - 1)
                     hashMap[rook.square] = rook
-                    if(depth == 1){
-                        castles.value+=1
+                    if (depth == 1) {
+                        castles.value += 1
                     }
                 }
             }
-            if(castleQueenSide()){
+            if (castleQueenSide()) {
                 if (newSquare.file == piece.square.file - 2) {
                     val rook: ChessPiece = hashMap[Square(newSquare.rank, newSquare.file - 2)]!!
                     hashMap.remove(Square(newSquare.rank, newSquare.file - 2))
                     rook.square = Square(newSquare.rank, newSquare.file + 1)
                     hashMap[rook.square] = rook
-                    if(depth == 1){
-                        castles.value+=1
+                    if (depth == 1) {
+                        castles.value += 1
                     }
                 }
             }
         }
         checkIfKingOrRooksMoved(piece)
-       // previousMoveWasEnPassant.value = false
+        // previousMoveWasEnPassant.value = false
         //Remove Defender
         if (hashMap.containsKey(newSquare)) {
-            if(depth == 1){
-                captures.value+=1
+            fiftyMoveCount.value = 0
+            if (depth == 1) {
+                captures.value += 1
             }
             hashMap[newSquare]?.let {
                 capturedPieces.add(it)
             }
             piecesOnBoard.remove(hashMap[newSquare])
-        }
-        else if (gameLogic.isEnPassant(
+        } else if (gameLogic.isEnPassant(
                 previousSquare.value,
                 currentSquare.value,
                 newSquare,
@@ -682,11 +856,12 @@ class GameRepository : ViewModel() {
                 getKingSquare()
             )
         ) {
+            fiftyMoveCount.value = 0
             println("--------------------en passant--------------------")
             //previousMoveWasEnPassant.value = true
-            if(depth == 1){
-                enPassants.value+=1
-                captures.value+=1
+            if (depth == 1) {
+                enPassants.value += 1
+                captures.value += 1
             }
             hashMap[currentSquare.value]?.let { capturedPieces.add(it) }
             piecesOnBoard.remove(hashMap[currentSquare.value])
@@ -716,16 +891,23 @@ class GameRepository : ViewModel() {
             checkAttacks()
         }
         setXRayAttacks()
-        previousGameStates.add(GameState(previousSquare.value, currentSquare.value, getGameStateAsFEN()))
+        previousGameStates.add(
+            GameState(
+                previousSquare.value,
+                currentSquare.value,
+                getGameStateAsFEN()
+            )
+        )
         setPositionFromFen(getGameStateAsFEN())
-        if(kingInCheck.value && depth == 1){
-            checks.value+=1
+        if (kingInCheck.value && depth == 1) {
+            checks.value += 1
         }
 
         checkAllLegalMoves()
         checkCheckmate()
         checkStalemate()
         checkInsufficientMaterial()
+        checkThreefoldRepetition()
     }
 
     fun getGameState(): GameState {

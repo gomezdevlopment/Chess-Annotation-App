@@ -26,6 +26,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.ChessPiece
@@ -101,6 +102,14 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
 
     val insufficientMaterial = remember {
         viewModel.getInsufficientMaterial()
+    }
+
+    val threeFoldRepetition = remember {
+        viewModel.getThreeFoldRepetition()
+    }
+
+    val fiftyMoveRule = remember {
+        viewModel.getFiftyMoveRule()
     }
 //    val xRays = remember {
 //        viewModel.xRays()
@@ -202,15 +211,23 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
         if(viewModel.getPlayerTurn() == "white"){
             winner = "Black"
         }
-        EndOfGameCard(message = "Checkmate - $winner Wins!")
+        EndOfGameCard("Checkmate", message = "$winner Wins!")
     }
 
     if(insufficientMaterial.value){
-        EndOfGameCard(message = "Draw by Insufficient Material")
+        EndOfGameCard("Draw", message = "by Insufficient Material")
     }
 
     if(stalemate.value){
-        EndOfGameCard(message = "Stalemate")
+        EndOfGameCard("Draw", message = "Stalemate")
+    }
+
+    if(threeFoldRepetition.value){
+        EndOfGameCard("Draw", message = "by Threefold Repetition")
+    }
+
+    if(fiftyMoveRule.value){
+        EndOfGameCard("Draw", message = "by Fifty Move Rule")
     }
 }
 
@@ -380,7 +397,7 @@ private fun PromotionV2(width: Float, chessPiece: ChessPiece, squareClicked: Mut
 }
 
 @Composable
-private fun EndOfGameCard(message: String) {
+private fun EndOfGameCard(header: String, message: String) {
     Box(modifier = Modifier
         .fillMaxWidth()
         .fillMaxHeight()
@@ -394,8 +411,9 @@ private fun EndOfGameCard(message: String) {
             elevation = 10.dp,
             shape = RoundedCornerShape(20.dp)
         ){
-            Column(Modifier.fillMaxWidth()){
-                Text(text = message, textAlign = TextAlign.Center)
+            Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally){
+                Text(text = header, textAlign = TextAlign.Center, fontSize = 24.sp, modifier = Modifier.padding(10.dp, 10.dp))
+                Text(text = message, textAlign = TextAlign.Center, fontSize = 14.sp)
             }
         }
     }
