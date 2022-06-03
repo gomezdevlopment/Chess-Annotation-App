@@ -24,7 +24,7 @@ class GameFragment : Fragment() {
         val viewModel: GameViewModel = GameViewModel()
         return ComposeView(requireContext()).apply {
             setContent {
-                ChessCanvas(width, viewModel)
+                ChessCanvas(width, viewModel, context)
             }
         }
     }

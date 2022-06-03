@@ -1,5 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.model
 
+import android.content.Context
+import android.media.MediaPlayer
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.width
@@ -17,7 +19,7 @@ import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
 import com.gomezdevlopment.chessnotationapp.model.pieces.*
 
 
-class GameRepository : ViewModel() {
+class GameRepository() : ViewModel() {
     private var piecesOnBoard: MutableList<ChessPiece> = mutableListOf()
     private var hashMap: MutableMap<Square, ChessPiece> = HashMap()
     private var previousSquare: MutableState<Square> = mutableStateOf(Square(10, 10))
@@ -44,14 +46,34 @@ class GameRepository : ViewModel() {
     private var gameStateAsFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 "
     private var previousGameStates = mutableListOf<GameState>()
     private var gameState = GameState(previousSquare.value, currentSquare.value, gameStateAsFEN)
-    private var previousGameState =
-        mutableStateOf(GameState(previousSquare.value, currentSquare.value, gameStateAsFEN))
     private var checkmate: MutableState<Boolean> = mutableStateOf(false)
     private var stalemate: MutableState<Boolean> = mutableStateOf(false)
     private var insufficientMaterial: MutableState<Boolean> = mutableStateOf(false)
     private var threeFoldRepetition: MutableState<Boolean> = mutableStateOf(false)
     private var fiftyMoveRule: MutableState<Boolean> = mutableStateOf(false)
     private var fiftyMoveCount = mutableStateOf(0)
+
+    private var pieceSound: MutableState<Boolean> = mutableStateOf(false)
+    private var checkSound: MutableState<Boolean> = mutableStateOf(false)
+    private var captureSound: MutableState<Boolean> = mutableStateOf(false)
+    private var castlingSound: MutableState<Boolean> = mutableStateOf(false)
+    private var gameEndSound: MutableState<Boolean> = mutableStateOf(false)
+
+    fun getPieceSound(): MutableState<Boolean> {
+        return pieceSound
+    }
+    fun getCheckSound(): MutableState<Boolean> {
+        return checkSound
+    }
+    fun getCaptureSound(): MutableState<Boolean> {
+        return captureSound
+    }
+    fun getCastlingSound(): MutableState<Boolean> {
+        return castlingSound
+    }
+    fun getGameEndSound(): MutableState<Boolean> {
+        return gameEndSound
+    }
 
     fun getCheckmate(): MutableState<Boolean> {
         return checkmate
@@ -404,28 +426,6 @@ class GameRepository : ViewModel() {
         gameState.fenPosition = getGameStateAsFEN()
     }
 
-//    fun resetGame() {
-//        piecesOnBoard.clear()
-//        hashMap.clear()
-//        squaresToBlock.clear()
-//        addPieces()
-//        playerTurn.value = "white"
-//        whiteKingSquare.value = Square(0, 4)
-//        blackKingSquare.value = Square(7, 4)
-//        previousSquare.value = Square(10, 10)
-//        currentSquare.value = Square(10, 10)
-//        whiteKingCanCastleKingSide.value = true
-//        whiteKingCanCastleQueenSide.value = true
-//        blackKingCanCastleKingSide.value = true
-//        blackKingCanCastleQueenSide.value = true
-//        kingInCheck = mutableStateOf(false)
-//        piecesCheckingKing.clear()
-//        checksOnKing.clear()
-//        capturedPieces.clear()
-//        checkAttacks()
-//        setXRayAttacks()
-//    }
-
     fun kingInCheck(): MutableState<Boolean> {
         return kingInCheck
     }
@@ -534,7 +534,6 @@ class GameRepository : ViewModel() {
         }
     }
 
-    val previousMoveWasEnPassant = mutableStateOf(false)
     fun castleKingSide(): Boolean {
         if (playerTurn.value == "white") {
             return whiteKingCanCastleKingSide.value
@@ -559,92 +558,6 @@ class GameRepository : ViewModel() {
 
     }
 
-//    fun getPreviousGameStates(): MutableList<GameState> {
-//        return previousGameStates
-//    }
-
-    fun getCurrentGameState(): GameState {
-        return GameState(previousSquare.value, currentSquare.value, gameStateAsFEN)
-    }
-
-//    fun undoChangePiecePosition(
-//        piece: ChessPiece,
-//        originalSquare: Square,
-//        currentSquare: Square,
-//        previousSquare: Square,
-//        kingsSquare: Square,
-//        legalMove: Square,
-//        canCastleKingSide: Boolean,
-//        canCastleQueenSide: Boolean
-//    ) {
-//        //val gameLogic = GameLogic()
-//        if (piece.piece == "king") {
-//            if(canCastleKingSide){
-//                if (legalMove.file == originalSquare.file + 2) {
-//                    val rook: ChessPiece = hashMap[Square(legalMove.rank, legalMove.file - 1)]!!
-//                    hashMap.remove(Square(legalMove.rank, legalMove.file - 1))
-//                    rook.square = Square(legalMove.rank, legalMove.file + 1)
-//                    hashMap[rook.square] = rook
-//
-//                }
-//            }else if(canCastleQueenSide){
-//                if (legalMove.file == originalSquare.file - 2) {
-//                    val rook: ChessPiece = hashMap[Square(legalMove.rank, legalMove.file + 1)]!!
-//                    hashMap.remove(Square(legalMove.rank, legalMove.file + 1))
-//                    rook.square = Square(legalMove.rank, legalMove.file - 2)
-//                    hashMap[rook.square] = rook
-//                }
-//            }
-//        }
-//        if(piece.color == "white"){
-//            whiteKingCanCastleKingSide.value = canCastleKingSide
-//            whiteKingCanCastleQueenSide.value = canCastleQueenSide
-//        }else{
-//            blackKingCanCastleKingSide.value = canCastleKingSide
-//            blackKingCanCastleQueenSide.value = canCastleQueenSide
-//        }
-//        hashMap.remove(legalMove)
-//        //Add Defender
-//        val capturedPiecesTemp = mutableListOf<ChessPiece>()
-//        capturedPiecesTemp.addAll(capturedPieces)
-//        if (capturedPiecesTemp.isNotEmpty()) {
-//            for(capturedPiece in capturedPiecesTemp){
-//                if(capturedPiece.square == legalMove){
-//                    piecesOnBoard.add(capturedPiece)
-//                    hashMap[legalMove] = capturedPiece
-//                    capturedPieces.remove(capturedPiece)
-//                }else if(capturedPiece.square == currentSquare && previousMoveWasEnPassant.value){
-//                    piecesOnBoard.add(capturedPiece)
-//                    hashMap[currentSquare] = capturedPiece
-//                    capturedPieces.remove(capturedPiece)
-//                    previousMoveWasEnPassant.value = false
-//                }
-//            }
-//        }
-//
-//        piece.square = originalSquare
-//        hashMap[originalSquare] = piece
-//        setPreviousSquare(previousSquare)
-//        setCurrentSquare(currentSquare)
-//
-//        if (piece.color == "white") {
-//            if (piece.piece == "king") {
-//                whiteKingSquare.value = kingsSquare
-//            }
-//            setPlayerTurn("white")
-//            checkAttacks()
-//        } else {
-//            if (piece.piece == "king") {
-//                blackKingSquare.value = kingsSquare
-//            }
-//            setPlayerTurn("black")
-//            checkAttacks()
-//        }
-//
-//        //checkIfKingOrRooksMoved(piece)
-//        setXRayAttacks()
-//    }
-
     fun checkAllLegalMoves() {
         allLegalMoves.clear()
 
@@ -660,12 +573,14 @@ class GameRepository : ViewModel() {
     fun checkCheckmate() {
         if (allLegalMoves.isEmpty() && kingInCheck().value) {
             checkmate.value = true
+            gameEndSound.value = true
         }
     }
 
     fun checkStalemate() {
         if (allLegalMoves.isEmpty() && !kingInCheck().value) {
             stalemate.value = true
+            gameEndSound.value = true
         }
     }
 
@@ -673,6 +588,7 @@ class GameRepository : ViewModel() {
         if (allLegalMoves.isNotEmpty()) {
             if (fiftyMoveCount.value == 100) {
                 fiftyMoveRule.value = true
+                gameEndSound.value = true
             }
         }
     }
@@ -690,6 +606,7 @@ class GameRepository : ViewModel() {
                     duplicatePositions++
                     if(duplicatePositions == 3){
                         threeFoldRepetition.value = true
+                        gameEndSound.value = true
                         break
                     }
                 }
@@ -736,6 +653,7 @@ class GameRepository : ViewModel() {
                 }
                 if (whiteBishopsAndKnights < 2 && blackBishopsAndKnights < 2 && onlyKnightsOrBishops) {
                     insufficientMaterial.value = true
+                    gameEndSound.value = true
                 }
             }
         }
@@ -758,6 +676,9 @@ class GameRepository : ViewModel() {
                 capturedPieces.add(it)
             }
             piecesOnBoard.remove(hashMap[newSquare])
+            captureSound.value = true
+        }else{
+            pieceSound.value = true
         }
 
         val previousPieceSquare = Square(piece.square.rank, piece.square.file)
@@ -821,6 +742,7 @@ class GameRepository : ViewModel() {
                     if (depth == 1) {
                         castles.value += 1
                     }
+                    castlingSound.value = true
                 }
             }
             if (castleQueenSide()) {
@@ -832,6 +754,7 @@ class GameRepository : ViewModel() {
                     if (depth == 1) {
                         castles.value += 1
                     }
+                    castlingSound.value = true
                 }
             }
         }
@@ -847,6 +770,9 @@ class GameRepository : ViewModel() {
                 capturedPieces.add(it)
             }
             piecesOnBoard.remove(hashMap[newSquare])
+            if(!castlingSound.value){
+                captureSound.value = true
+            }
         } else if (gameLogic.isEnPassant(
                 previousSquare.value,
                 currentSquare.value,
@@ -857,8 +783,6 @@ class GameRepository : ViewModel() {
             )
         ) {
             fiftyMoveCount.value = 0
-            println("--------------------en passant--------------------")
-            //previousMoveWasEnPassant.value = true
             if (depth == 1) {
                 enPassants.value += 1
                 captures.value += 1
@@ -866,6 +790,13 @@ class GameRepository : ViewModel() {
             hashMap[currentSquare.value]?.let { capturedPieces.add(it) }
             piecesOnBoard.remove(hashMap[currentSquare.value])
             hashMap.remove(currentSquare.value)
+            if(!castlingSound.value){
+                captureSound.value = true
+            }
+        } else{
+            if(!castlingSound.value){
+                pieceSound.value = true
+            }
         }
 
         //Check Promotion
@@ -899,6 +830,9 @@ class GameRepository : ViewModel() {
             )
         )
         setPositionFromFen(getGameStateAsFEN())
+        if(kingInCheck.value){
+            checkSound.value = true
+        }
         if (kingInCheck.value && depth == 1) {
             checks.value += 1
         }

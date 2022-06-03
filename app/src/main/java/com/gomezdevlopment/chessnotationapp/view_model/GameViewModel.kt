@@ -1,11 +1,12 @@
 package com.gomezdevlopment.chessnotationapp.view_model
 
+import android.content.Context
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gomezdevlopment.chessnotationapp.model.*
 
-class GameViewModel: ViewModel() {
+class GameViewModel(): ViewModel() {
     private var gameRepository: GameRepository = GameRepository.getGameRepository()
     private var  hashMap : MutableMap<Square, ChessPiece> = gameRepository.getHashMap()
     private var previousSquare : MutableState<Square> = gameRepository.getPreviousSquare()
@@ -100,5 +101,21 @@ class GameViewModel: ViewModel() {
 
     fun getFiftyMoveRule(): MutableState<Boolean> {
         return gameRepository.getFiftyMoveRule()
+    }
+
+    fun getPieceSound(): MutableState<Boolean> {
+        return gameRepository.getPieceSound()
+    }
+    fun getCheckSound(): MutableState<Boolean> {
+        return gameRepository.getCheckSound()
+    }
+    fun getCaptureSound(): MutableState<Boolean> {
+        return gameRepository.getCaptureSound()
+    }
+    fun getCastlingSound(): MutableState<Boolean> {
+        return gameRepository.getCastlingSound()
+    }
+    fun getGameEndSound(): MutableState<Boolean> {
+        return gameRepository.getGameEndSound()
     }
 }

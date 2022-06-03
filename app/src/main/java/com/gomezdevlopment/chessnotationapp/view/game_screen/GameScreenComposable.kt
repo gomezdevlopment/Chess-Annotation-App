@@ -1,6 +1,8 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen
 
 import android.app.Activity
+import android.content.Context
+import android.media.MediaPlayer
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
@@ -35,13 +37,23 @@ import com.gomezdevlopment.chessnotationapp.model.Square
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable
-fun ChessCanvas(width: Float, viewModel: GameViewModel) {
+fun ChessCanvas(width: Float, viewModel: GameViewModel, context: Context) {
+    val piecePlayer = MediaPlayer.create(context, R.raw.piece_sound)
+    val checkPlayer = MediaPlayer.create(context, R.raw.check_sound)
+    val capturePlayer = MediaPlayer.create(context, R.raw.capture_sound)
+    val castlingPlayer = MediaPlayer.create(context, R.raw.castling_sound)
+    val gameEndPlayer = MediaPlayer.create(context, R.raw.end_of_game_sound)
+
+    val pieceSound = remember { viewModel.getPieceSound() }
+    val checkSound = remember { viewModel.getCheckSound() }
+    val captureSound = remember { viewModel.getCaptureSound() }
+    val castlingSound = remember { viewModel.getCastlingSound() }
+    val gameEndSound = remember { viewModel.getGameEndSound() }
+
     val chessBoardVector: ImageVector =
         ImageVector.vectorResource(id = R.drawable.ic_chess_board_blue_outlined)
 
     val rowWidthAndHeight: Float = (width/ 8f)
-    println(rowWidthAndHeight)
-    println(rowWidthAndHeight/2f)
 
     Box(
         modifier = Modifier
@@ -75,6 +87,26 @@ fun ChessCanvas(width: Float, viewModel: GameViewModel) {
         }
     }
 
+    if(pieceSound.value){
+        pieceSound.value = false
+        piecePlayer.start()
+    }
+    if(checkSound.value){
+        checkSound.value = false
+        checkPlayer.start()
+    }
+    if(captureSound.value){
+        captureSound.value = false
+        capturePlayer.start()
+    }
+    if(castlingSound.value){
+        castlingSound.value = false
+        castlingPlayer.start()
+    }
+    if(gameEndSound.value){
+        gameEndSound.value = false
+        gameEndPlayer.start()
+    }
 }
 
 @Composable
@@ -219,7 +251,7 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
     }
 
     if(stalemate.value){
-        EndOfGameCard("Draw", message = "Stalemate")
+        EndOfGameCard("Draw", message = "by Stalemate")
     }
 
     if(threeFoldRepetition.value){
