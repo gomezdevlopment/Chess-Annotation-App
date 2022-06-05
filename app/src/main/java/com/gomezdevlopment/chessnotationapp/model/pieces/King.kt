@@ -42,9 +42,12 @@ class King {
         for (move in listOfMoves) {
             if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock, xRayAttacks, kingSquare, piecesCheckingKing) &&
                 !attackedSquares.contains(move)) {
-                if(attackedSquares.contains(kingSquare) && checksOnKing.contains(move)) break
+                if(piecesCheckingKing.isNotEmpty() && checksOnKing.contains(move)){
+                    continue
+                }
                 moves.add(move)
             }
+
             if(checkDefendedPieces && gameLogic.isDefending(move, hashMap)){
                 moves.add(move)
             }

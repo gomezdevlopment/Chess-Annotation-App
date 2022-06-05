@@ -34,21 +34,30 @@ class GameLogic {
         //prevent king from entering into check when in check
         if (piecesCheckingKing.isNotEmpty()) {
             if (squaresToBlock.contains(square) && piece.piece == "king"){
+                //println("King cant move into check")
                 return true
             }
 
             if (!squaresToBlock.contains(square) && !piecesCheckingKing.contains(square) && piece.piece != "king") {
+                //println("Piece must block or capture attacker!")
                 return true
             }
 
             if(piecesCheckingKing.size > 1 && piece.piece != "king"){
+                //println("Double Check or greater")
                 return true }
 
             //if(isPinned()) return true
         }
         if (square.rank > 7 || square.rank < 0 || square.file > 7 || square.file < 0) return true
-        if (!isCapture(square, occupiedSquares, piece)) return true
-        if (isPinned(square, xRayAttacks, piece, kingSquare)) return true
+        if (!isCapture(square, occupiedSquares, piece)){
+            //println("Not a Capture")
+            return true
+        }
+        if (isPinned(square, xRayAttacks, piece, kingSquare)) {
+            //println("Pinned")
+            return true
+        }
         return false
     }
 

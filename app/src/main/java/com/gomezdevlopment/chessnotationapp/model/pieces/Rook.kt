@@ -36,7 +36,6 @@ class Rook {
             moveSquare = Square(piece.square.rank, file)
             if (gameLogic.pieceInPath(hashMap, listOfMoves, moveSquare)) break
         }
-
         val moves = mutableListOf<Square>()
         for (move in listOfMoves) {
             if (!gameLogic.illegalMove(

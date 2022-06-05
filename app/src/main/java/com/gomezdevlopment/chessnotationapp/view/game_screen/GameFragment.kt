@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen
 
+import android.app.Application
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -21,8 +22,8 @@ class GameFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val width = resources.configuration.screenWidthDp.toFloat()
-        val viewModel: GameViewModel = GameViewModel()
         return ComposeView(requireContext()).apply {
+            val viewModel = GameViewModel(requireActivity().application)
             setContent {
                 ChessCanvas(width, viewModel, context)
             }

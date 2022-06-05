@@ -1,16 +1,13 @@
 package com.gomezdevlopment.chessnotationapp.model
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.gomezdevlopment.chessnotationapp.R
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class GameRepositoryTest {
-    val gameRepository: GameRepository = GameRepository.getGameRepository()
+    private val gameRepository: GameRepository = GameRepository.getGameRepository()
 
     private fun analyzePositions(depth: Int): Int {
         if (depth == 0) {
@@ -24,19 +21,40 @@ class GameRepositoryTest {
             if (piece.color == playerTurn) {
                 val originalPieceSquare = piece.square
                 for (legalMove in gameRepository.checkLegalMoves(piece, false)) {
-                    if(depth == 1){
-                        println("${piece.piece} ${squareInAlgebraicNotation(legalMove)}")
+                    if (piece.piece == "pawn" && (legalMove.rank == 7 || legalMove.rank == 0)) {
+                        val promotionPieces = mutableListOf<ChessPiece>()
+                        val blackPieceImages = listOf(
+                            ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(legalMove.rank, legalMove.file)),
+                            ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(legalMove.rank, legalMove.file)),
+                            ChessPiece("black", "bishop", R.drawable.ic_bb_alpha, Square(legalMove.rank, legalMove.file)),
+                            ChessPiece("black", "knight", R.drawable.ic_bn_alpha, Square(legalMove.rank, legalMove.file))
+                        )
+
+                        val whitePieceImages = listOf(
+                            ChessPiece("white", "queen", R.drawable.ic_wq_alpha, Square(legalMove.rank, legalMove.file)),
+                            ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(legalMove.rank, legalMove.file)),
+                            ChessPiece("white", "bishop", R.drawable.ic_wb_alpha, Square(legalMove.rank, legalMove.file)),
+                            ChessPiece("white", "knight", R.drawable.ic_wn_alpha, Square(legalMove.rank, legalMove.file))
+                        )
+
+                        if (piece.color == "white") {
+                            promotionPieces.addAll(whitePieceImages)
+                        } else {
+                            promotionPieces.addAll(blackPieceImages)
+                        }
+                        for(promotionPiece in promotionPieces){
+                            gameRepository.movePiece(Square(legalMove.rank, legalMove.file), piece, depth)
+                            gameRepository.promotion(legalMove, promotionPiece, depth)
+                            numberOfMoves += analyzePositions(depth - 1)
+                            gameRepository.previousGameState()
+                            //piece.square = originalPieceSquare
+                        }
+                    }else{
+                        gameRepository.changePiecePosition(legalMove, piece, depth)
+                        numberOfMoves += analyzePositions(depth - 1)
+                        gameRepository.previousGameState()
+                        piece.square = originalPieceSquare
                     }
-                    //val originalSquare = piece.square
-//                    val kingSquare = gameRepository.kingSquare().value
-//                    val castleKingSide = gameRepository.castleKingSide()
-//                    val castleQueenSide = gameRepository.castleQueenSide()
-                    //println("${piece.piece} from ${piece.square} to $legalMove")
-                    gameRepository.changePiecePosition(legalMove, piece, depth)
-                    numberOfMoves += analyzePositions(depth - 1)
-                    gameRepository.previousGameState()
-                    piece.square = originalPieceSquare
-                    //gameRepository.undoChangePiecePosition(piece, originalSquare, currentSquare, previousSquare, kingSquare, legalMove, castleKingSide, castleQueenSide)
                 }
             }
         }
@@ -219,5 +237,54 @@ class GameRepositoryTest {
         assert(gameRepository.getChecks() == 1680)
         assert(gameRepository.getCastles() == 0)
         assert(gameRepository.getEnPassants() == 123)
+    }
+
+    @Test
+    fun testPosition4Depth1() {
+        gameRepository.testPosition4()
+        val numberOfPositions = analyzePositions(1)
+        println(numberOfPositions)
+        println("Number of Pieces on Board: ${gameRepository.getPiecesOnBoard().size}")
+        println("Number of Occupied Squares on Board: ${gameRepository.getHashMap().size}")
+        println("Number of Captures: ${gameRepository.getCaptures()}")
+        println("Number of Checks: ${gameRepository.getChecks()}")
+        println("Number of Castles: ${gameRepository.getCastles()}")
+        println("Number of EnPassants: ${gameRepository.getEnPassants()}")
+        assert(numberOfPositions == 6)
+        assert(gameRepository.getCaptures() == 0)
+        assert(gameRepository.getChecks() == 0)
+        assert(gameRepository.getCastles() == 0)
+        assert(gameRepository.getEnPassants() == 0)
+    }
+
+    @Test
+    fun testPosition4Depth2() {
+        gameRepository.testPosition4()
+        val numberOfPositions = analyzePositions(2)
+        println(numberOfPositions)
+        println("Number of Pieces on Board: ${gameRepository.getPiecesOnBoard().size}")
+        println("Number of Occupied Squares on Board: ${gameRepository.getHashMap().size}")
+        println("Number of Captures: ${gameRepository.getCaptures()}")
+        println("Number of Checks: ${gameRepository.getChecks()}")
+        println("Number of Castles: ${gameRepository.getCastles()}")
+        println("Number of EnPassants: ${gameRepository.getEnPassants()}")
+        println("Number of Promotions: ${gameRepository.getPromotions()}")
+        assert(numberOfPositions == 264)
+        assert(gameRepository.getCaptures() == 87)
+    }
+
+    @Test
+    fun testPosition4Depth3() {
+        gameRepository.testPosition4()
+        val numberOfPositions = analyzePositions(3)
+        println(numberOfPositions)
+        println("Number of Pieces on Board: ${gameRepository.getPiecesOnBoard().size}")
+        println("Number of Occupied Squares on Board: ${gameRepository.getHashMap().size}")
+        println("Number of Captures: ${gameRepository.getCaptures()}")
+        println("Number of Checks: ${gameRepository.getChecks()}")
+        println("Number of Castles: ${gameRepository.getCastles()}")
+        println("Number of EnPassants: ${gameRepository.getEnPassants()}")
+        println("Number of Promotions: ${gameRepository.getPromotions()}")
+        assert(numberOfPositions == 9467)
     }
 }
