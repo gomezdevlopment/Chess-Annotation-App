@@ -1,20 +1,9 @@
 package com.gomezdevlopment.chessnotationapp.model
 
-import android.content.Context
-import android.media.MediaPlayer
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.width
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.unit.dp
-import androidx.core.os.persistableBundleOf
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.gomezdevlopment.chessnotationapp.R
+import com.gomezdevlopment.chessnotationapp.model.game_logic.FEN
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
 import com.gomezdevlopment.chessnotationapp.model.game_logic.Notation
 import com.gomezdevlopment.chessnotationapp.model.pieces.*
@@ -34,10 +23,10 @@ class GameRepository() : ViewModel() {
     private var xRayAttacks: MutableList<Square> = mutableListOf()
     private var attacks: MutableList<Square> = mutableListOf()
     private var allLegalMoves: MutableList<Square> = mutableListOf()
-    private var whiteKingCanCastleKingSide: MutableState<Boolean> = mutableStateOf(false)
-    private var whiteKingCanCastleQueenSide: MutableState<Boolean> = mutableStateOf(false)
-    private var blackKingCanCastleKingSide: MutableState<Boolean> = mutableStateOf(false)
-    private var blackKingCanCastleQueenSide: MutableState<Boolean> = mutableStateOf(false)
+    private var whiteCanCastleKingSide: MutableState<Boolean> = mutableStateOf(false)
+    private var whiteCanCastleQueenSide: MutableState<Boolean> = mutableStateOf(false)
+    private var blackCanCastleKingSide: MutableState<Boolean> = mutableStateOf(false)
+    private var blackCanCastleQueenSide: MutableState<Boolean> = mutableStateOf(false)
     private var kingInCheck: MutableState<Boolean> = mutableStateOf(false)
     private var piecesCheckingKing = mutableListOf<Square>()
     private var checksOnKing = mutableListOf<Square>()
@@ -63,7 +52,7 @@ class GameRepository() : ViewModel() {
     private var castlingSound: MutableState<Boolean> = mutableStateOf(false)
     private var gameEndSound: MutableState<Boolean> = mutableStateOf(false)
 
-    private var annotations: MutableList<String> = mutableListOf("1.")
+    private var annotations: MutableList<String> = mutableListOf()
     private var currentNotation: StringBuilder = StringBuilder("")
 
     fun getAnnotations(): MutableList<String> {
@@ -150,7 +139,7 @@ class GameRepository() : ViewModel() {
 
     init {
         //testPosition4()
-        //promotionPosition()
+        promotionPosition()
         //addPieces()
         //testPositionKiwipete()
         // testPosition3()
@@ -158,267 +147,32 @@ class GameRepository() : ViewModel() {
         initialPosition()
     }
 
-    fun getGameStateAsFEN(): String {
-        val fenString = StringBuilder()
-        for (rank in 7 downTo 0) {
-            var emptySquares = 0
-            for (file in 0..7) {
-                if (hashMap.containsKey(Square(rank, file))) {
-                    if (emptySquares != 0) {
-                        fenString.append(emptySquares)
-                    }
-                    emptySquares = 0
-                    val piece = hashMap[Square(rank, file)]
-                    when (piece?.piece) {
-                        "rook" -> {
-                            if (piece.color == "white") {
-                                fenString.append("R")
-                            } else {
-                                fenString.append("r")
-                            }
-                        }
-                        "knight" -> {
-                            if (piece.color == "white") {
-                                fenString.append("N")
-                            } else {
-                                fenString.append("n")
-                            }
-                        }
-                        "bishop" -> {
-                            if (piece.color == "white") {
-                                fenString.append("B")
-                            } else {
-                                fenString.append("b")
-                            }
-                        }
-                        "queen" -> {
-                            if (piece.color == "white") {
-                                fenString.append("Q")
-                            } else {
-                                fenString.append("q")
-                            }
-                        }
-                        "king" -> {
-                            if (piece.color == "white") {
-                                fenString.append("K")
-                            } else {
-                                fenString.append("k")
-                            }
-                        }
-                        "pawn" -> {
-                            if (piece.color == "white") {
-                                fenString.append("P")
-                            } else {
-                                fenString.append("p")
-                            }
-                        }
-                    }
-                } else {
-                    emptySquares += 1
-                    if (file == 7) {
-                        if (emptySquares != 0) {
-                            fenString.append(emptySquares)
-                        }
-                    }
-                }
-            }
-            if (rank != 0) {
-                fenString.append("/")
-            }
-        }
-        fenString.append(" ")
-        when (playerTurn.value) {
-            "white" -> fenString.append("w ")
-            "black" -> fenString.append("b ")
-        }
-
-        if (!whiteKingCanCastleKingSide.value && !whiteKingCanCastleQueenSide.value && !blackKingCanCastleKingSide.value && !blackKingCanCastleQueenSide.value) {
-            fenString.append("- ")
-        } else {
-            if (whiteKingCanCastleKingSide.value) {
-                fenString.append("K")
-            }
-            if (whiteKingCanCastleQueenSide.value) {
-                fenString.append("Q")
-            }
-            if (blackKingCanCastleKingSide.value) {
-                fenString.append("k")
-            }
-            if (blackKingCanCastleQueenSide.value) {
-                fenString.append("q")
-            }
-            fenString.append(" ")
-        }
-        return fenString.toString()
+    private fun getGameStateAsFEN(): String {
+        return FEN().getGameStateAsFEN(
+            hashMap,
+            playerTurn,
+            whiteCanCastleKingSide,
+            whiteCanCastleQueenSide,
+            blackCanCastleKingSide,
+            blackCanCastleQueenSide
+        )
     }
 
-    fun parseFEN(fen: String): MutableList<ChessPiece> {
-        val pieces = mutableListOf<ChessPiece>()
-        val splitFen = fen.split(" ")
-        val piecePositions = splitFen[0].split("/")
-        var rank = 8
-        for (string in piecePositions) {
-            rank--
-            var file = 0
-            for (char in string) {
-                if (char.isDigit()) {
-                    file += char.digitToInt()
-                } else {
-                    when (char) {
-                        'r' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "black",
-                                    "rook",
-                                    R.drawable.ic_br_alpha,
-                                    Square(rank, file)
-                                )
-                            )
-                        }
-                        'n' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "black",
-                                    "knight",
-                                    R.drawable.ic_bn_alpha,
-                                    Square(rank, file)
-                                )
-                            )
-                        }
-                        'b' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "black",
-                                    "bishop",
-                                    R.drawable.ic_bb_alpha,
-                                    Square(rank, file)
-                                )
-                            )
-                        }
-                        'q' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "black",
-                                    "queen",
-                                    R.drawable.ic_bq_alpha,
-                                    Square(rank, file)
-                                )
-                            )
-                        }
-                        'k' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "black",
-                                    "king",
-                                    R.drawable.ic_bk_alpha,
-                                    Square(rank, file)
-                                )
-                            )
-                            blackKingSquare.value = Square(rank, file)
-                        }
-                        'p' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "black",
-                                    "pawn",
-                                    R.drawable.ic_bp_alpha,
-                                    Square(rank, file)
-                                )
-                            )
-                        }
-                        'R' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "white",
-                                    "rook",
-                                    R.drawable.ic_wr_alpha,
-                                    Square(rank, file)
-                                )
-                            )
-                        }
-                        'N' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "white",
-                                    "knight",
-                                    R.drawable.ic_wn_alpha,
-                                    Square(rank, file)
-                                )
-                            )
-                        }
-                        'B' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "white",
-                                    "bishop",
-                                    R.drawable.ic_wb_alpha,
-                                    Square(rank, file)
-                                )
-                            )
-                        }
-                        'Q' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "white",
-                                    "queen",
-                                    R.drawable.ic_wq_alpha,
-                                    Square(rank, file)
-                                )
-                            )
-                        }
-                        'K' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "white",
-                                    "king",
-                                    R.drawable.ic_wk,
-                                    Square(rank, file)
-                                )
-                            )
-                            whiteKingSquare.value = Square(rank, file)
-                        }
-                        'P' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "white",
-                                    "pawn",
-                                    R.drawable.ic_wp_alpha,
-                                    Square(rank, file)
-                                )
-                            )
-                        }
-                    }
-                    file++
-                }
-            }
-        }
-
-        when (splitFen[1]) {
-            "w" -> playerTurn.value = "white"
-            "b" -> playerTurn.value = "black"
-        }
-
-        for (char in splitFen[2]) {
-            when (char) {
-                'K' -> whiteKingCanCastleKingSide.value = true
-                'Q' -> whiteKingCanCastleQueenSide.value = true
-                'k' -> blackKingCanCastleKingSide.value = true
-                'q' -> blackKingCanCastleQueenSide.value = true
-                '-' -> {
-                    whiteKingCanCastleKingSide.value = false
-                    whiteKingCanCastleQueenSide.value = false
-                    blackKingCanCastleKingSide.value = false
-                    blackKingCanCastleQueenSide.value = false
-                }
-            }
-        }
-        return pieces
-    }
-
-    fun setPositionFromFen(fen: String) {
+    private fun setPositionFromFen(fen: String) {
         piecesOnBoard.clear()
         hashMap.clear()
-        piecesOnBoard.addAll(parseFEN(fen))
+        piecesOnBoard.addAll(
+            FEN().parseFEN(
+                fen,
+                playerTurn,
+                whiteCanCastleKingSide,
+                whiteCanCastleQueenSide,
+                blackCanCastleKingSide,
+                blackCanCastleQueenSide,
+                whiteKingSquare,
+                blackKingSquare
+            )
+        )
         for (piece in piecesOnBoard) {
             hashMap[piece.square] = piece
         }
@@ -532,32 +286,32 @@ class GameRepository() : ViewModel() {
 
     private fun checkIfKingOrRooksMoved(piece: ChessPiece) {
         if (piece.color == "white") {
-            if (whiteKingCanCastleQueenSide.value || whiteKingCanCastleKingSide.value) {
+            if (whiteCanCastleQueenSide.value || whiteCanCastleKingSide.value) {
                 when (piece.piece) {
                     "king" -> {
-                        whiteKingCanCastleQueenSide.value = false
-                        whiteKingCanCastleKingSide.value = false
+                        whiteCanCastleQueenSide.value = false
+                        whiteCanCastleKingSide.value = false
                     }
                     "rook" -> {
                         when (piece.square) {
-                            Square(0, 0) -> whiteKingCanCastleQueenSide.value = false
-                            Square(0, 7) -> whiteKingCanCastleKingSide.value = false
+                            Square(0, 0) -> whiteCanCastleQueenSide.value = false
+                            Square(0, 7) -> whiteCanCastleKingSide.value = false
                         }
                     }
                 }
             }
 
         } else {
-            if (blackKingCanCastleQueenSide.value || blackKingCanCastleQueenSide.value) {
+            if (blackCanCastleQueenSide.value || blackCanCastleQueenSide.value) {
                 when (piece.piece) {
                     "king" -> {
-                        blackKingCanCastleQueenSide.value = false
-                        blackKingCanCastleKingSide.value = false
+                        blackCanCastleQueenSide.value = false
+                        blackCanCastleKingSide.value = false
                     }
                     "rook" -> {
                         when (piece.square) {
-                            Square(7, 0) -> blackKingCanCastleQueenSide.value = false
-                            Square(7, 7) -> blackKingCanCastleKingSide.value = false
+                            Square(7, 0) -> blackCanCastleQueenSide.value = false
+                            Square(7, 7) -> blackCanCastleKingSide.value = false
                         }
                     }
                 }
@@ -567,16 +321,16 @@ class GameRepository() : ViewModel() {
 
     fun castleKingSide(): Boolean {
         if (playerTurn.value == "white") {
-            return whiteKingCanCastleKingSide.value
+            return whiteCanCastleKingSide.value
         }
-        return blackKingCanCastleKingSide.value
+        return blackCanCastleKingSide.value
     }
 
     fun castleQueenSide(): Boolean {
         if (playerTurn.value == "white") {
-            return whiteKingCanCastleQueenSide.value
+            return whiteCanCastleQueenSide.value
         }
-        return blackKingCanCastleQueenSide.value
+        return blackCanCastleQueenSide.value
     }
 
     fun previousGameState() {
@@ -719,7 +473,7 @@ class GameRepository() : ViewModel() {
             notation.capture()
         } else {
             pieceSound.value = true
-            notation.square()
+            notation.square(false)
         }
 
         val previousPieceSquare = Square(piece.square.rank, piece.square.file)
@@ -764,6 +518,7 @@ class GameRepository() : ViewModel() {
         }
         notation.checkmateOrCheck(checkmate.value, kingInCheck().value)
         annotations.add(currentNotation.toString())
+        //annotations.add(currentNotation.toString())
         currentNotation.clear()
         println(annotations)
     }
@@ -820,7 +575,7 @@ class GameRepository() : ViewModel() {
         }
         checkIfKingOrRooksMoved(piece)
 
-        if(!castled){
+        if (!castled) {
             notation.piece(piece, piecesOnBoard, mapOfPiecesAndTheirLegalMoves)
         }
 
@@ -857,7 +612,7 @@ class GameRepository() : ViewModel() {
             notation.capture()
         } else {
             if (!castled) {
-                notation.square()
+                notation.square(false)
                 pieceSound.value = true
             }
         }
@@ -870,7 +625,6 @@ class GameRepository() : ViewModel() {
         hashMap[newSquare] = piece
         setPreviousSquare(previousPieceSquare)
         setCurrentSquare(newSquare)
-
         if (piece.color == "white") {
             if (piece.piece == "king") {
                 whiteKingSquare.value = newSquare
@@ -892,7 +646,7 @@ class GameRepository() : ViewModel() {
                 getGameStateAsFEN()
             )
         )
-        setPositionFromFen(getGameStateAsFEN())
+        //setPositionFromFen(getGameStateAsFEN())
         if (kingInCheck.value) {
             checkSound.value = true
         }
@@ -906,9 +660,6 @@ class GameRepository() : ViewModel() {
         checkInsufficientMaterial()
         checkThreefoldRepetition()
         notation.checkmateOrCheck(checkmate.value, kingInCheck().value)
-        if(playerTurn.value == "black" && annotations.size >= 3){
-            annotations.add("${(annotations.size/3)+1}.")
-        }
         annotations.add(currentNotation.toString())
         currentNotation.clear()
         println(annotations)
@@ -1034,8 +785,8 @@ class GameRepository() : ViewModel() {
                 hashMap,
                 squaresToBlock,
                 attacks,
-                whiteKingCanCastleKingSide.value,
-                whiteKingCanCastleQueenSide.value,
+                whiteCanCastleKingSide.value,
+                whiteCanCastleQueenSide.value,
                 xRayAttacks,
                 getKingSquare(),
                 getChecksOnKing(),
@@ -1048,8 +799,8 @@ class GameRepository() : ViewModel() {
             hashMap,
             squaresToBlock,
             attacks,
-            blackKingCanCastleKingSide.value,
-            blackKingCanCastleQueenSide.value,
+            blackCanCastleKingSide.value,
+            blackCanCastleQueenSide.value,
             xRayAttacks,
             getKingSquare(),
             getChecksOnKing(),

@@ -48,11 +48,11 @@ class Notation(private val stringBuilder: StringBuilder, private val square: Squ
 
     fun capture() {
         stringBuilder.append("x")
-        square()
+        square(true)
     }
 
-    fun square() {
-        if(pieceMoved == "pawn"){
+    fun square(capture: Boolean) {
+        if(pieceMoved == "pawn" && !capture){
             stringBuilder.delete(0, 1)
         }
         stringBuilder.append(fileLetter(square.file))

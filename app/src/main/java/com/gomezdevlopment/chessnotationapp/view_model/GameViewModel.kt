@@ -4,7 +4,10 @@ import android.app.Application
 import android.content.Context
 import android.media.MediaPlayer
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gomezdevlopment.chessnotationapp.R
@@ -14,6 +17,28 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     private var gameRepository: GameRepository = GameRepository.getGameRepository()
     private var hashMap: MutableMap<Square, ChessPiece> = gameRepository.getHashMap()
     private var previousSquare: MutableState<Square> = gameRepository.getPreviousSquare()
+    private var selectedPiece: MutableState<ChessPiece> =  mutableStateOf(ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(7, 0)))
+    private var pieceClicked: MutableState<Boolean> = mutableStateOf(false)
+
+    fun setPieceClickedState(clicked: Boolean){
+        pieceClicked.value = clicked
+    }
+
+    fun isPieceClicked(): MutableState<Boolean> {
+        return pieceClicked
+    }
+
+    fun selectPiece(piece: ChessPiece){
+        selectedPiece.value = piece
+    }
+
+    fun getSelectedPiece(): MutableState<ChessPiece> {
+        return selectedPiece
+    }
+
+    fun getPiecesOnBoard(): MutableList<ChessPiece> {
+        return gameRepository.getPiecesOnBoard()
+    }
 
     fun resetGame() {
         //gameRepository.undoChangePiecePosition(pieceTemp, originalSquare, currentSquare, previousSquareTemp, kingSquare, gameRepository.getCurrentSquare().value)
@@ -140,6 +165,7 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun getAnnotations(): MutableList<String> {
+        //val annotations: LiveData<MutableList<String>> = gameRepository.getAnnotations()
         return gameRepository.getAnnotations()
     }
 }
