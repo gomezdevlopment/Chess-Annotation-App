@@ -1,14 +1,9 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen
 
 import android.content.Context
-import android.media.MediaPlayer
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
@@ -24,8 +19,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -34,13 +27,11 @@ import com.gomezdevlopment.chessnotationapp.model.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.GameEvent
 import com.gomezdevlopment.chessnotationapp.model.Square
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
-import com.google.firebase.components.Lazy
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun AnnotationBar(viewModel: GameViewModel) {
     val scrollState = rememberLazyListState()
+    viewModel.onUpdate.value
     val annotationsSize = remember {
         mutableStateOf(0)
     }
@@ -80,19 +71,37 @@ fun AnnotationBar(viewModel: GameViewModel) {
 }
 
 @Composable
-fun ChessCanvas(width: Float, viewModel: GameViewModel, context: Context) {
-//    val piecePlayer = MediaPlayer.create(context, R.raw.piece_sound)
-//    val checkPlayer = MediaPlayer.create(context, R.raw.check_sound)
-//    val capturePlayer = MediaPlayer.create(context, R.raw.capture_sound)
-//    val castlingPlayer = MediaPlayer.create(context, R.raw.castling_sound)
-//    val gameEndPlayer = MediaPlayer.create(context, R.raw.end_of_game_sound)
-//
-//    val pieceSound = remember { viewModel.getPieceSound() }
-//    val checkSound = remember { viewModel.getCheckSound() }
-//    val captureSound = remember { viewModel.getCaptureSound() }
-//    val castlingSound = remember { viewModel.getCastlingSound() }
-//    val gameEndSound = remember { viewModel.getGameEndSound() }
+fun SoundFX(viewModel: GameViewModel){
+    val pieceSound = remember { viewModel.getPieceSound() }
+    val checkSound = remember { viewModel.getCheckSound() }
+    val captureSound = remember { viewModel.getCaptureSound() }
+    val castlingSound = remember { viewModel.getCastlingSound() }
+    val gameEndSound = remember { viewModel.getGameEndSound() }
 
+    if (pieceSound.value) {
+        pieceSound.value = false
+        viewModel.playSound(R.raw.piece_sound)
+    }
+    if (checkSound.value) {
+        checkSound.value = false
+        viewModel.playSound(R.raw.check_sound)
+    }
+    if (captureSound.value) {
+        captureSound.value = false
+        viewModel.playSound(R.raw.capture_sound)
+    }
+    if (castlingSound.value) {
+        castlingSound.value = false
+        viewModel.playSound(R.raw.castling_sound)
+    }
+    if (gameEndSound.value) {
+        gameEndSound.value = false
+        viewModel.playSound(R.raw.end_of_game_sound)
+    }
+}
+
+@Composable
+fun ChessCanvas(width: Float, viewModel: GameViewModel) {
     val chessBoardVector: ImageVector =
         ImageVector.vectorResource(id = R.drawable.ic_chess_board_blue_outlined)
     val rowWidthAndHeight: Float = (width / 8f)
@@ -112,15 +121,21 @@ fun ChessCanvas(width: Float, viewModel: GameViewModel, context: Context) {
                 .fillMaxSize()
                 .aspectRatio(1f)
         )
-        println("Recomposing for some reason")
+        println("recomposing main")
+        Pieces(viewModel = viewModel, height = rowWidthAndHeight)
         ChessSquaresV2(height = rowWidthAndHeight, viewModel = viewModel)
+        val onBackPressedDispatcher =
+            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
         Button(
             onClick =
-            { viewModel.resetGame() },
+            {
+                onBackPressedDispatcher?.onBackPressed()
+                viewModel.resetGame()
+            },
             modifier = Modifier.offset((50).dp, (-50).dp),
             enabled = true
         ) {
-            Text(text = "Reset Game")
+            Text(text = "Exit")
         }
         Button(
             onClick =
@@ -131,85 +146,68 @@ fun ChessCanvas(width: Float, viewModel: GameViewModel, context: Context) {
             Text(text = "Undo Move")
         }
     }
-
-//    if (pieceSound.value) {
-//        pieceSound.value = false
-//        viewModel.playSound(R.raw.piece_sound)
-//    }
-//    if (checkSound.value) {
-//        checkSound.value = false
-//        checkPlayer.start()
-//        checkPlayer.setOnCompletionListener {
-//            checkPlayer.release()
-//        }
-//    }
-//    if (captureSound.value) {
-//        captureSound.value = false
-//        capturePlayer.start()
-//        capturePlayer.setOnCompletionListener {
-//            capturePlayer.release()
-//        }
-//    }
-//    if (castlingSound.value) {
-//        castlingSound.value = false
-//        castlingPlayer.start()
-//        castlingPlayer.setOnCompletionListener {
-//            castlingPlayer.release()
-//        }
-//    }
-//    if (gameEndSound.value) {
-//        gameEndSound.value = false
-//        gameEndPlayer.start()
-//        gameEndPlayer.setOnCompletionListener {
-//            gameEndPlayer.release()
-//        }
-//    }
 }
 
 @Composable
 fun Piece(
     piece: ChessPiece,
-    promotionSelectionShowing: MutableState<Boolean>,
     height: Float,
     viewModel: GameViewModel
 ) {
-    val square = piece.square
-    val offsetX = height * square.file
-    val offsetY = (7 - square.rank) * height
-    val imageVector = ImageVector.vectorResource(piece.pieceDrawable)
-    Image(
-        imageVector = imageVector,
-        contentDescription = "Chess Piece",
-        modifier = Modifier
-            .height(height.dp)
-            .aspectRatio(1f)
-            .offset(offsetX.dp, offsetY.dp)
-            .clickable {
-                if (!promotionSelectionShowing.value) {
-                    //clicked.value = false
-                    viewModel.setPieceClickedState(false)
+    key(piece){
+        val square = piece.square
+        val offsetX = height * square.file
+        val offsetY = (7 - square.rank) * height
+        val offsetXAnimated by animateDpAsState(targetValue = offsetX.dp, tween(250))
+        val offsetYAnimated by animateDpAsState(targetValue = offsetY.dp, tween(250))
+        val imageVector = ImageVector.vectorResource(piece.pieceDrawable)
+        Image(
+            imageVector = imageVector,
+            contentDescription = "Chess Piece",
+            modifier = Modifier
+                .height(height.dp)
+                .aspectRatio(1f)
+                .offset(offsetXAnimated, offsetYAnimated)
+                .clickable {
                     viewModel.selectPiece(piece)
-                    if (viewModel.getPlayerTurn() == viewModel.getSelectedPiece().value.color) {
-                        //clickedPiece.value.square
-                        viewModel.setPieceClickedState(true)
-                        //clicked.value = true
-                    }
                 }
-                //viewModel.setPieceClickedState(false)
-            }
-    )
+        )
+    }
+
+}
+
+@Composable
+fun Pieces(viewModel: GameViewModel, height: Float) {
+    println("printing pieces again")
+    viewModel.piecesOnBoard.value.forEach { piece ->
+        viewModel.onUpdate.value
+        if (viewModel.kingInCheck() && piece.square == viewModel.kingSquare()) {
+            Outline(height = height, square = piece.square, Color.Red)
+        }
+        if (piece.square == viewModel.getCurrentSquare().value) {
+            Highlight(height = height, square = piece.square, Color.Blue)
+        }
+        key(piece) {
+            Piece(
+                piece = piece,
+                height = height,
+                viewModel = viewModel
+            )
+        }
+    }
+    val previousSquare = viewModel.getPreviousSquare().value
+    if (previousSquare.rank != 10) {
+        Highlight(height = height, square = previousSquare, color = Color.Blue)
+    }
 }
 
 @Composable
 fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
     val cardVisible = remember { mutableStateOf(false) }
-    val piecesOnBoard = remember {
-        viewModel.getPiecesOnBoard()
-    }
+    // val piecesOnBoard = viewModel.getPiecesOnBoard() as List<ChessPiece>
     val hashMap = viewModel.getHashMap()
     val clicked = remember { viewModel.isPieceClicked() }
     val squareClicked = remember { mutableStateOf(false) }
-    val movePiece = remember { mutableStateOf(false) }
     val promotionSelectionShowing = remember { mutableStateOf(false) }
     val clickedPiece = remember {
         viewModel.getSelectedPiece()
@@ -252,96 +250,6 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
         viewModel.getAttacks()
     }
 
-    // with hashmap
-//    for (rank in 7 downTo 0) {
-//        for (file in 0..7) {
-//            val square = Square(rank, file)
-//            val offsetX = height * file
-//            val offsetY = (7 - rank) * height
-////            if(attackedSquares.contains(square)){
-////                Highlight(height = height, square = square, Color.Blue)
-////            }
-////            if(xRays.contains(square)){
-////                Outline(height = height, square = square, Color.Yellow)
-////            }
-//            if (attacks.contains(square)) {
-//                Highlight(height = height, square = square, Color.Red)
-//            }
-//
-//            if (hashMap.containsKey(square)) {
-//                val chessPiece = hashMap[square]!!
-//                val imageVector = ImageVector.vectorResource(chessPiece.pieceDrawable)
-//                if (square == viewModel.getCurrentSquare().value) {
-//                    //Outline(height = height, square = square, Color.Blue)
-//                    Highlight(height = height, square = square, Color.Blue)
-//                }
-//                if (viewModel.kingInCheck() && square == viewModel.kingSquare()) {
-//                    Outline(height = height, square = square, Color.Red)
-//                }
-//                Image(
-//                    imageVector = imageVector,
-//                    contentDescription = "Chess Piece",
-//                    modifier = Modifier
-//                        .height(height.dp)
-//                        .aspectRatio(1f)
-//                        .offset(offsetX.dp, offsetY.dp)
-//                        .clickable {
-//
-//                            if (!promotionSelectionShowing.value) {
-//                                clicked.value = false
-//                                clickedPiece.value = chessPiece
-//                                if (viewModel.getPlayerTurn() == clickedPiece.value.color) {
-//                                    clickedPiece.value.square
-//                                    clicked.value = true
-//                                }
-//                            }
-//                        }
-//                )
-//            }
-//        }
-//    }
-
-    piecesOnBoard.forEach { piece ->
-        key(piece) {
-            if (viewModel.kingInCheck() && piece.square == viewModel.kingSquare()) {
-                Outline(height = height, square = piece.square, Color.Red)
-            }
-            if (piece.square == viewModel.getCurrentSquare().value) {
-                Highlight(height = height, square = piece.square, Color.Blue)
-            }
-
-            Piece(
-                piece = piece,
-                height = height,
-                promotionSelectionShowing = promotionSelectionShowing,
-                viewModel = viewModel
-            )
-           // println("redrawing piece $piece")
-        }
-    }
-
-//    for (piece in piecesOnBoard) {
-//        key(piece) {
-//            if (viewModel.kingInCheck() && piece.square == viewModel.kingSquare()) {
-//                Outline(height = height, square = piece.square, Color.Red)
-//            }
-//            if (piece.square == viewModel.getCurrentSquare().value) {
-//                Highlight(height = height, square = piece.square, Color.Blue)
-//            }
-//
-//            println("redrawing piece")
-//            Piece(
-//                piece = piece,
-//                height = height,
-//                promotionSelectionShowing = promotionSelectionShowing,
-//                clicked = clicked,
-//                clickedPiece = clickedPiece,
-//                viewModel = viewModel
-//            )
-//        }
-//    }
-
-
     if (clicked.value) {
         val legalMoves = viewModel.onEvent(GameEvent.OnPieceClicked, clickedPiece.value)
         if (legalMoves != null) {
@@ -356,34 +264,6 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
     }
 
     if (squareClicked.value) {
-//        movePiece.value = true
-//        val offsetX = height * targetFile.value
-//        val offsetY = (7 - targetRank.value) * height
-//        val imageVector = ImageVector.vectorResource(clickedPiece.value.pieceDrawable)
-//        Highlight(
-//            height = height,
-//            square = Square(targetRank.value, targetFile.value),
-//            Color.Blue
-//        )
-//        Image(
-//            imageVector = imageVector,
-//            contentDescription = "Chess Piece",
-//            modifier = Modifier
-//                .height(height.dp)
-//                .aspectRatio(1f)
-//                .offset(offsetX.dp, offsetY.dp)
-//                .clickable {
-//                    if (!promotionSelectionShowing.value) {
-//                        clicked.value = false
-//                        clickedPiece.value = clickedPiece.value
-//                        if (viewModel.getPlayerTurn() == clickedPiece.value.color) {
-//                            clickedPiece.value.square
-//                            clicked.value = true
-//                        }
-//                    }
-//                }
-//        )
-
         if (clickedPiece.value.piece == "pawn" && (targetRank.value == 7 || targetRank.value == 0)) {
             viewModel.movePiece(
                 Square(targetRank.value, targetFile.value),
@@ -391,7 +271,6 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
             )
             promotionSelectionShowing.value = true
         } else {
-            //clickedPiece.value.square = Square(targetRank.value, targetFile.value)
             viewModel.changePiecePosition(
                 Square(targetRank.value, targetFile.value),
                 clickedPiece.value
@@ -411,13 +290,6 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
             viewModel
         )
     }
-
-    val previousSquare = viewModel.getPreviousSquare().value
-    if (previousSquare.rank != 10) {
-        //Outline(height = height, square = previousSquare, Color.Blue)
-        Highlight(height = height, square = previousSquare, color = Color.Blue)
-    }
-
 
     if (checkmate.value) {
         var winner = "White"
@@ -464,7 +336,7 @@ private fun Highlight(
         drawRect(
             color = color,
             size = size,
-            alpha = .5f
+            alpha = .3f
         )
     }
 }

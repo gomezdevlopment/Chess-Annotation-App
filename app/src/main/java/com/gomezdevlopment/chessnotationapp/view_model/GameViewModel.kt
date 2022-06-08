@@ -4,7 +4,10 @@ import android.app.Application
 import android.content.Context
 import android.media.MediaPlayer
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -12,6 +15,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.*
+import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
 
 class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     private var gameRepository: GameRepository = GameRepository.getGameRepository()
@@ -19,6 +23,28 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     private var previousSquare: MutableState<Square> = gameRepository.getPreviousSquare()
     private var selectedPiece: MutableState<ChessPiece> =  mutableStateOf(ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(7, 0)))
     private var pieceClicked: MutableState<Boolean> = mutableStateOf(false)
+    private var promotionDialogShowing: MutableState<Boolean> = mutableStateOf(false)
+
+
+    var onUpdate = mutableStateOf(0)
+    val endOfGame = mutableStateOf(false)
+
+    private fun updateUI() {
+        onUpdate.value = (0..1_000_000).random()
+    }
+    //private val _piecesOnBoard = gameRepository.getPiecesOnBoard()
+    val piecesOnBoard: MutableState<List<ChessPiece>> = mutableStateOf(gameRepository.getPiecesOnBoard())
+
+    fun setPromotionDialogState(clicked: Boolean){
+        promotionDialogShowing.value = clicked
+    }
+
+    fun resetGame(){
+        gameRepository.resetGame()
+    }
+    fun isPromotionDialogShowing(): MutableState<Boolean> {
+        return promotionDialogShowing
+    }
 
     fun setPieceClickedState(clicked: Boolean){
         pieceClicked.value = clicked
@@ -29,27 +55,21 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun selectPiece(piece: ChessPiece){
-        selectedPiece.value = piece
+        if (!isPromotionDialogShowing().value) {
+            setPieceClickedState(false)
+            selectedPiece.value = piece
+            if (getPlayerTurn() == getSelectedPiece().value.color) {
+                setPieceClickedState(true)
+            }
+        }
     }
 
     fun getSelectedPiece(): MutableState<ChessPiece> {
         return selectedPiece
     }
 
-    fun getPiecesOnBoard(): MutableList<ChessPiece> {
-        return gameRepository.getPiecesOnBoard()
-    }
-
-    fun resetGame() {
-        //gameRepository.undoChangePiecePosition(pieceTemp, originalSquare, currentSquare, previousSquareTemp, kingSquare, gameRepository.getCurrentSquare().value)
-        //gameRepository.resetGame()
-        //gameRepository.previousGameState(gameState)
-    }
-
     fun undoMove() {
         gameRepository.previousGameState()
-        ///gameRepository.setPositionFromFen(fen)
-        //gameRepository.undoChangePiecePosition(pieceTemp, originalSquare, currentSquare, previousSquareTemp, kingSquare, gameRepository.getCurrentSquare().value, gameRepository.castleKingSide(), gameRepository.castleQueenSide())
     }
 
     fun onEvent(event: GameEvent, piece: ChessPiece): MutableList<Square>? {
@@ -64,21 +84,23 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
         return hashMap
     }
 
+    fun endOfGameCard(title: String, message:String) {
+
+    }
+
     fun changePiecePosition(newSquare: Square, piece: ChessPiece) {
-//        pieceTemp = piece
-//        originalSquare = piece.square
-//        currentSquare = gameRepository.getCurrentSquare().value
-//        previousSquareTemp = gameRepository.getPreviousSquare().value
-//        kingSquare = gameRepository.kingSquare().value
         gameRepository.changePiecePosition(newSquare, piece, 0)
+        updateUI()
     }
 
     fun promotion(newSquare: Square, promotionSelection: ChessPiece) {
         gameRepository.promotion(newSquare, promotionSelection, 0)
+        updateUI()
     }
 
     fun movePiece(newSquare: Square, piece: ChessPiece) {
         gameRepository.movePiece(newSquare, piece, 0)
+        updateUI()
     }
 
     fun getPreviousSquare(): MutableState<Square> {
@@ -154,14 +176,7 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun playSound(soundId: Int){
-        val player = MediaPlayer.create(app, R.raw.piece_sound)
-        if(player.isPlaying){
-            player.release()
-        }
-        player.start()
-        player.setOnCompletionListener {
-            player.release()
-        }
+        SoundPlayer().playSound(app, soundId)
     }
 
     fun getAnnotations(): MutableList<String> {

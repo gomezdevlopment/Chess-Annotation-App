@@ -1,7 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.model
 
 import androidx.compose.runtime.*
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.gomezdevlopment.chessnotationapp.model.game_logic.FEN
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
@@ -11,7 +10,7 @@ import com.gomezdevlopment.chessnotationapp.model.pieces.*
 
 class GameRepository() : ViewModel() {
     private var piecesOnBoard: MutableList<ChessPiece> = mutableListOf()
-    private var hashMap: MutableMap<Square, ChessPiece> = HashMap()
+    private var occupiedSquares: MutableMap<Square, ChessPiece> = mutableMapOf()
     private var mapOfPiecesAndTheirLegalMoves: MutableMap<ChessPiece, MutableList<Square>> =
         mutableMapOf()
     private var previousSquare: MutableState<Square> = mutableStateOf(Square(10, 10))
@@ -139,7 +138,7 @@ class GameRepository() : ViewModel() {
 
     init {
         //testPosition4()
-        promotionPosition()
+        //promotionPosition()
         //addPieces()
         //testPositionKiwipete()
         // testPosition3()
@@ -147,9 +146,25 @@ class GameRepository() : ViewModel() {
         initialPosition()
     }
 
+    fun resetGame(){
+        previousGameStates.clear()
+        checkmate = mutableStateOf(false)
+        stalemate = mutableStateOf(false)
+        insufficientMaterial = mutableStateOf(false)
+        threeFoldRepetition = mutableStateOf(false)
+        fiftyMoveRule = mutableStateOf(false)
+        fiftyMoveCount = mutableStateOf(0)
+        previousSquare = mutableStateOf(Square(10, 10))
+        currentSquare = mutableStateOf(Square(10, 10))
+        playerTurn = mutableStateOf("white")
+        annotations.clear()
+        currentNotation = StringBuilder("")
+        initialPosition()
+    }
+
     private fun getGameStateAsFEN(): String {
         return FEN().getGameStateAsFEN(
-            hashMap,
+            occupiedSquares,
             playerTurn,
             whiteCanCastleKingSide,
             whiteCanCastleQueenSide,
@@ -160,7 +175,7 @@ class GameRepository() : ViewModel() {
 
     private fun setPositionFromFen(fen: String) {
         piecesOnBoard.clear()
-        hashMap.clear()
+        occupiedSquares.clear()
         piecesOnBoard.addAll(
             FEN().parseFEN(
                 fen,
@@ -174,7 +189,7 @@ class GameRepository() : ViewModel() {
             )
         )
         for (piece in piecesOnBoard) {
-            hashMap[piece.square] = piece
+            occupiedSquares[piece.square] = piece
         }
         checkAttacks()
         setXRayAttacks()
@@ -235,13 +250,13 @@ class GameRepository() : ViewModel() {
             if (piece.color != playerTurn.value) {
                 when (piece.piece) {
                     "queen" -> {
-                        checksOnKing.addAll(Queen().xRayAttacks(piece, hashMap, true))
+                        checksOnKing.addAll(Queen().xRayAttacks(piece, occupiedSquares, true))
                     }
                     "rook" -> {
-                        checksOnKing.addAll(Rook().xRayAttacks(piece, hashMap, true))
+                        checksOnKing.addAll(Rook().xRayAttacks(piece, occupiedSquares, true))
                     }
                     "bishop" -> {
-                        checksOnKing.addAll(Bishop().xRayAttacks(piece, hashMap, true))
+                        checksOnKing.addAll(Bishop().xRayAttacks(piece, occupiedSquares, true))
                     }
                 }
             }
@@ -461,11 +476,11 @@ class GameRepository() : ViewModel() {
             )
         }
 
-        if (hashMap.containsKey(newSquare)) {
-            hashMap[newSquare]?.let {
+        if (occupiedSquares.containsKey(newSquare)) {
+            occupiedSquares[newSquare]?.let {
                 capturedPieces.add(it)
             }
-            piecesOnBoard.remove(hashMap[newSquare])
+            removePiece(newSquare)
             captureSound.value = true
             if (depth == 1) {
                 captures.value += 1
@@ -477,7 +492,7 @@ class GameRepository() : ViewModel() {
         }
 
         val previousPieceSquare = Square(piece.square.rank, piece.square.file)
-        hashMap.remove(piece.square)
+        occupiedSquares.remove(piece.square)
         piecesOnBoard.remove(piece)
         setPreviousSquare(previousPieceSquare)
         setCurrentSquare(newSquare)
@@ -489,7 +504,7 @@ class GameRepository() : ViewModel() {
         if (depth == 1) {
             promotions.value += 1
         }
-        hashMap[newSquare] = promotionSelection
+        occupiedSquares[newSquare] = promotionSelection
         piecesOnBoard.add(promotionSelection)
         //setCurrentSquare(piece.square)
         if (playerTurn.value == "white") {
@@ -520,10 +535,22 @@ class GameRepository() : ViewModel() {
         annotations.add(currentNotation.toString())
         //annotations.add(currentNotation.toString())
         currentNotation.clear()
-        println(annotations)
+    }
+
+    private fun changePieceSquare(piece: ChessPiece, newSquare: Square): ChessPiece {
+        piece.square = newSquare
+        return piece
+//        val updatedPiece = piece.copy(square = newSquare)
+//        piecesOnBoard[piecesOnBoard.indexOf(piece)] = updatedPiece
+//        return updatedPiece
+    }
+
+    private fun removePiece(square: Square){
+        println(piecesOnBoard.remove(occupiedSquares.remove(square)))
     }
 
     fun changePiecePosition(newSquare: Square, piece: ChessPiece, depth: Int) {
+        val previousPieceSquare = piece.square
         val notation = Notation(currentNotation, newSquare)
         var castled = false
 
@@ -546,10 +573,10 @@ class GameRepository() : ViewModel() {
         if (piece.piece == "king") {
             if (castleKingSide()) {
                 if (newSquare.file == piece.square.file + 2) {
-                    val rook: ChessPiece = hashMap[Square(newSquare.rank, newSquare.file + 1)]!!
-                    hashMap.remove(Square(newSquare.rank, newSquare.file + 1))
-                    rook.square = Square(newSquare.rank, newSquare.file - 1)
-                    hashMap[rook.square] = rook
+                    val rook: ChessPiece = occupiedSquares[Square(newSquare.rank, newSquare.file + 1)]!!
+                    occupiedSquares.remove(Square(newSquare.rank, newSquare.file + 1))
+                    changePieceSquare(rook, Square(newSquare.rank, newSquare.file - 1))
+                    occupiedSquares[rook.square] = rook
                     if (depth == 1) {
                         castles.value += 1
                     }
@@ -560,10 +587,10 @@ class GameRepository() : ViewModel() {
             }
             if (castleQueenSide()) {
                 if (newSquare.file == piece.square.file - 2) {
-                    val rook: ChessPiece = hashMap[Square(newSquare.rank, newSquare.file - 2)]!!
-                    hashMap.remove(Square(newSquare.rank, newSquare.file - 2))
-                    rook.square = Square(newSquare.rank, newSquare.file + 1)
-                    hashMap[rook.square] = rook
+                    val rook: ChessPiece = occupiedSquares[Square(newSquare.rank, newSquare.file - 2)]!!
+                    occupiedSquares.remove(Square(newSquare.rank, newSquare.file - 2))
+                    changePieceSquare(rook, Square(newSquare.rank, newSquare.file + 1))
+                    occupiedSquares[rook.square] = rook
                     if (depth == 1) {
                         castles.value += 1
                     }
@@ -580,22 +607,22 @@ class GameRepository() : ViewModel() {
         }
 
         //Remove Defender
-        if (hashMap.containsKey(newSquare)) {
+        if (occupiedSquares.containsKey(newSquare)) {
             fiftyMoveCount.value = 0
             if (depth == 1) {
                 captures.value += 1
             }
-            hashMap[newSquare]?.let {
+            occupiedSquares[newSquare]?.let {
                 capturedPieces.add(it)
             }
-            piecesOnBoard.remove(hashMap[newSquare])
+            removePiece(newSquare)
             captureSound.value = true
             notation.capture()
         } else if (gameLogic.isEnPassant(
                 previousSquare.value,
                 currentSquare.value,
                 newSquare,
-                hashMap,
+                occupiedSquares,
                 piece,
                 getKingSquare()
             )
@@ -605,9 +632,8 @@ class GameRepository() : ViewModel() {
                 enPassants.value += 1
                 captures.value += 1
             }
-            hashMap[currentSquare.value]?.let { capturedPieces.add(it) }
-            piecesOnBoard.remove(hashMap[currentSquare.value])
-            hashMap.remove(currentSquare.value)
+            occupiedSquares[currentSquare.value]?.let { capturedPieces.add(it) }
+            removePiece(currentSquare.value)
             captureSound.value = true
             notation.capture()
         } else {
@@ -617,12 +643,9 @@ class GameRepository() : ViewModel() {
             }
         }
 
-        //Check Promotion
-
-        val previousPieceSquare = piece.square
-        hashMap.remove(piece.square)
-        piece.square = newSquare
-        hashMap[newSquare] = piece
+        occupiedSquares.remove(previousPieceSquare)
+        changePieceSquare(piece, newSquare)
+        occupiedSquares[newSquare] = piece
         setPreviousSquare(previousPieceSquare)
         setCurrentSquare(newSquare)
         if (piece.color == "white") {
@@ -662,7 +685,7 @@ class GameRepository() : ViewModel() {
         notation.checkmateOrCheck(checkmate.value, kingInCheck().value)
         annotations.add(currentNotation.toString())
         currentNotation.clear()
-        println(annotations)
+        println(piecesOnBoard.size)
     }
 
     fun getPiecesOnBoard(): MutableList<ChessPiece> {
@@ -670,7 +693,7 @@ class GameRepository() : ViewModel() {
     }
 
     fun getHashMap(): MutableMap<Square, ChessPiece> {
-        return hashMap
+        return occupiedSquares
     }
 
     fun getPreviousSquare(): MutableState<Square> {
@@ -707,13 +730,13 @@ class GameRepository() : ViewModel() {
             if (piece.color != playerTurn.value) {
                 when (piece.piece) {
                     "queen" -> {
-                        xRayAttacks.addAll(Queen().xRayAttacks(piece, hashMap, false))
+                        xRayAttacks.addAll(Queen().xRayAttacks(piece, occupiedSquares, false))
                     }
                     "rook" -> {
-                        xRayAttacks.addAll(Rook().xRayAttacks(piece, hashMap, false))
+                        xRayAttacks.addAll(Rook().xRayAttacks(piece, occupiedSquares, false))
                     }
                     "bishop" -> {
-                        xRayAttacks.addAll(Bishop().xRayAttacks(piece, hashMap, false))
+                        xRayAttacks.addAll(Bishop().xRayAttacks(piece, occupiedSquares, false))
                     }
                 }
             }
@@ -767,7 +790,7 @@ class GameRepository() : ViewModel() {
     private fun pawnMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
         return Pawn().moves(
             piece,
-            hashMap,
+            occupiedSquares,
             squaresToBlock,
             previousSquare.value,
             currentSquare.value,
@@ -782,7 +805,7 @@ class GameRepository() : ViewModel() {
         if (piece.color == "white") {
             return King().moves(
                 piece,
-                hashMap,
+                occupiedSquares,
                 squaresToBlock,
                 attacks,
                 whiteCanCastleKingSide.value,
@@ -796,7 +819,7 @@ class GameRepository() : ViewModel() {
         }
         return King().moves(
             piece,
-            hashMap,
+            occupiedSquares,
             squaresToBlock,
             attacks,
             blackCanCastleKingSide.value,
@@ -812,7 +835,7 @@ class GameRepository() : ViewModel() {
     private fun bishopMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
         return Bishop().moves(
             piece,
-            hashMap,
+            occupiedSquares,
             squaresToBlock,
             checkDefendedPieces,
             xRayAttacks,
@@ -824,7 +847,7 @@ class GameRepository() : ViewModel() {
     private fun rookMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
         return Rook().moves(
             piece,
-            hashMap,
+            occupiedSquares,
             squaresToBlock,
             checkDefendedPieces,
             xRayAttacks,
@@ -836,7 +859,7 @@ class GameRepository() : ViewModel() {
     private fun queenMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
         return Queen().moves(
             piece,
-            hashMap,
+            occupiedSquares,
             squaresToBlock,
             checkDefendedPieces,
             xRayAttacks,
@@ -848,7 +871,7 @@ class GameRepository() : ViewModel() {
     private fun knightMoves(piece: ChessPiece, checkDefendedPieces: Boolean): MutableList<Square> {
         return Knight().moves(
             piece,
-            hashMap,
+            occupiedSquares,
             squaresToBlock,
             checkDefendedPieces,
             xRayAttacks,
