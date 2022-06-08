@@ -1,18 +1,17 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen
 
-import android.content.Context
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -29,121 +28,100 @@ import com.gomezdevlopment.chessnotationapp.model.Square
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable
-fun AnnotationBar(viewModel: GameViewModel) {
-    val scrollState = rememberLazyListState()
-    viewModel.onUpdate.value
-    val annotationsSize = remember {
-        mutableStateOf(0)
-    }
-    val annotations = remember {
-        viewModel.getAnnotations()
-    }
-
-    Spacer(modifier = Modifier.height(20.dp))
-    LazyRow(modifier = Modifier.fillMaxWidth(), state = scrollState) {
-        itemsIndexed(annotations) { index, annotation ->
-            //val text by remember{mutableStateOf(annotation)}
-            if (index % 2 == 0) {
-                Text(
-                    text = "${((index / 2) + 1)}.",
-                    textAlign = TextAlign.Center,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(4.dp)
-                )
-            }
-            Text(
-                text = annotation,
-                textAlign = TextAlign.Center,
-                fontSize = 18.sp,
-                modifier = Modifier.padding(4.dp)
-            )
-        }
-
-    }
-
-    if (annotationsSize.value != annotations.size) {
-        annotationsSize.value = annotations.size
-        LaunchedEffect(annotations) {
-            scrollState.scrollToItem(annotations.size - 1)
-        }
-    }
-
-}
-
-@Composable
-fun SoundFX(viewModel: GameViewModel){
-    val pieceSound = remember { viewModel.getPieceSound() }
-    val checkSound = remember { viewModel.getCheckSound() }
-    val captureSound = remember { viewModel.getCaptureSound() }
-    val castlingSound = remember { viewModel.getCastlingSound() }
-    val gameEndSound = remember { viewModel.getGameEndSound() }
-
-    if (pieceSound.value) {
-        pieceSound.value = false
-        viewModel.playSound(R.raw.piece_sound)
-    }
-    if (checkSound.value) {
-        checkSound.value = false
-        viewModel.playSound(R.raw.check_sound)
-    }
-    if (captureSound.value) {
-        captureSound.value = false
-        viewModel.playSound(R.raw.capture_sound)
-    }
-    if (castlingSound.value) {
-        castlingSound.value = false
-        viewModel.playSound(R.raw.castling_sound)
-    }
-    if (gameEndSound.value) {
-        gameEndSound.value = false
-        viewModel.playSound(R.raw.end_of_game_sound)
-    }
-}
-
-@Composable
 fun ChessCanvas(width: Float, viewModel: GameViewModel) {
     val chessBoardVector: ImageVector =
-        ImageVector.vectorResource(id = R.drawable.ic_chess_board_blue_outlined)
+        ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
     val rowWidthAndHeight: Float = (width / 8f)
 
-    AnnotationBar(viewModel)
-
-    Box(
-        modifier = Modifier
-            .width(width.dp)
-            .aspectRatio(1f)
-            .background(colorResource(id = R.color.orange))
-    ) {
-        Image(
-            imageVector = chessBoardVector,
-            contentDescription = "Chess Board",
-            modifier = Modifier
-                .fillMaxSize()
-                .aspectRatio(1f)
-        )
-        println("recomposing main")
-        Pieces(viewModel = viewModel, height = rowWidthAndHeight)
-        ChessSquaresV2(height = rowWidthAndHeight, viewModel = viewModel)
-        val onBackPressedDispatcher =
-            LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-        Button(
-            onClick =
-            {
-                onBackPressedDispatcher?.onBackPressed()
-                viewModel.resetGame()
-            },
-            modifier = Modifier.offset((50).dp, (-50).dp),
-            enabled = true
-        ) {
-            Text(text = "Exit")
+    Column() {
+        Row(Modifier.weight(1f)) {
+            AnnotationBar(viewModel)
         }
-        Button(
-            onClick =
-            { viewModel.undoMove() },
-            modifier = Modifier.offset((200).dp, (-50).dp),
-            enabled = true
-        ) {
-            Text(text = "Undo Move")
+        Row(modifier = Modifier.weight(2f)) {
+            Box(
+                modifier = Modifier
+                    .width(width.dp)
+                    .aspectRatio(1f),
+            ) {
+                Image(
+                    imageVector = chessBoardVector,
+                    contentDescription = "Chess Board",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .aspectRatio(1f)
+                )
+                println("recomposing main")
+                Pieces(viewModel = viewModel, height = rowWidthAndHeight)
+                ChessSquaresV2(height = rowWidthAndHeight, viewModel = viewModel)
+            }
+        }
+
+        Row(Modifier.wrapContentHeight()) {
+            val onBackPressedDispatcher =
+                LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
+            Column(
+                Modifier
+                    .weight(1f)
+                    .clickable {
+                        onBackPressedDispatcher?.onBackPressed()
+                        viewModel.resetGame()
+                    }) {
+
+                val home: ImageVector =
+                    ImageVector.vectorResource(id = R.drawable.ic_home)
+                Icon(
+                    imageVector = home,
+                    contentDescription = "Go to Home Screen",
+                    tint = tealDarker,
+                    modifier = Modifier
+                        .height(50.dp)
+                        .padding(10.dp)
+                        .aspectRatio(1f)
+                        .align(CenterHorizontally)
+                )
+            }
+
+            Column(
+                Modifier
+                    .weight(1f)
+                    .clickable {
+                        viewModel.previousNotation()
+                        //viewModel.undoMove()
+                    }
+            ) {
+                val leftArrow: ImageVector =
+                    ImageVector.vectorResource(id = R.drawable.ic_round_arrow_left)
+                Icon(
+                    imageVector = leftArrow,
+                    contentDescription = "Previous Move",
+                    tint = tealDarker,
+                    modifier = Modifier
+                        .height(50.dp)
+                        .padding(10.dp)
+                        .aspectRatio(1f)
+                        .align(CenterHorizontally)
+                )
+            }
+
+            Column(
+                Modifier
+                    .weight(1f)
+                    .clickable {
+                        viewModel.nextNotation()
+                    }) {
+                val rightArrow: ImageVector =
+                    ImageVector.vectorResource(id = R.drawable.ic_round_arrow_right)
+                Icon(
+                    imageVector = rightArrow,
+                    contentDescription = "Next Move",
+                    tint = tealDarker,
+                    modifier = Modifier
+                        .height(50.dp)
+                        .padding(10.dp)
+                        .aspectRatio(1f)
+                        .align(CenterHorizontally)
+                )
+            }
         }
     }
 }
@@ -154,10 +132,10 @@ fun Piece(
     height: Float,
     viewModel: GameViewModel
 ) {
-    key(piece){
+    key(piece) {
         val square = piece.square
-        val offsetX = height * square.file
-        val offsetY = (7 - square.rank) * height
+        val offsetX = height * (square.file).toFloat()
+        val offsetY = (7 - square.rank).toFloat() * height
         val offsetXAnimated by animateDpAsState(targetValue = offsetX.dp, tween(250))
         val offsetYAnimated by animateDpAsState(targetValue = offsetY.dp, tween(250))
         val imageVector = ImageVector.vectorResource(piece.pieceDrawable)
@@ -179,13 +157,13 @@ fun Piece(
 @Composable
 fun Pieces(viewModel: GameViewModel, height: Float) {
     println("printing pieces again")
+    viewModel.onUpdate.value
     viewModel.piecesOnBoard.value.forEach { piece ->
-        viewModel.onUpdate.value
         if (viewModel.kingInCheck() && piece.square == viewModel.kingSquare()) {
-            Outline(height = height, square = piece.square, Color.Red)
+            Highlight(height = height, square = piece.square, orange, 1f)
         }
         if (piece.square == viewModel.getCurrentSquare().value) {
-            Highlight(height = height, square = piece.square, Color.Blue)
+            Highlight(height = height, square = piece.square, Color.Yellow, .5f)
         }
         key(piece) {
             Piece(
@@ -197,7 +175,7 @@ fun Pieces(viewModel: GameViewModel, height: Float) {
     }
     val previousSquare = viewModel.getPreviousSquare().value
     if (previousSquare.rank != 10) {
-        Highlight(height = height, square = previousSquare, color = Color.Blue)
+        Highlight(height = height, square = previousSquare, color = Color.Yellow, .5f)
     }
 }
 
@@ -246,9 +224,10 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
 //        viewModel.getSquaresToBlock()
 //    }
 //
-    val attacks = remember {
-        viewModel.getAttacks()
-    }
+//    val attacks = remember {
+//        viewModel.getAttacks()
+//    }
+
 
     if (clicked.value) {
         val legalMoves = viewModel.onEvent(GameEvent.OnPieceClicked, clickedPiece.value)
@@ -281,7 +260,7 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
     }
 
     if (promotionSelectionShowing.value) {
-        PromotionV2(
+        Promotion(
             height,
             clickedPiece.value,
             promotionSelectionShowing,
@@ -323,8 +302,9 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
 
 @Composable
 private fun Highlight(
-    height: Float, square: Square, color: Color
+    height: Float, square: Square, color: Color, transparency: Float
 ) {
+    println(height)
     val offsetX = height * square.file
     val offsetY = (7 - square.rank) * height
     Canvas(
@@ -336,7 +316,7 @@ private fun Highlight(
         drawRect(
             color = color,
             size = size,
-            alpha = .3f
+            alpha = transparency
         )
     }
 }
@@ -422,147 +402,5 @@ private fun Outline(
             alpha = 1f,
             style = Stroke(size.width * .05f)
         )
-    }
-}
-
-@Composable
-private fun PromotionV2(
-    width: Float,
-    chessPiece: ChessPiece,
-    promotionSelectionShowing: MutableState<Boolean>,
-    rank: Int,
-    file: Int,
-    viewModel: GameViewModel
-) {
-    val pieces = mutableListOf<ChessPiece>()
-    val blackPieceImages = listOf(
-        ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(rank, file)),
-        ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(rank, file)),
-        ChessPiece("black", "bishop", R.drawable.ic_bb_alpha, Square(rank, file)),
-        ChessPiece("black", "knight", R.drawable.ic_bn_alpha, Square(rank, file))
-    )
-
-    val whitePieceImages = listOf(
-        ChessPiece("white", "queen", R.drawable.ic_wq_alpha, Square(rank, file)),
-        ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(rank, file)),
-        ChessPiece("white", "bishop", R.drawable.ic_wb_alpha, Square(rank, file)),
-        ChessPiece("white", "knight", R.drawable.ic_wn_alpha, Square(rank, file))
-    )
-
-    if (chessPiece.color == "white") {
-        pieces.addAll(whitePieceImages)
-    } else {
-        pieces.addAll(blackPieceImages)
-    }
-
-    val offsetX = width * file
-    var offsetY = (7 - rank) * width
-    if (rank == 0) {
-        offsetY = 4 * width
-    }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight()
-            .background(colorResource(id = R.color.transparentBlack))
-            .zIndex(2f)
-    )
-    {
-        Card(
-            modifier = Modifier
-                .width(width.dp)
-                .height((width * 4).dp)
-                .absoluteOffset(offsetX.dp, offsetY.dp),
-            elevation = 5.dp,
-            shape = RoundedCornerShape(10.dp)
-        ) {
-            Column(Modifier.fillMaxWidth()) {
-                pieces.forEach { selectedPiece ->
-                    Image(
-                        imageVector = ImageVector.vectorResource(selectedPiece.pieceDrawable),
-                        contentDescription = "Chess Piece",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f)
-                            .padding(5.dp)
-                            .clickable {
-                                promotionSelectionShowing.value = false
-                                viewModel.promotion(Square(rank, file), selectedPiece)
-                            }
-                    )
-                }
-            }
-        }
-
-    }
-}
-
-@Composable
-private fun EndOfGameCard(
-    header: String,
-    message: String,
-    cardVisible: MutableState<Boolean>
-) {
-    if (cardVisible.value) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .background(colorResource(id = R.color.transparentBlack))
-                .zIndex(2f)
-        )
-        {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(50.dp),
-                elevation = 10.dp,
-                shape = RoundedCornerShape(20.dp)
-            ) {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .weight(1f), horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Spacer(modifier = Modifier.height(50.dp))
-                        Text(
-                            text = header,
-                            textAlign = TextAlign.Center,
-                            fontSize = 24.sp,
-                            modifier = Modifier.absolutePadding(10.dp)
-                        )
-                        Text(text = message, textAlign = TextAlign.Center, fontSize = 14.sp)
-                    }
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        RoundDialogButton(buttonText = "Close", bool = cardVisible)
-                        RoundDialogButton(buttonText = "Rematch", bool = cardVisible)
-                        Spacer(modifier = Modifier.height(20.dp))
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun RoundDialogButton(buttonText: String, bool: MutableState<Boolean>) {
-    Button(
-        onClick = { bool.value = false },
-        shape = CircleShape,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(20.dp, 5.dp)
-            .wrapContentHeight(),
-        border = BorderStroke(2.dp, colorResource(id = R.color.teal)),
-        colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color.White,
-            contentColor = colorResource(id = R.color.teal)
-        )
-    )
-    {
-        Text(buttonText)
     }
 }

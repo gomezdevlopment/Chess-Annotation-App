@@ -25,9 +25,31 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     private var pieceClicked: MutableState<Boolean> = mutableStateOf(false)
     private var promotionDialogShowing: MutableState<Boolean> = mutableStateOf(false)
 
-
+    var selectedNotationIndex: MutableState<Int> = mutableStateOf(-1)
+    var currentPosition: MutableState<Boolean> = mutableStateOf(true)
     var onUpdate = mutableStateOf(0)
     val endOfGame = mutableStateOf(false)
+
+    fun previousNotation(){
+        if(selectedNotationIndex.value > 0){
+            currentPosition.value = false
+            gameRepository.previousGameState()
+            selectedNotationIndex.value-=1
+        }
+        updateUI()
+    }
+
+    fun nextNotation(){
+        if(selectedNotationIndex.value < getAnnotations().size-1){
+            gameRepository.nextGameState()
+            selectedNotationIndex.value+=1
+            if(selectedNotationIndex.value == getAnnotations().size-1){
+                currentPosition.value = true
+            }
+        }
+        updateUI()
+    }
+
 
     private fun updateUI() {
         onUpdate.value = (0..1_000_000).random()
@@ -55,13 +77,16 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun selectPiece(piece: ChessPiece){
-        if (!isPromotionDialogShowing().value) {
-            setPieceClickedState(false)
-            selectedPiece.value = piece
-            if (getPlayerTurn() == getSelectedPiece().value.color) {
-                setPieceClickedState(true)
+        if(currentPosition.value){
+            if (!isPromotionDialogShowing().value) {
+                setPieceClickedState(false)
+                selectedPiece.value = piece
+                if (getPlayerTurn() == getSelectedPiece().value.color) {
+                    setPieceClickedState(true)
+                }
             }
         }
+
     }
 
     fun getSelectedPiece(): MutableState<ChessPiece> {
@@ -90,11 +115,13 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun changePiecePosition(newSquare: Square, piece: ChessPiece) {
         gameRepository.changePiecePosition(newSquare, piece, 0)
+        selectedNotationIndex.value +=1
         updateUI()
     }
 
     fun promotion(newSquare: Square, promotionSelection: ChessPiece) {
         gameRepository.promotion(newSquare, promotionSelection, 0)
+        selectedNotationIndex.value +=1
         updateUI()
     }
 

@@ -141,9 +141,9 @@ class GameRepository() : ViewModel() {
         //promotionPosition()
         //addPieces()
         //testPositionKiwipete()
-        // testPosition3()
+        testPosition3()
 //        previousGameStates.add(GameState(previousSquare.value, currentSquare.value, gameStateAsFEN))
-        initialPosition()
+        //initialPosition()
     }
 
     fun resetGame(){
@@ -173,7 +173,7 @@ class GameRepository() : ViewModel() {
         )
     }
 
-    private fun setPositionFromFen(fen: String) {
+    fun setPositionFromFen(fen: String) {
         piecesOnBoard.clear()
         occupiedSquares.clear()
         piecesOnBoard.addAll(
@@ -348,14 +348,29 @@ class GameRepository() : ViewModel() {
         return blackCanCastleQueenSide.value
     }
 
-    fun previousGameState() {
+    fun undoMove() {
         if (previousGameStates.size > 1) {
             previousGameStates.removeAt(previousGameStates.size - 1)
             setPositionFromFen(previousGameStates[previousGameStates.size - 1].fenPosition)
             currentSquare.value = previousGameStates[previousGameStates.size - 1].currentSquare
             previousSquare.value = previousGameStates[previousGameStates.size - 1].previousSquare
         }
+    }
 
+    fun previousGameState() {
+        if (previousGameStates.size > 1) {
+            setPositionFromFen(previousGameStates[previousGameStates.size - 1].fenPosition)
+            currentSquare.value = previousGameStates[previousGameStates.size - 1].currentSquare
+            previousSquare.value = previousGameStates[previousGameStates.size - 1].previousSquare
+        }
+    }
+
+    fun nextGameState() {
+        if (previousGameStates.size < previousGameStates.size-1) {
+            setPositionFromFen(previousGameStates[previousGameStates.size + 1].fenPosition)
+            currentSquare.value = previousGameStates[previousGameStates.size + 1].currentSquare
+            previousSquare.value = previousGameStates[previousGameStates.size + 1].previousSquare
+        }
     }
 
     private fun checkAllLegalMoves() {
@@ -724,7 +739,7 @@ class GameRepository() : ViewModel() {
         return xRayAttacks
     }
 
-    fun setXRayAttacks() {
+    private fun setXRayAttacks() {
         xRayAttacks.clear()
         for (piece in piecesOnBoard) {
             if (piece.color != playerTurn.value) {
@@ -746,11 +761,10 @@ class GameRepository() : ViewModel() {
     private fun setSquaresToBlock(): MutableList<Square> {
         squaresToBlock.clear()
         for (square in checksOnKing) {
-            if (attacks.contains(square)) {
+            if (attacks.contains(square) && xRayAttacks.contains(square)) {
                 squaresToBlock.add(square)
             }
         }
-        //squaresToBlock.addAll(getAttackedSquaresNearKing(attacks, kingSquare().value))
         return squaresToBlock
     }
 
