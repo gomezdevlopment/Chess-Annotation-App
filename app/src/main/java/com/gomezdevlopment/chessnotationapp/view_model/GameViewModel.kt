@@ -19,8 +19,8 @@ import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
 
 class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     private var gameRepository: GameRepository = GameRepository.getGameRepository()
-    private var hashMap: MutableMap<Square, ChessPiece> = gameRepository.getHashMap()
-    private var previousSquare: MutableState<Square> = gameRepository.getPreviousSquare()
+    private var hashMap: MutableMap<Square, ChessPiece> = gameRepository.occupiedSquares
+    private var previousSquare: MutableState<Square> = gameRepository.previousSquare
     private var selectedPiece: MutableState<ChessPiece> =  mutableStateOf(ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(7, 0)))
     private var pieceClicked: MutableState<Boolean> = mutableStateOf(false)
     private var promotionDialogShowing: MutableState<Boolean> = mutableStateOf(false)
@@ -37,18 +37,16 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
             gameRepository.previousGameState(selectedNotationIndex.value)
 
         }
-        //updateUI()
     }
 
     fun nextNotation(){
         if(selectedNotationIndex.value < getAnnotations().size-1){
             selectedNotationIndex.value+=1
             gameRepository.nextGameState(selectedNotationIndex.value)
-            if(selectedNotationIndex.value == getAnnotations().size){
+            if(selectedNotationIndex.value == getAnnotations().size-1){
                 currentPosition.value = true
             }
         }
-        //updateUI()
     }
 
 
@@ -56,7 +54,8 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
         onUpdate.value = (0..1_000_000).random()
     }
     //private val _piecesOnBoard = gameRepository.getPiecesOnBoard()
-    val piecesOnBoard: MutableState<List<ChessPiece>> = mutableStateOf(gameRepository.getPiecesOnBoard())
+    //val piecesOnBoard: MutableState<List<ChessPiece>> = mutableStateOf(gameRepository.getPiecesOnBoard())
+    val piecesOnBoard: List<ChessPiece> = gameRepository.piecesOnBoard
 
     fun setPromotionDialogState(clicked: Boolean){
         promotionDialogShowing.value = clicked
@@ -101,7 +100,7 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     fun onEvent(event: GameEvent, piece: ChessPiece): MutableList<Square>? {
         when (event) {
             GameEvent.OnPieceClicked -> {
-                return gameRepository.getLegalMoves(piece)
+                return gameRepository.mapOfPiecesAndTheirLegalMoves[piece]
             }
         }
     }
@@ -136,11 +135,11 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun getCurrentSquare(): MutableState<Square> {
-        return gameRepository.getCurrentSquare()
+        return gameRepository.currentSquare
     }
 
     fun getPlayerTurn(): String {
-        return gameRepository.getPlayerTurn().value
+        return gameRepository.playerTurn.value
     }
 
     fun kingSquare(): Square {
@@ -148,59 +147,59 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun kingInCheck(): Boolean {
-        return gameRepository.kingInCheck().value
+        return gameRepository.kingInCheck.value
     }
 
     fun xRays(): MutableList<Square> {
-        return gameRepository.getXRayAttacks()
+        return gameRepository.xRayAttacks
     }
 
     fun getSquaresToBlock(): MutableList<Square> {
-        return gameRepository.getSquaresToBlock()
+        return gameRepository.squaresToBlock
     }
 
     fun getAttacks(): MutableList<Square> {
-        return gameRepository.getAttacks()
+        return gameRepository.attacks
     }
 
     fun getCheckmate(): MutableState<Boolean> {
-        return gameRepository.getCheckmate()
+        return gameRepository.checkmate
     }
 
     fun getStalemate(): MutableState<Boolean> {
-        return gameRepository.getStalemate()
+        return gameRepository.stalemate
     }
 
     fun getInsufficientMaterial(): MutableState<Boolean> {
-        return gameRepository.getInsufficientMaterial()
+        return gameRepository.insufficientMaterial
     }
 
     fun getThreeFoldRepetition(): MutableState<Boolean> {
-        return gameRepository.getThreeFoldRepetition()
+        return gameRepository.threeFoldRepetition
     }
 
     fun getFiftyMoveRule(): MutableState<Boolean> {
-        return gameRepository.getFiftyMoveRule()
+        return gameRepository.fiftyMoveRule
     }
 
     fun getPieceSound(): MutableState<Boolean> {
-        return gameRepository.getPieceSound()
-    }
+        return gameRepository.pieceSound
+}
 
     fun getCheckSound(): MutableState<Boolean> {
-        return gameRepository.getCheckSound()
+        return gameRepository.checkSound
     }
 
     fun getCaptureSound(): MutableState<Boolean> {
-        return gameRepository.getCaptureSound()
+        return gameRepository.captureSound
     }
 
     fun getCastlingSound(): MutableState<Boolean> {
-        return gameRepository.getCastlingSound()
+        return gameRepository.castlingSound
     }
 
     fun getGameEndSound(): MutableState<Boolean> {
-        return gameRepository.getGameEndSound()
+        return gameRepository.gameEndSound
     }
 
     fun playSound(soundId: Int){
@@ -209,6 +208,6 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun getAnnotations(): MutableList<String> {
         //val annotations: LiveData<MutableList<String>> = gameRepository.getAnnotations()
-        return gameRepository.getAnnotations()
+        return gameRepository.annotations
     }
 }

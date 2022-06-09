@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Alignment.Companion.CenterVertically
@@ -15,12 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.node.Ref
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import com.gomezdevlopment.chessnotationapp.BuildConfig
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.GameEvent
@@ -33,11 +36,12 @@ fun ChessCanvas(width: Float, viewModel: GameViewModel) {
         ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
     val rowWidthAndHeight: Float = (width / 8f)
 
-    Column() {
-        Row(Modifier.weight(1f)) {
-            AnnotationBar(viewModel)
-        }
-        Row(modifier = Modifier.weight(2f)) {
+    Row(verticalAlignment = Alignment.Top) {
+        AnnotationBar(viewModel)
+    }
+    
+    Column(verticalArrangement = Arrangement.Center) {
+        Row(verticalAlignment = CenterVertically) {
             Box(
                 modifier = Modifier
                     .width(width.dp)
@@ -49,81 +53,19 @@ fun ChessCanvas(width: Float, viewModel: GameViewModel) {
                     modifier = Modifier
                         .fillMaxSize()
                         .aspectRatio(1f)
+                        .zIndex(1f)
                 )
                 println("recomposing main")
                 Pieces(viewModel = viewModel, height = rowWidthAndHeight)
                 ChessSquaresV2(height = rowWidthAndHeight, viewModel = viewModel)
             }
         }
-
-        Row(Modifier.wrapContentHeight()) {
-            val onBackPressedDispatcher =
-                LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
-            Column(
-                Modifier
-                    .weight(1f)
-                    .clickable {
-                        onBackPressedDispatcher?.onBackPressed()
-                        viewModel.resetGame()
-                    }) {
-
-                val home: ImageVector =
-                    ImageVector.vectorResource(id = R.drawable.ic_home)
-                Icon(
-                    imageVector = home,
-                    contentDescription = "Go to Home Screen",
-                    tint = tealDarker,
-                    modifier = Modifier
-                        .height(50.dp)
-                        .padding(10.dp)
-                        .aspectRatio(1f)
-                        .align(CenterHorizontally)
-                )
-            }
-
-            Column(
-                Modifier
-                    .weight(1f)
-                    .clickable {
-                        viewModel.previousNotation()
-                        //viewModel.undoMove()
-                    }
-            ) {
-                val leftArrow: ImageVector =
-                    ImageVector.vectorResource(id = R.drawable.ic_round_arrow_left)
-                Icon(
-                    imageVector = leftArrow,
-                    contentDescription = "Previous Move",
-                    tint = tealDarker,
-                    modifier = Modifier
-                        .height(50.dp)
-                        .padding(10.dp)
-                        .aspectRatio(1f)
-                        .align(CenterHorizontally)
-                )
-            }
-
-            Column(
-                Modifier
-                    .weight(1f)
-                    .clickable {
-                        viewModel.nextNotation()
-                    }) {
-                val rightArrow: ImageVector =
-                    ImageVector.vectorResource(id = R.drawable.ic_round_arrow_right)
-                Icon(
-                    imageVector = rightArrow,
-                    contentDescription = "Next Move",
-                    tint = tealDarker,
-                    modifier = Modifier
-                        .height(50.dp)
-                        .padding(10.dp)
-                        .aspectRatio(1f)
-                        .align(CenterHorizontally)
-                )
-            }
-        }
     }
+
+    Row(verticalAlignment = Alignment.Bottom) {
+        GameBar(viewModel = viewModel)
+    }
+
 }
 
 @Composable
@@ -133,12 +75,16 @@ fun Piece(
     viewModel: GameViewModel
 ) {
     //viewModel.onUpdate.value
+    val start = System.currentTimeMillis()
+//    if (BuildConfig.DEBUG) {
+//        SideEffect { println(System.currentTimeMillis()) }
+//    }
     key(piece) {
         val square = piece.square
         val offsetX = height * (square.file).toFloat()
         val offsetY = (7 - square.rank).toFloat() * height
-        val offsetXAnimated by animateDpAsState(targetValue = offsetX.dp, tween(250))
-        val offsetYAnimated by animateDpAsState(targetValue = offsetY.dp, tween(250))
+        val offsetXAnimated by animateDpAsState(targetValue = offsetX.dp, tween(100))
+        val offsetYAnimated by animateDpAsState(targetValue = offsetY.dp, tween(100))
         val imageVector = ImageVector.vectorResource(piece.pieceDrawable)
         Image(
             imageVector = imageVector,
@@ -146,28 +92,24 @@ fun Piece(
             modifier = Modifier
                 .height(height.dp)
                 .aspectRatio(1f)
+                .zIndex(3f)
                 .offset(offsetXAnimated, offsetYAnimated)
                 .clickable {
                     viewModel.selectPiece(piece)
                 }
         )
     }
-
+    val end = System.currentTimeMillis()
+    println(end-start)
 }
 
 @Composable
 fun Pieces(viewModel: GameViewModel, height: Float) {
-    println("printing")
-    val pieces by remember {
+    val pieces = remember {
         viewModel.piecesOnBoard
     }
-     pieces.forEach { piece ->
-        if (viewModel.kingInCheck() && piece.square == viewModel.kingSquare()) {
-            Highlight(height = height, square = piece.square, orange, 1f)
-        }
-        if (piece.square == viewModel.getCurrentSquare().value) {
-            Highlight(height = height, square = piece.square, Color.Yellow, .5f)
-        }
+    val start = System.currentTimeMillis()
+     pieces.asReversed().forEach() { piece ->
         key(piece) {
             Piece(
                 piece = piece,
@@ -175,7 +117,15 @@ fun Pieces(viewModel: GameViewModel, height: Float) {
                 viewModel = viewModel
             )
         }
+         if (viewModel.kingInCheck() && piece.square == viewModel.kingSquare()) {
+             Highlight(height = height, square = piece.square, orange, 1f)
+         }
+         if (piece.square == viewModel.getCurrentSquare().value) {
+             Highlight(height = height, square = piece.square, Color.Yellow, .5f)
+         }
     }
+    val end = System.currentTimeMillis()
+    println(end-start)
     val previousSquare = viewModel.getPreviousSquare().value
     if (previousSquare.rank != 10) {
         Highlight(height = height, square = previousSquare, color = Color.Yellow, .5f)
@@ -219,18 +169,26 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
     val fiftyMoveRule = remember {
         viewModel.getFiftyMoveRule()
     }
-//    val xRays = remember {
-//        viewModel.xRays()
-//    }
-//
-//    val attackedSquares = remember {
-//        viewModel.getSquaresToBlock()
-//    }
-//
-//    val attacks = remember {
-//        viewModel.getAttacks()
-//    }
 
+    val xRays = remember {
+        viewModel.xRays()
+    }
+//
+    val attackedSquares = remember {
+        viewModel.getSquaresToBlock()
+    }
+
+    val attacks = remember {
+        viewModel.getAttacks()
+    }
+
+//    for(attack in attacks){
+//        Highlight(height = height, square = attack, color = Color.Red, .5f)
+//    }
+//
+//    for(attack in xRays){
+//        Outline(height = height, square = attack, color = Color.Blue)
+//    }
 
     if (clicked.value) {
         val legalMoves = viewModel.onEvent(GameEvent.OnPieceClicked, clickedPiece.value)
@@ -314,6 +272,7 @@ private fun Highlight(
             .height(height.dp)
             .aspectRatio(1f)
             .absoluteOffset(offsetX.dp, offsetY.dp)
+            .zIndex(2f)
     ) {
         drawRect(
             color = color,
@@ -338,6 +297,7 @@ private fun PossibleMove(
             .height(height.dp)
             .aspectRatio(1f)
             .absoluteOffset(offsetX.dp, offsetY.dp)
+            .zIndex(2f)
             .clickable {
                 targetRank.value = square.rank
                 targetFile.value = square.file
@@ -367,6 +327,7 @@ private fun PossibleCapture(
             .height(height.dp)
             .aspectRatio(1f)
             .absoluteOffset(offsetX.dp, offsetY.dp)
+            .zIndex(3f)
             .clickable {
                 targetRank.value = square.rank
                 targetFile.value = square.file
@@ -396,6 +357,7 @@ private fun Outline(
             .aspectRatio(1f)
             .absoluteOffset(offsetX.dp, offsetY.dp)
             .padding(1.dp)
+            .zIndex(2f)
 
     ) {
         drawRect(

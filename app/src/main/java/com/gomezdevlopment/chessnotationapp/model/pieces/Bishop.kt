@@ -52,7 +52,8 @@ class Bishop {
     fun xRayAttacks(
         piece: ChessPiece,
         hashMap: MutableMap<Square, ChessPiece>,
-        isKingInCheck: Boolean
+        isKingInCheck: Boolean,
+        squaresToBlock: MutableList<Square>
     ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
         val listOfXRays = mutableListOf<Square>()
@@ -76,6 +77,7 @@ class Bishop {
                     if(isKingInCheck){
                         if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
                             gameLogic.addXRayMoves(listOfXRays, listOfMoves)
+                            squaresToBlock.addAll(listOfXRays)
                             kingFound = true
                         }else{
                             break
@@ -104,6 +106,7 @@ class Bishop {
                     if(isKingInCheck){
                         if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
                             gameLogic.addXRayMoves(listOfXRays, listOfMoves)
+                            squaresToBlock.addAll(listOfXRays)
                             kingFound = true
                         }else{
                             break
@@ -132,6 +135,7 @@ class Bishop {
                     if(isKingInCheck){
                         if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
                             gameLogic.addXRayMoves(listOfXRays, listOfMoves)
+                            squaresToBlock.addAll(listOfXRays)
                             kingFound = true
                         }else{
                             break
@@ -160,6 +164,7 @@ class Bishop {
                     if(isKingInCheck){
                         if (gameLogic.squareContainsEnemyKing(hashMap, moveSquare, piece)) {
                             gameLogic.addXRayMoves(listOfXRays, listOfMoves)
+                            squaresToBlock.addAll(listOfXRays)
                             kingFound = true
                         }else{
                             break

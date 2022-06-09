@@ -33,7 +33,7 @@ fun EndOfGameCard(
                 .fillMaxWidth()
                 .fillMaxHeight()
                 .background(colorResource(id = R.color.transparentBlack))
-                .zIndex(2f)
+                .zIndex(4f)
         )
         {
             Card(

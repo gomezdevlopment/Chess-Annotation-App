@@ -143,14 +143,15 @@ class GameLogic {
         square: Square,
         occupiedSquares: MutableMap<Square, ChessPiece>,
         piece: ChessPiece,
-        kingSquare: Square
+        kingSquare: Square,
+        squaresToBlock: MutableList<Square>
     ): Boolean {
         if(piece.piece == "pawn"){
             if (piece.color == "white") {
                 if (previousSquare.rank == 6 && currentSquare.rank == 4) {
                     if (square.rank == currentSquare.rank + 1 && square.file == currentSquare.file) {
                         if (occupiedSquares[currentSquare]?.piece == "pawn" && occupiedSquares[currentSquare]?.color == "black") {
-                            if(!kingInCheckIfEnPassant(piece, occupiedSquares, kingSquare)){
+                            if(!kingInCheckIfEnPassant(piece, occupiedSquares, kingSquare, squaresToBlock)){
                                 return true
                             }
                         }
@@ -161,7 +162,7 @@ class GameLogic {
                     if (previousSquare.rank == 1 && currentSquare.rank == 3) {
                         if (square.rank == currentSquare.rank - 1 && square.file == currentSquare.file) {
                             if (occupiedSquares[currentSquare]?.piece == "pawn" && occupiedSquares[currentSquare]?.color == "white") {
-                                if(!kingInCheckIfEnPassant(piece, occupiedSquares, kingSquare)){
+                                if(!kingInCheckIfEnPassant(piece, occupiedSquares, kingSquare, squaresToBlock)){
                                     return true
                                 }
                             }
@@ -228,7 +229,8 @@ class GameLogic {
     private fun kingInCheckIfEnPassant(
         pawn: ChessPiece,
         hashMap: MutableMap<Square, ChessPiece>,
-        kingSquare: Square
+        kingSquare: Square,
+        squaresToBlock: MutableList<Square>
     ): Boolean {
         val xRayAttacksIfEnPassant = mutableListOf<Square>()
         val hashMapIfEnPassant: MutableMap<Square, ChessPiece> = HashMap()
@@ -240,9 +242,9 @@ class GameLogic {
             val piece = hashMap[square]
             if (piece?.color != pawn.color) {
                 when (piece?.piece) {
-                    "queen" -> { xRayAttacksIfEnPassant.addAll(Queen().xRayAttacks(piece, hashMapIfEnPassant, false))}
-                    "rook" -> { xRayAttacksIfEnPassant.addAll(Rook().xRayAttacks(piece, hashMapIfEnPassant, false)) }
-                    "bishop" -> { xRayAttacksIfEnPassant.addAll(Bishop().xRayAttacks(piece, hashMapIfEnPassant, false))}
+                    "queen" -> { xRayAttacksIfEnPassant.addAll(Queen().xRayAttacks(piece, hashMapIfEnPassant, false, squaresToBlock))}
+                    "rook" -> { xRayAttacksIfEnPassant.addAll(Rook().xRayAttacks(piece, hashMapIfEnPassant, false, squaresToBlock)) }
+                    "bishop" -> { xRayAttacksIfEnPassant.addAll(Bishop().xRayAttacks(piece, hashMapIfEnPassant, false, squaresToBlock))}
                 }
             }
         }

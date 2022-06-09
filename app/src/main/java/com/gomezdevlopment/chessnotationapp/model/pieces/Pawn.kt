@@ -48,14 +48,14 @@ class Pawn {
         if (piece.color == "white") {
             moveSquare = Square(piece.square.rank + 1, piece.square.file - 1)
             if (hashMap.containsKey(moveSquare)
-                || gameLogic.isEnPassant(previousSquare, currentSquare, moveSquare, hashMap, piece, kingSquare)
+                || gameLogic.isEnPassant(previousSquare, currentSquare, moveSquare, hashMap, piece, kingSquare, squaresToBlock)
             ) {
                 listOfMoves.add(moveSquare)
             }
 
             moveSquare = Square(piece.square.rank + 1, piece.square.file + 1)
             if (hashMap.containsKey(moveSquare)
-                || gameLogic.isEnPassant(previousSquare, currentSquare, moveSquare, hashMap, piece, kingSquare)
+                || gameLogic.isEnPassant(previousSquare, currentSquare, moveSquare, hashMap, piece, kingSquare, squaresToBlock)
             ) {
                 listOfMoves.add(moveSquare)
             }
@@ -63,13 +63,13 @@ class Pawn {
         } else {
             moveSquare = Square(piece.square.rank - 1, piece.square.file - 1)
             if (hashMap.containsKey(moveSquare)
-               || gameLogic.isEnPassant(previousSquare, currentSquare, moveSquare, hashMap, piece, kingSquare)
+               || gameLogic.isEnPassant(previousSquare, currentSquare, moveSquare, hashMap, piece, kingSquare, squaresToBlock)
             ) {
                 listOfMoves.add(moveSquare)
             }
             moveSquare = Square(piece.square.rank - 1, piece.square.file + 1)
             if (hashMap.containsKey(moveSquare)
-                || gameLogic.isEnPassant(previousSquare, currentSquare, moveSquare, hashMap, piece, kingSquare)
+                || gameLogic.isEnPassant(previousSquare, currentSquare, moveSquare, hashMap, piece, kingSquare, squaresToBlock)
             ) {
                 listOfMoves.add(moveSquare)
             }

@@ -46,13 +46,13 @@ class GameRepositoryTest {
                             gameRepository.movePiece(Square(legalMove.rank, legalMove.file), piece, depth)
                             gameRepository.promotion(legalMove, promotionPiece, depth)
                             numberOfMoves += analyzePositions(depth - 1)
-                            gameRepository.previousGameState()
+                            gameRepository.undoMove()
                             //piece.square = originalPieceSquare
                         }
                     }else{
                         gameRepository.changePiecePosition(legalMove, piece, depth)
                         numberOfMoves += analyzePositions(depth - 1)
-                        gameRepository.previousGameState()
+                        gameRepository.undoMove()
                         piece.square = originalPieceSquare
                     }
                 }
