@@ -132,6 +132,7 @@ fun Piece(
     height: Float,
     viewModel: GameViewModel
 ) {
+    //viewModel.onUpdate.value
     key(piece) {
         val square = piece.square
         val offsetX = height * (square.file).toFloat()
@@ -156,9 +157,11 @@ fun Piece(
 
 @Composable
 fun Pieces(viewModel: GameViewModel, height: Float) {
-    println("printing pieces again")
-    viewModel.onUpdate.value
-    viewModel.piecesOnBoard.value.forEach { piece ->
+    println("printing")
+    val pieces by remember {
+        viewModel.piecesOnBoard
+    }
+     pieces.forEach { piece ->
         if (viewModel.kingInCheck() && piece.square == viewModel.kingSquare()) {
             Highlight(height = height, square = piece.square, orange, 1f)
         }
@@ -304,7 +307,6 @@ fun ChessSquaresV2(height: Float, viewModel: GameViewModel) {
 private fun Highlight(
     height: Float, square: Square, color: Color, transparency: Float
 ) {
-    println(height)
     val offsetX = height * square.file
     val offsetY = (7 - square.rank) * height
     Canvas(

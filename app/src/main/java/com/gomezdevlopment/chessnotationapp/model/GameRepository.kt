@@ -9,7 +9,7 @@ import com.gomezdevlopment.chessnotationapp.model.pieces.*
 
 
 class GameRepository() : ViewModel() {
-    private var piecesOnBoard: MutableList<ChessPiece> = mutableListOf()
+    private var piecesOnBoard: MutableList<ChessPiece> = mutableStateListOf()
     private var occupiedSquares: MutableMap<Square, ChessPiece> = mutableMapOf()
     private var mapOfPiecesAndTheirLegalMoves: MutableMap<ChessPiece, MutableList<Square>> =
         mutableMapOf()
@@ -51,7 +51,7 @@ class GameRepository() : ViewModel() {
     private var castlingSound: MutableState<Boolean> = mutableStateOf(false)
     private var gameEndSound: MutableState<Boolean> = mutableStateOf(false)
 
-    private var annotations: MutableList<String> = mutableListOf()
+    private var annotations: MutableList<String> = mutableStateListOf("start:")
     private var currentNotation: StringBuilder = StringBuilder("")
 
     fun getAnnotations(): MutableList<String> {
@@ -146,7 +146,7 @@ class GameRepository() : ViewModel() {
         //initialPosition()
     }
 
-    fun resetGame(){
+    fun resetGame() {
         previousGameStates.clear()
         checkmate = mutableStateOf(false)
         stalemate = mutableStateOf(false)
@@ -173,53 +173,58 @@ class GameRepository() : ViewModel() {
         )
     }
 
-    fun setPositionFromFen(fen: String) {
+    fun clearPieces() {
         piecesOnBoard.clear()
+    }
+
+    fun setPositionFromFen(fen: String) {
         occupiedSquares.clear()
-        piecesOnBoard.addAll(
-            FEN().parseFEN(
-                fen,
-                playerTurn,
-                whiteCanCastleKingSide,
-                whiteCanCastleQueenSide,
-                blackCanCastleKingSide,
-                blackCanCastleQueenSide,
-                whiteKingSquare,
-                blackKingSquare
-            )
+        piecesOnBoard.clear()
+        val piecesOnBoardFromFENPosition = FEN().parseFEN(
+            fen,
+            playerTurn,
+            whiteCanCastleKingSide,
+            whiteCanCastleQueenSide,
+            blackCanCastleKingSide,
+            blackCanCastleQueenSide,
+            whiteKingSquare,
+            blackKingSquare
         )
+
+        piecesOnBoard.addAll(piecesOnBoardFromFENPosition)
         for (piece in piecesOnBoard) {
             occupiedSquares[piece.square] = piece
         }
         checkAttacks()
         setXRayAttacks()
         checkAllLegalMoves()
+        println("After fen ${piecesOnBoard.size}")
         //gameState.value.fenPosition = getGameStateAsFEN()
     }
 
     fun testPositionKiwipete() {
         setPositionFromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ")
-        gameState.fenPosition = getGameStateAsFEN()
+        //gameState.fenPosition = getGameStateAsFEN()
     }
 
     fun testPosition3() {
         setPositionFromFen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -")
-        gameState.fenPosition = getGameStateAsFEN()
+        //gameState.fenPosition = getGameStateAsFEN()
     }
 
     fun testPosition4() {
         setPositionFromFen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq -")
-        gameState.fenPosition = getGameStateAsFEN()
+        //gameState.fenPosition = getGameStateAsFEN()
     }
 
     fun initialPosition() {
         setPositionFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ")
-        gameState.fenPosition = getGameStateAsFEN()
+        //gameState.fenPosition = getGameStateAsFEN()
     }
 
     fun promotionPosition() {
         setPositionFromFen("2r5/KP6/8/8/8/8/6pk/8 w - - 0 1")
-        gameState.fenPosition = getGameStateAsFEN()
+        //gameState.fenPosition = getGameStateAsFEN()
     }
 
     fun kingInCheck(): MutableState<Boolean> {
@@ -357,20 +362,18 @@ class GameRepository() : ViewModel() {
         }
     }
 
-    fun previousGameState() {
-        if (previousGameStates.size > 1) {
-            setPositionFromFen(previousGameStates[previousGameStates.size - 1].fenPosition)
-            currentSquare.value = previousGameStates[previousGameStates.size - 1].currentSquare
-            previousSquare.value = previousGameStates[previousGameStates.size - 1].previousSquare
-        }
+    fun previousGameState(index: Int) {
+        setPositionFromFen(previousGameStates[index].fenPosition)
+        currentSquare.value = previousGameStates[index].currentSquare
+        previousSquare.value = previousGameStates[index].previousSquare
+
     }
 
-    fun nextGameState() {
-        if (previousGameStates.size < previousGameStates.size-1) {
-            setPositionFromFen(previousGameStates[previousGameStates.size + 1].fenPosition)
-            currentSquare.value = previousGameStates[previousGameStates.size + 1].currentSquare
-            previousSquare.value = previousGameStates[previousGameStates.size + 1].previousSquare
-        }
+    fun nextGameState(index: Int) {
+        setPositionFromFen(previousGameStates[index].fenPosition)
+        currentSquare.value = previousGameStates[index].currentSquare
+        previousSquare.value = previousGameStates[index].previousSquare
+
     }
 
     private fun checkAllLegalMoves() {
@@ -542,9 +545,13 @@ class GameRepository() : ViewModel() {
         checkInsufficientMaterial()
         checkFiftyMoveCount()
         checkThreefoldRepetition()
-        setPositionFromFen(getGameStateAsFEN())
-        if (kingInCheck.value && depth == 1) {
-            checks.value += 1
+        //setPositionFromFen(getGameStateAsFEN())
+        if (kingInCheck.value) {
+            checkSound.value = true
+            if (depth == 1) {
+                checks.value += 1
+            }
+
         }
         notation.checkmateOrCheck(checkmate.value, kingInCheck().value)
         annotations.add(currentNotation.toString())
@@ -560,7 +567,7 @@ class GameRepository() : ViewModel() {
 //        return updatedPiece
     }
 
-    private fun removePiece(square: Square){
+    private fun removePiece(square: Square) {
         println(piecesOnBoard.remove(occupiedSquares.remove(square)))
     }
 
@@ -568,6 +575,8 @@ class GameRepository() : ViewModel() {
         val previousPieceSquare = piece.square
         val notation = Notation(currentNotation, newSquare)
         var castled = false
+        var capture = false
+        var move = false
 
         fiftyMoveCount.value += 1
         if (previousGameStates.isEmpty()) {
@@ -588,28 +597,30 @@ class GameRepository() : ViewModel() {
         if (piece.piece == "king") {
             if (castleKingSide()) {
                 if (newSquare.file == piece.square.file + 2) {
-                    val rook: ChessPiece = occupiedSquares[Square(newSquare.rank, newSquare.file + 1)]!!
+                    val rook: ChessPiece =
+                        occupiedSquares[Square(newSquare.rank, newSquare.file + 1)]!!
                     occupiedSquares.remove(Square(newSquare.rank, newSquare.file + 1))
                     changePieceSquare(rook, Square(newSquare.rank, newSquare.file - 1))
                     occupiedSquares[rook.square] = rook
                     if (depth == 1) {
                         castles.value += 1
                     }
-                    castlingSound.value = true
+                    //castlingSound.value = true
                     castled = true
                     notation.castleKingSide()
                 }
             }
             if (castleQueenSide()) {
                 if (newSquare.file == piece.square.file - 2) {
-                    val rook: ChessPiece = occupiedSquares[Square(newSquare.rank, newSquare.file - 2)]!!
+                    val rook: ChessPiece =
+                        occupiedSquares[Square(newSquare.rank, newSquare.file - 2)]!!
                     occupiedSquares.remove(Square(newSquare.rank, newSquare.file - 2))
                     changePieceSquare(rook, Square(newSquare.rank, newSquare.file + 1))
                     occupiedSquares[rook.square] = rook
                     if (depth == 1) {
                         castles.value += 1
                     }
-                    castlingSound.value = true
+                    //castlingSound.value = true
                     castled = true
                     notation.castleQueenSide()
                 }
@@ -631,7 +642,8 @@ class GameRepository() : ViewModel() {
                 capturedPieces.add(it)
             }
             removePiece(newSquare)
-            captureSound.value = true
+            //captureSound.value = true
+            capture = true
             notation.capture()
         } else if (gameLogic.isEnPassant(
                 previousSquare.value,
@@ -649,12 +661,14 @@ class GameRepository() : ViewModel() {
             }
             occupiedSquares[currentSquare.value]?.let { capturedPieces.add(it) }
             removePiece(currentSquare.value)
-            captureSound.value = true
+            capture = true
+            //captureSound.value = true
             notation.capture()
         } else {
             if (!castled) {
                 notation.square(false)
-                pieceSound.value = true
+                move = true
+                //pieceSound.value = true
             }
         }
 
@@ -687,7 +701,16 @@ class GameRepository() : ViewModel() {
         //setPositionFromFen(getGameStateAsFEN())
         if (kingInCheck.value) {
             checkSound.value = true
+        } else {
+            if (castled) {
+                castlingSound.value = true
+            } else if (capture) {
+                captureSound.value = true
+            } else {
+                pieceSound.value = true
+            }
         }
+
         if (kingInCheck.value && depth == 1) {
             checks.value += 1
         }
@@ -700,7 +723,6 @@ class GameRepository() : ViewModel() {
         notation.checkmateOrCheck(checkmate.value, kingInCheck().value)
         annotations.add(currentNotation.toString())
         currentNotation.clear()
-        println(piecesOnBoard.size)
     }
 
     fun getPiecesOnBoard(): MutableList<ChessPiece> {

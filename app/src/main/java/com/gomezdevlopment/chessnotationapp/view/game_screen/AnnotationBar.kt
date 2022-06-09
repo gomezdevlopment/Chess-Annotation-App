@@ -34,7 +34,7 @@ fun AnnotationBar(viewModel: GameViewModel) {
         contentAlignment = Alignment.CenterStart){
 
         val scrollState = rememberLazyListState()
-        viewModel.onUpdate.value
+        //viewModel.onUpdate.value
         val annotationsSize = remember {
             mutableStateOf(0)
         }
@@ -48,19 +48,19 @@ fun AnnotationBar(viewModel: GameViewModel) {
                 .padding(10.dp, 10.dp),
             state = scrollState
         ) {
-            item{
-                Text(
-                    text = "1.",
-                    textAlign = TextAlign.Center,
-                    fontSize = 18.sp,
-                    modifier = Modifier.padding(4.dp),
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            }
+//            item{
+//                Text(
+//                    text = "1.",
+//                    textAlign = TextAlign.Center,
+//                    fontSize = 18.sp,
+//                    modifier = Modifier.padding(4.dp),
+//                    fontWeight = FontWeight.Bold,
+//                    color = Color.White
+//                )
+//            }
             itemsIndexed(annotations) { index, annotation ->
                 //val text by remember{mutableStateOf(annotation)}
-                if (index % 2 == 0 && index != 0) {
+                if (index % 2 != 0 && index!=0) {
                     Text(
                         text = "${((index / 2) + 1)}.",
                         textAlign = TextAlign.Center,
@@ -77,8 +77,10 @@ fun AnnotationBar(viewModel: GameViewModel) {
         }
         if (annotationsSize.value != annotations.size) {
             annotationsSize.value = annotations.size
-            LaunchedEffect(annotations) {
-                scrollState.scrollToItem(annotations.size - 1)
+            if(annotationsSize.value > 0){
+                LaunchedEffect(annotations) {
+                    scrollState.scrollToItem(annotations.size - 1)
+                }
             }
         }
     }
