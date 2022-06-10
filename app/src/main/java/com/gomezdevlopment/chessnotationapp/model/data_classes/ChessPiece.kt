@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp.model
+package com.gomezdevlopment.chessnotationapp.model.data_classes
 
 data class ChessPiece(
     val color: String,

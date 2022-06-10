@@ -1,7 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.model.game_logic
 
-import com.gomezdevlopment.chessnotationapp.model.ChessPiece
-import com.gomezdevlopment.chessnotationapp.model.Square
+import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
+import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 
 class Notation(private val stringBuilder: StringBuilder, private val square: Square) {
 

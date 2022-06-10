@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp.model
+package com.gomezdevlopment.chessnotationapp.model.repositories
 
 import android.app.Application
 import android.content.ContentValues
@@ -6,12 +6,10 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.launch
 import java.lang.StringBuilder
 
 class HomeRepository() : ViewModel() {

@@ -1,9 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.model.pieces
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import com.gomezdevlopment.chessnotationapp.model.ChessPiece
-import com.gomezdevlopment.chessnotationapp.model.Square
+import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
+import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
 
 class Rook {

@@ -5,7 +5,7 @@ import android.view.View
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.gomezdevlopment.chessnotationapp.model.AuthenticationRepository
+import com.gomezdevlopment.chessnotationapp.model.repositories.AuthenticationRepository
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.launch
 

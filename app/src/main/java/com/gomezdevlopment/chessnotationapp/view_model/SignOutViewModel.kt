@@ -3,7 +3,7 @@ package com.gomezdevlopment.chessnotationapp.view_model
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.gomezdevlopment.chessnotationapp.model.AuthenticationRepository
+import com.gomezdevlopment.chessnotationapp.model.repositories.AuthenticationRepository
 import kotlinx.coroutines.launch
 
 class SignOutViewModel(application: Application): AndroidViewModel(application) {

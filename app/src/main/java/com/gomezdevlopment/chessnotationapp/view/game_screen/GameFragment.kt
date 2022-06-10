@@ -1,6 +1,5 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen
 
-import android.app.Application
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +8,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import com.gomezdevlopment.chessnotationapp.R
+import com.gomezdevlopment.chessnotationapp.view.game_screen.board.ChessCanvas
+import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.SoundFX
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 

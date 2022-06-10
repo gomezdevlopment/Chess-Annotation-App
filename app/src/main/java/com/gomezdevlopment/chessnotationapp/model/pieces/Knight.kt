@@ -1,7 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.model.pieces
 
-import com.gomezdevlopment.chessnotationapp.model.ChessPiece
-import com.gomezdevlopment.chessnotationapp.model.Square
+import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
+import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
 
 class Knight {
@@ -13,7 +13,7 @@ class Knight {
         squaresToBlock: MutableList<Square>,
         checkDefendedPieces: Boolean,
         xRayAttacks: MutableList<Square>,
-        kingSquare:Square,
+        kingSquare: Square,
         piecesCheckingKing: MutableList<Square>
     ): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()

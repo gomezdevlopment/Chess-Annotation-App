@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp.view.game_screen
+package com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements
 
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.clickable
@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import com.gomezdevlopment.chessnotationapp.R
+import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.tealDarker
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable

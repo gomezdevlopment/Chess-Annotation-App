@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp.view.game_screen
+package com.gomezdevlopment.chessnotationapp.view.game_screen.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

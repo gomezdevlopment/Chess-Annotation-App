@@ -1,9 +1,9 @@
 package com.gomezdevlopment.chessnotationapp.model.game_logic
 
 import androidx.compose.runtime.MutableState
-import com.gomezdevlopment.chessnotationapp.model.ChessPiece
-import com.gomezdevlopment.chessnotationapp.model.GameState
-import com.gomezdevlopment.chessnotationapp.model.Square
+import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
+import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
+import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 
 class EndOfGameConditions(private val gameEndSound: MutableState<Boolean>) {
 

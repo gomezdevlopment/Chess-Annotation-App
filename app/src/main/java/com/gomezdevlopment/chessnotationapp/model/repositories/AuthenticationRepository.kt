@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp.model
+package com.gomezdevlopment.chessnotationapp.model.repositories
 
 import android.app.Application
 import android.view.View

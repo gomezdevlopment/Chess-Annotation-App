@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp.view.game_screen
+package com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -27,6 +27,7 @@ fun EndOfGameCard(
     message: String,
     cardVisible: MutableState<Boolean>
 ) {
+
     if (cardVisible.value) {
         Box(
             modifier = Modifier

@@ -2,8 +2,8 @@ package com.gomezdevlopment.chessnotationapp.model.game_logic
 
 import androidx.compose.runtime.MutableState
 import com.gomezdevlopment.chessnotationapp.R
-import com.gomezdevlopment.chessnotationapp.model.ChessPiece
-import com.gomezdevlopment.chessnotationapp.model.Square
+import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
+import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 
 class FEN {
     fun getGameStateAsFEN(

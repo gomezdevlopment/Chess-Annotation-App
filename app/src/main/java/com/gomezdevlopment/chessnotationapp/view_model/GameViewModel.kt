@@ -1,21 +1,15 @@
 package com.gomezdevlopment.chessnotationapp.view_model
 
 import android.app.Application
-import android.content.Context
-import android.media.MediaPlayer
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.*
+import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
+import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
+import com.gomezdevlopment.chessnotationapp.model.repositories.GameRepository
 
 class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     private var gameRepository: GameRepository = GameRepository.getGameRepository()
@@ -32,23 +26,23 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun previousNotation(){
         if(selectedNotationIndex.value > 0){
-            currentPosition.value = false
             selectedNotationIndex.value-=1
-            gameRepository.previousGameState(selectedNotationIndex.value)
-
+            setGameState(selectedNotationIndex.value)
         }
     }
 
     fun nextNotation(){
         if(selectedNotationIndex.value < getAnnotations().size-1){
             selectedNotationIndex.value+=1
-            gameRepository.nextGameState(selectedNotationIndex.value)
-            if(selectedNotationIndex.value == getAnnotations().size-1){
-                currentPosition.value = true
-            }
+            setGameState(selectedNotationIndex.value)
         }
     }
 
+    fun setGameState(index: Int){
+        isPieceClicked().value = false
+        currentPosition.value = (selectedNotationIndex.value == getAnnotations().size-1)
+        gameRepository.setGameState(index)
+    }
 
     private fun updateUI() {
         onUpdate.value = (0..1_000_000).random()

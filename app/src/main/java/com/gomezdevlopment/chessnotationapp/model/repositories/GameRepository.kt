@@ -1,7 +1,10 @@
-package com.gomezdevlopment.chessnotationapp.model
+package com.gomezdevlopment.chessnotationapp.model.repositories
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
+import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
+import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
+import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.EndOfGameConditions
 import com.gomezdevlopment.chessnotationapp.model.game_logic.FEN
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
@@ -10,114 +13,52 @@ import com.gomezdevlopment.chessnotationapp.model.pieces.*
 
 
 class GameRepository() : ViewModel() {
-   var piecesOnBoard: MutableList<ChessPiece> = mutableStateListOf()
-     var occupiedSquares: MutableMap<Square, ChessPiece> = mutableMapOf()
-     var mapOfPiecesAndTheirLegalMoves: MutableMap<ChessPiece, MutableList<Square>> =
+    var piecesOnBoard: MutableList<ChessPiece> = mutableStateListOf()
+    var occupiedSquares: MutableMap<Square, ChessPiece> = mutableMapOf()
+    var mapOfPiecesAndTheirLegalMoves: MutableMap<ChessPiece, MutableList<Square>> =
         mutableMapOf()
-     var previousSquare: MutableState<Square> = mutableStateOf(Square(10, 10))
-     var currentSquare: MutableState<Square> = mutableStateOf(Square(10, 10))
-     var playerTurn: MutableState<String> = mutableStateOf("white")
-     var squaresToBlock: MutableList<Square> = mutableListOf()
-     var whiteKingSquare: MutableState<Square> = mutableStateOf(Square(0, 4))
-     var blackKingSquare: MutableState<Square> = mutableStateOf(Square(7, 4))
-     var xRayAttacks: MutableList<Square> = mutableListOf()
-     var attacks: MutableList<Square> = mutableListOf()
-     var allLegalMoves: MutableList<Square> = mutableListOf()
-     var whiteCanCastleKingSide: MutableState<Boolean> = mutableStateOf(false)
-     var whiteCanCastleQueenSide: MutableState<Boolean> = mutableStateOf(false)
-     var blackCanCastleKingSide: MutableState<Boolean> = mutableStateOf(false)
-     var blackCanCastleQueenSide: MutableState<Boolean> = mutableStateOf(false)
-     var kingInCheck: MutableState<Boolean> = mutableStateOf(false)
-     var piecesCheckingKing = mutableListOf<Square>()
-     var checksOnKing = mutableListOf<Square>()
-     var capturedPieces: MutableList<ChessPiece> = mutableListOf()
-     var checks = mutableStateOf(0)
-     var captures = mutableStateOf(0)
-     var castles = mutableStateOf(0)
-     var enPassants = mutableStateOf(0)
-     var promotions = mutableStateOf(0)
-     //var gameStateAsFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 "
-     var previousGameStates = mutableListOf<GameState>()
-     var gameState = GameState(previousSquare.value, currentSquare.value, "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ")
-     var checkmate: MutableState<Boolean> = mutableStateOf(false)
-     var stalemate: MutableState<Boolean> = mutableStateOf(false)
-     var insufficientMaterial: MutableState<Boolean> = mutableStateOf(false)
-     var threeFoldRepetition: MutableState<Boolean> = mutableStateOf(false)
-     var fiftyMoveRule: MutableState<Boolean> = mutableStateOf(false)
-     var fiftyMoveCount = mutableStateOf(0)
+    var previousSquare: MutableState<Square> = mutableStateOf(Square(10, 10))
+    var currentSquare: MutableState<Square> = mutableStateOf(Square(10, 10))
+    var playerTurn: MutableState<String> = mutableStateOf("white")
+    var squaresToBlock: MutableList<Square> = mutableListOf()
+    private var whiteKingSquare: MutableState<Square> = mutableStateOf(Square(0, 4))
+    private var blackKingSquare: MutableState<Square> = mutableStateOf(Square(7, 4))
+    var xRayAttacks: MutableList<Square> = mutableListOf()
+    var attacks: MutableList<Square> = mutableListOf()
+    private var allLegalMoves: MutableList<Square> = mutableListOf()
+    private var whiteCanCastleKingSide: MutableState<Boolean> = mutableStateOf(false)
+    private var whiteCanCastleQueenSide: MutableState<Boolean> = mutableStateOf(false)
+    private var blackCanCastleKingSide: MutableState<Boolean> = mutableStateOf(false)
+    private var blackCanCastleQueenSide: MutableState<Boolean> = mutableStateOf(false)
+    var kingInCheck: MutableState<Boolean> = mutableStateOf(false)
+    private var piecesCheckingKing = mutableListOf<Square>()
+    private var checksOnKing = mutableListOf<Square>()
+    private var capturedPieces: MutableList<ChessPiece> = mutableListOf()
+    private var previousGameStates = mutableListOf<GameState>()
+    var annotations: MutableList<String> = mutableStateListOf("start:")
+    private var currentNotation: StringBuilder = StringBuilder("")
 
-     var pieceSound: MutableState<Boolean> = mutableStateOf(false)
-     var checkSound: MutableState<Boolean> = mutableStateOf(false)
-     var captureSound: MutableState<Boolean> = mutableStateOf(false)
-     var castlingSound: MutableState<Boolean> = mutableStateOf(false)
-     var gameEndSound: MutableState<Boolean> = mutableStateOf(false)
+    //Testing Variables
+    var checks = mutableStateOf(0)
+    var captures = mutableStateOf(0)
+    var castles = mutableStateOf(0)
+    var enPassants = mutableStateOf(0)
+    var promotions = mutableStateOf(0)
 
-     var annotations: MutableList<String> = mutableStateListOf("start:")
-     var currentNotation: StringBuilder = StringBuilder("")
+    //Enf of Game Booleans
+    var checkmate: MutableState<Boolean> = mutableStateOf(false)
+    var stalemate: MutableState<Boolean> = mutableStateOf(false)
+    var insufficientMaterial: MutableState<Boolean> = mutableStateOf(false)
+    var threeFoldRepetition: MutableState<Boolean> = mutableStateOf(false)
+    var fiftyMoveRule: MutableState<Boolean> = mutableStateOf(false)
+    private var fiftyMoveCount = mutableStateOf(0)
 
-//    fun getAnnotations(): MutableList<String> {
-//        return annotations
-//    }
-//
-//    fun getPieceSound(): MutableState<Boolean> {
-//        return pieceSound
-//    }
-//
-//    fun getCheckSound(): MutableState<Boolean> {
-//        return checkSound
-//    }
-//
-//    fun getCaptureSound(): MutableState<Boolean> {
-//        return captureSound
-//    }
-//
-//    fun getCastlingSound(): MutableState<Boolean> {
-//        return castlingSound
-//    }
-//
-//    fun getGameEndSound(): MutableState<Boolean> {
-//        return gameEndSound
-//    }
-//
-//    fun getCheckmate(): MutableState<Boolean> {
-//        return checkmate
-//    }
-//
-//    fun getStalemate(): MutableState<Boolean> {
-//        return stalemate
-//    }
-//
-//    fun getInsufficientMaterial(): MutableState<Boolean> {
-//        return insufficientMaterial
-//    }
-//
-//    fun getThreeFoldRepetition(): MutableState<Boolean> {
-//        return threeFoldRepetition
-//    }
-//
-//    fun getFiftyMoveRule(): MutableState<Boolean> {
-//        return fiftyMoveRule
-//    }
-//
-//    fun getChecks(): Int {
-//        return checks.value
-//    }
-//
-//    fun getCaptures(): Int {
-//        return captures.value
-//    }
-//
-//    fun getCastles(): Int {
-//        return castles.value
-//    }
-//
-//    fun getEnPassants(): Int {
-//        return enPassants.value
-//    }
-//
-//    fun getPromotions(): Int {
-//        return promotions.value
-//    }
+    //Sound FX Booleans
+    var pieceSound: MutableState<Boolean> = mutableStateOf(false)
+    var checkSound: MutableState<Boolean> = mutableStateOf(false)
+    var captureSound: MutableState<Boolean> = mutableStateOf(false)
+    var castlingSound: MutableState<Boolean> = mutableStateOf(false)
+    var gameEndSound: MutableState<Boolean> = mutableStateOf(false)
 
 
     companion object {
@@ -143,7 +84,6 @@ class GameRepository() : ViewModel() {
         //addPieces()
         //testPositionKiwipete()
         testPosition3()
-//        previousGameStates.add(GameState(previousSquare.value, currentSquare.value, gameStateAsFEN))
         //initialPosition()
     }
 
@@ -174,10 +114,6 @@ class GameRepository() : ViewModel() {
         )
     }
 
-    fun clearPieces() {
-        piecesOnBoard.clear()
-    }
-
     fun setPositionFromFen(fen: String) {
         occupiedSquares.clear()
         piecesOnBoard.clear()
@@ -198,7 +134,6 @@ class GameRepository() : ViewModel() {
         }
         checkAttacks()
         checkAllLegalMoves()
-        //gameState.value.fenPosition = getGameStateAsFEN()
     }
 
     private fun addInitialGameState() {
@@ -215,36 +150,27 @@ class GameRepository() : ViewModel() {
     fun testPositionKiwipete() {
         setPositionFromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ")
         addInitialGameState()
-        //gameState.fenPosition = getGameStateAsFEN()
     }
 
     fun testPosition3() {
         setPositionFromFen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -")
         addInitialGameState()
-        //gameState.fenPosition = getGameStateAsFEN()
     }
 
     fun testPosition4() {
         setPositionFromFen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq -")
         addInitialGameState()
-        //gameState.fenPosition = getGameStateAsFEN()
     }
 
     fun initialPosition() {
         setPositionFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ")
         addInitialGameState()
-        //gameState.fenPosition = getGameStateAsFEN()
     }
 
     fun promotionPosition() {
         setPositionFromFen("2r5/KP6/8/8/8/8/6pk/8 w - - 0 1")
         addInitialGameState()
-        //gameState.fenPosition = getGameStateAsFEN()
     }
-
-//    fun kingInCheck(): MutableState<Boolean> {
-//        return kingInCheck
-//    }
 
     fun kingSquare(): MutableState<Square> {
         if (playerTurn.value == "white") {
@@ -259,10 +185,6 @@ class GameRepository() : ViewModel() {
         }
         return blackKingSquare.value
     }
-
-//    fun getChecksOnKing(): MutableList<Square> {
-//        return checksOnKing
-//    }
 
     private fun setChecksOnKing() {
         checksOnKing.clear()
@@ -303,10 +225,6 @@ class GameRepository() : ViewModel() {
             }
         }
     }
-
-//    fun getAttacks(): MutableList<Square> {
-//        return attacks
-//    }
 
     private fun checkAttacks() {
         piecesCheckingKing.clear()
@@ -400,14 +318,7 @@ class GameRepository() : ViewModel() {
         }
     }
 
-    fun previousGameState(index: Int) {
-        setPositionFromFen(previousGameStates[index].fenPosition)
-        currentSquare.value = previousGameStates[index].currentSquare
-        previousSquare.value = previousGameStates[index].previousSquare
-
-    }
-
-    fun nextGameState(index: Int) {
+    fun setGameState(index: Int) {
         setPositionFromFen(previousGameStates[index].fenPosition)
         currentSquare.value = previousGameStates[index].currentSquare
         previousSquare.value = previousGameStates[index].previousSquare
@@ -683,42 +594,6 @@ class GameRepository() : ViewModel() {
 
     }
 
-//    fun getPiecesOnBoard(): MutableList<ChessPiece> {
-//        return piecesOnBoard
-//    }
-//
-//    fun getHashMap(): MutableMap<Square, ChessPiece> {
-//        return occupiedSquares
-//    }
-//
-//    fun getPreviousSquare(): MutableState<Square> {
-//        return previousSquare
-//    }
-
-//    private fun setPreviousSquare(square: Square) {
-//        previousSquare.value = square
-//    }
-
-//    fun getCurrentSquare(): MutableState<Square> {
-//        return currentSquare
-//    }
-
-//    private fun setCurrentSquare(square: Square) {
-//        currentSquare.value = square
-//    }
-//
-//    private fun setPlayerTurn(turn: String) {
-//        playerTurn.value = turn
-//    }
-//
-//    fun getPlayerTurn(): MutableState<String> {
-//        return playerTurn
-//    }
-//
-//    fun getXRayAttacks(): MutableList<Square> {
-//        return xRayAttacks
-//    }
-
     private fun setXRayAttacks() {
         xRayAttacks.clear()
         piecesOnBoard.forEach() { piece ->
@@ -767,14 +642,6 @@ class GameRepository() : ViewModel() {
         }
         return squaresToBlock
     }
-
-//    fun getSquaresToBlock(): MutableList<Square> {
-//        return squaresToBlock
-//    }
-//
-//    fun getLegalMoves(piece: ChessPiece): MutableList<Square>? {
-//        return mapOfPiecesAndTheirLegalMoves[piece]
-//    }
 
     fun checkLegalMoves(piece: ChessPiece, checkDefendedPieces: Boolean): List<Square> {
         return Piece(
