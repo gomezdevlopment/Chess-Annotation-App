@@ -5,6 +5,7 @@ data class ChessPiece(
     val piece: String,
     val pieceDrawable: Int,
     var square: Square,
+    val value: Int
 )
 
 

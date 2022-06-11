@@ -15,7 +15,7 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     private var gameRepository: GameRepository = GameRepository.getGameRepository()
     private var hashMap: MutableMap<Square, ChessPiece> = gameRepository.occupiedSquares
     private var previousSquare: MutableState<Square> = gameRepository.previousSquare
-    private var selectedPiece: MutableState<ChessPiece> =  mutableStateOf(ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(7, 0)))
+    private var selectedPiece: MutableState<ChessPiece> =  mutableStateOf(ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(7, 0), 5))
     private var pieceClicked: MutableState<Boolean> = mutableStateOf(false)
     private var promotionDialogShowing: MutableState<Boolean> = mutableStateOf(false)
 
@@ -23,6 +23,8 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     var currentPosition: MutableState<Boolean> = mutableStateOf(true)
     var onUpdate = mutableStateOf(0)
     val endOfGame = mutableStateOf(false)
+
+    val capturedPieces = mutableStateOf(gameRepository.capturedPieces)
 
     fun previousNotation(){
         if(selectedNotationIndex.value > 0){

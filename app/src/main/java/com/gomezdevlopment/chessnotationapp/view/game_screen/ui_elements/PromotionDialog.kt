@@ -30,17 +30,17 @@ fun Promotion(
 ) {
     val pieces = mutableListOf<ChessPiece>()
     val blackPieceImages = listOf(
-        ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(rank, file)),
-        ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(rank, file)),
-        ChessPiece("black", "bishop", R.drawable.ic_bb_alpha, Square(rank, file)),
-        ChessPiece("black", "knight", R.drawable.ic_bn_alpha, Square(rank, file))
+        ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(rank, file), 9),
+        ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(rank, file), 5),
+        ChessPiece("black", "bishop", R.drawable.ic_bb_alpha, Square(rank, file), 3),
+        ChessPiece("black", "knight", R.drawable.ic_bn_alpha, Square(rank, file), 3)
     )
 
     val whitePieceImages = listOf(
-        ChessPiece("white", "queen", R.drawable.ic_wq_alpha, Square(rank, file)),
-        ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(rank, file)),
-        ChessPiece("white", "bishop", R.drawable.ic_wb_alpha, Square(rank, file)),
-        ChessPiece("white", "knight", R.drawable.ic_wn_alpha, Square(rank, file))
+        ChessPiece("white", "queen", R.drawable.ic_wq_alpha, Square(rank, file), 9),
+        ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(rank, file), 5),
+        ChessPiece("white", "bishop", R.drawable.ic_wb_alpha, Square(rank, file), 3),
+        ChessPiece("white", "knight", R.drawable.ic_wn_alpha, Square(rank, file), 3)
     )
 
     if (chessPiece.color == "white") {

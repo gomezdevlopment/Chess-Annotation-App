@@ -135,7 +135,8 @@ class FEN {
                                     "black",
                                     "rook",
                                     R.drawable.ic_br_alpha,
-                                    Square(rank, file)
+                                    Square(rank, file),
+                                    5
                                 )
                             )
                         }
@@ -145,7 +146,8 @@ class FEN {
                                     "black",
                                     "knight",
                                     R.drawable.ic_bn_alpha,
-                                    Square(rank, file)
+                                    Square(rank, file),
+                                    3
                                 )
                             )
                         }
@@ -155,7 +157,8 @@ class FEN {
                                     "black",
                                     "bishop",
                                     R.drawable.ic_bb_alpha,
-                                    Square(rank, file)
+                                    Square(rank, file),
+                                    3
                                 )
                             )
                         }
@@ -165,7 +168,8 @@ class FEN {
                                     "black",
                                     "queen",
                                     R.drawable.ic_bq_alpha,
-                                    Square(rank, file)
+                                    Square(rank, file),
+                                    9
                                 )
                             )
                         }
@@ -175,7 +179,8 @@ class FEN {
                                     "black",
                                     "king",
                                     R.drawable.ic_bk_alpha,
-                                    Square(rank, file)
+                                    Square(rank, file),
+                                    0
                                 )
                             )
                             blackKingSquare.value = Square(rank, file)
@@ -186,7 +191,8 @@ class FEN {
                                     "black",
                                     "pawn",
                                     R.drawable.ic_bp_alpha,
-                                    Square(rank, file)
+                                    Square(rank, file),
+                                    1
                                 )
                             )
                         }
@@ -196,7 +202,8 @@ class FEN {
                                     "white",
                                     "rook",
                                     R.drawable.ic_wr_alpha,
-                                    Square(rank, file)
+                                    Square(rank, file),
+                                    5
                                 )
                             )
                         }
@@ -206,7 +213,8 @@ class FEN {
                                     "white",
                                     "knight",
                                     R.drawable.ic_wn_alpha,
-                                    Square(rank, file)
+                                    Square(rank, file),
+                                    3
                                 )
                             )
                         }
@@ -216,7 +224,8 @@ class FEN {
                                     "white",
                                     "bishop",
                                     R.drawable.ic_wb_alpha,
-                                    Square(rank, file)
+                                    Square(rank, file),
+                                    3
                                 )
                             )
                         }
@@ -226,7 +235,8 @@ class FEN {
                                     "white",
                                     "queen",
                                     R.drawable.ic_wq_alpha,
-                                    Square(rank, file)
+                                    Square(rank, file),
+                                    9
                                 )
                             )
                         }
@@ -236,7 +246,8 @@ class FEN {
                                     "white",
                                     "king",
                                     R.drawable.ic_wk,
-                                    Square(rank, file)
+                                    Square(rank, file),
+                                    0
                                 )
                             )
                             whiteKingSquare.value = Square(rank, file)
@@ -247,7 +258,8 @@ class FEN {
                                     "white",
                                     "pawn",
                                     R.drawable.ic_wp_alpha,
-                                    Square(rank, file)
+                                    Square(rank, file),
+                                    1
                                 )
                             )
                         }

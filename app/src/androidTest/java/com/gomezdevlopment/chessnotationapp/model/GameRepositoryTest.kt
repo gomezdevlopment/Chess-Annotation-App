@@ -27,17 +27,17 @@ class GameRepositoryTest {
                     if (piece.piece == "pawn" && (legalMove.rank == 7 || legalMove.rank == 0)) {
                         val promotionPieces = mutableListOf<ChessPiece>()
                         val blackPieceImages = listOf(
-                            ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(legalMove.rank, legalMove.file)),
-                            ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(legalMove.rank, legalMove.file)),
-                            ChessPiece("black", "bishop", R.drawable.ic_bb_alpha, Square(legalMove.rank, legalMove.file)),
-                            ChessPiece("black", "knight", R.drawable.ic_bn_alpha, Square(legalMove.rank, legalMove.file))
+                            ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(legalMove.rank, legalMove.file), 9),
+                            ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(legalMove.rank, legalMove.file), 5),
+                            ChessPiece("black", "bishop", R.drawable.ic_bb_alpha, Square(legalMove.rank, legalMove.file), 3),
+                            ChessPiece("black", "knight", R.drawable.ic_bn_alpha, Square(legalMove.rank, legalMove.file), 3)
                         )
 
                         val whitePieceImages = listOf(
-                            ChessPiece("white", "queen", R.drawable.ic_wq_alpha, Square(legalMove.rank, legalMove.file)),
-                            ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(legalMove.rank, legalMove.file)),
-                            ChessPiece("white", "bishop", R.drawable.ic_wb_alpha, Square(legalMove.rank, legalMove.file)),
-                            ChessPiece("white", "knight", R.drawable.ic_wn_alpha, Square(legalMove.rank, legalMove.file))
+                            ChessPiece("white", "queen", R.drawable.ic_wq_alpha, Square(legalMove.rank, legalMove.file), 9),
+                            ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(legalMove.rank, legalMove.file), 5),
+                            ChessPiece("white", "bishop", R.drawable.ic_wb_alpha, Square(legalMove.rank, legalMove.file), 3),
+                            ChessPiece("white", "knight", R.drawable.ic_wn_alpha, Square(legalMove.rank, legalMove.file), 3)
                         )
 
                         if (piece.color == "white") {

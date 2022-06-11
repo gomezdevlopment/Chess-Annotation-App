@@ -33,7 +33,7 @@ class GameRepository() : ViewModel() {
     var kingInCheck: MutableState<Boolean> = mutableStateOf(false)
     private var piecesCheckingKing = mutableListOf<Square>()
     private var checksOnKing = mutableListOf<Square>()
-    private var capturedPieces: MutableList<ChessPiece> = mutableListOf()
+    var capturedPieces: MutableList<ChessPiece> = mutableStateListOf()
     private var previousGameStates = mutableListOf<GameState>()
     var annotations: MutableList<String> = mutableStateListOf("start:")
     private var currentNotation: StringBuilder = StringBuilder("")

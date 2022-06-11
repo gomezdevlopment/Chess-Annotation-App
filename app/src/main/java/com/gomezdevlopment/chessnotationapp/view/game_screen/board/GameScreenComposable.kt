@@ -12,11 +12,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.GameEvent
+import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
-import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.AnnotationBar
-import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.EndOfGameCard
-import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.GameBar
-import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.Promotion
+import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleCapture
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleMove
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
@@ -32,6 +30,10 @@ fun ChessCanvas(width: Float, viewModel: GameViewModel) {
     }
     
     Column(verticalArrangement = Arrangement.Center) {
+        val capturedPieces = remember {
+            viewModel.capturedPieces.value
+        }
+        BlackCaptures(pieces = capturedPieces)
         Row(verticalAlignment = CenterVertically) {
             Box(
                 modifier = Modifier
@@ -44,6 +46,7 @@ fun ChessCanvas(width: Float, viewModel: GameViewModel) {
                 ChessUILogic(height = rowWidthAndHeight, viewModel = viewModel)
             }
         }
+        WhiteCaptures(pieces = capturedPieces)
     }
 
     Row(verticalAlignment = Alignment.Bottom) {
