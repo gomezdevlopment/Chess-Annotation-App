@@ -25,15 +25,14 @@ fun ChessCanvas(width: Float, viewModel: GameViewModel) {
         ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
     val rowWidthAndHeight: Float = (width / 8f)
 
+    println("Recomposing")
     Row(verticalAlignment = Alignment.Top) {
         AnnotationBar(viewModel)
     }
-    
+
     Column(verticalArrangement = Arrangement.Center) {
-        val capturedPieces = remember {
-            viewModel.capturedPieces.value
-        }
-        BlackCaptures(pieces = capturedPieces)
+        BlackClock(viewModel = viewModel, size = rowWidthAndHeight)
+        BlackCaptures(viewModel)
         Row(verticalAlignment = CenterVertically) {
             Box(
                 modifier = Modifier
@@ -46,7 +45,8 @@ fun ChessCanvas(width: Float, viewModel: GameViewModel) {
                 ChessUILogic(height = rowWidthAndHeight, viewModel = viewModel)
             }
         }
-        WhiteCaptures(pieces = capturedPieces)
+        WhiteCaptures(viewModel)
+        WhiteClock(viewModel = viewModel, size = rowWidthAndHeight)
     }
 
     Row(verticalAlignment = Alignment.Bottom) {
@@ -56,7 +56,40 @@ fun ChessCanvas(width: Float, viewModel: GameViewModel) {
 }
 
 @Composable
-fun ChessBoard(chessBoardVector: ImageVector){
+fun BlackClock(viewModel: GameViewModel, size: Float) {
+    Row(modifier = Modifier.padding(10.dp)) {
+        CountDownView(
+            viewModel,
+            size,
+            viewModel.blackTimer.value,
+            viewModel.blackTime,
+            viewModel.blackProgress,
+            viewModel.blackTimeIsPlaying
+        )
+    }
+}
+
+@Composable
+fun WhiteClock(viewModel: GameViewModel, size: Float) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp), horizontalArrangement = Arrangement.End
+    ) {
+        CountDownView(
+            viewModel,
+            size,
+            viewModel.whiteTimer.value,
+            viewModel.whiteTime,
+            viewModel.whiteProgress,
+            viewModel.whiteTimeIsPlaying
+        )
+    }
+}
+
+
+@Composable
+fun ChessBoard(chessBoardVector: ImageVector) {
     Image(
         imageVector = chessBoardVector,
         contentDescription = "Chess Board",
@@ -69,7 +102,7 @@ fun ChessBoard(chessBoardVector: ImageVector){
 
 @Composable
 fun ChessUILogic(height: Float, viewModel: GameViewModel) {
-    val cardVisible = remember { mutableStateOf(false) }
+    val cardVisible = remember { viewModel.cardVisible }
     val hashMap = viewModel.getHashMap()
     val showMoves by remember { viewModel.isPieceClicked() }
     val isMoveSelected = remember { mutableStateOf(false) }
@@ -77,11 +110,7 @@ fun ChessUILogic(height: Float, viewModel: GameViewModel) {
     val clickedPiece = remember { viewModel.getSelectedPiece() }
     val targetRank = remember { mutableStateOf(0) }
     val targetFile = remember { mutableStateOf(0) }
-    val checkmate = remember { viewModel.getCheckmate() }
-    val stalemate = remember { viewModel.getStalemate() }
-    val insufficientMaterial = remember { viewModel.getInsufficientMaterial() }
-    val threeFoldRepetition = remember { viewModel.getThreeFoldRepetition() }
-    val fiftyMoveRule = remember { viewModel.getFiftyMoveRule() }
+    val endOfGame by remember { viewModel.endOfGame }
 
 //    val xRays = remember {
 //        viewModel.xRays()
@@ -144,32 +173,11 @@ fun ChessUILogic(height: Float, viewModel: GameViewModel) {
         )
     }
 
-    if (checkmate.value) {
-        var winner = "White"
-        if (viewModel.getPlayerTurn() == "white") {
-            winner = "Black"
+    if (endOfGame) {
+        if (cardVisible.value) {
+            val header by viewModel.endOfGameResult
+            val message by viewModel.endOfGameMessage
+            EndOfGameCard(header, message = message, cardVisible, viewModel)
         }
-        cardVisible.value = true
-        EndOfGameCard("Checkmate", message = "$winner Wins!", cardVisible)
-    }
-
-    if (insufficientMaterial.value) {
-        cardVisible.value = true
-        EndOfGameCard("Draw", message = "by Insufficient Material", cardVisible)
-    }
-
-    if (stalemate.value) {
-        cardVisible.value = true
-        EndOfGameCard("Draw", message = "by Stalemate", cardVisible)
-    }
-
-    if (threeFoldRepetition.value) {
-        cardVisible.value = true
-        EndOfGameCard("Draw", message = "by Threefold Repetition", cardVisible)
-    }
-
-    if (fiftyMoveRule.value) {
-        cardVisible.value = true
-        EndOfGameCard("Draw", message = "by Fifty Move Rule", cardVisible)
     }
 }

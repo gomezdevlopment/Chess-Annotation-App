@@ -20,51 +20,57 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.R
+import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable
 fun EndOfGameCard(
     header: String,
     message: String,
-    cardVisible: MutableState<Boolean>
+    cardVisible: MutableState<Boolean>,
+    viewModel: GameViewModel
 ) {
-
-    if (cardVisible.value) {
-        Box(
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .background(colorResource(id = R.color.transparentBlack))
+            .zIndex(4f)
+    )
+    {
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .background(colorResource(id = R.color.transparentBlack))
-                .zIndex(4f)
-        )
-        {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()
-                    .padding(50.dp),
-                elevation = 10.dp,
-                shape = RoundedCornerShape(20.dp)
-            ) {
+                .padding(50.dp),
+            elevation = 10.dp,
+            shape = RoundedCornerShape(20.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    Modifier
+                        .fillMaxWidth()
+                        .weight(1f), horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(50.dp))
+                    Text(
+                        text = header,
+                        textAlign = TextAlign.Center,
+                        fontSize = 24.sp,
+                        modifier = Modifier.absolutePadding(10.dp)
+                    )
+                    Text(text = message, textAlign = TextAlign.Center, fontSize = 14.sp)
+                }
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    Column(
-                        Modifier
-                            .fillMaxWidth()
-                            .weight(1f), horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Spacer(modifier = Modifier.height(50.dp))
-                        Text(
-                            text = header,
-                            textAlign = TextAlign.Center,
-                            fontSize = 24.sp,
-                            modifier = Modifier.absolutePadding(10.dp)
-                        )
-                        Text(text = message, textAlign = TextAlign.Center, fontSize = 14.sp)
+                    RoundDialogButton("Close")
+                    {
+                        cardVisible.value = false
                     }
-                    Column(modifier = Modifier.fillMaxWidth()) {
-                        RoundDialogButton(buttonText = "Close", bool = cardVisible)
-                        RoundDialogButton(buttonText = "Rematch", bool = cardVisible)
-                        Spacer(modifier = Modifier.height(20.dp))
+                    RoundDialogButton("Rematch")
+                    {
+                        cardVisible.value = false
+                        viewModel.resetGame()
                     }
+                    Spacer(modifier = Modifier.height(20.dp))
                 }
             }
         }
@@ -72,9 +78,13 @@ fun EndOfGameCard(
 }
 
 @Composable
-private fun RoundDialogButton(buttonText: String, bool: MutableState<Boolean>) {
+private fun RoundDialogButton(
+    buttonText: String,
+    onClick: () -> Unit
+) {
     Button(
-        onClick = { bool.value = false },
+        onClick = onClick,
+
         shape = CircleShape,
         modifier = Modifier
             .fillMaxWidth()

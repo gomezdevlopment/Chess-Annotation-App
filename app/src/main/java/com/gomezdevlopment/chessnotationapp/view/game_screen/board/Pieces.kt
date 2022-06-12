@@ -54,14 +54,15 @@ fun Piece(
         )
     }
     val end = System.currentTimeMillis()
-    println(end-start)
+    //println(end-start)
 }
 
 @Composable
 fun Pieces(viewModel: GameViewModel, height: Float) {
-    val pieces = remember {
+    val pieces =
+       // remember {
         viewModel.piecesOnBoard
-    }
+    //}
     val start = System.currentTimeMillis()
     pieces.asReversed().forEach() { piece ->
         key(piece) {
@@ -79,7 +80,7 @@ fun Pieces(viewModel: GameViewModel, height: Float) {
         }
     }
     val end = System.currentTimeMillis()
-    println(end-start)
+    println("Time for piece recomposition: ${end-start}ms")
     val previousSquare = viewModel.getPreviousSquare().value
     if (previousSquare.rank != 10) {
         Highlight(height = height, square = previousSquare, color = Color.Yellow, .5f)

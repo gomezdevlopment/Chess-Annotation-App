@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -13,11 +14,11 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
+import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 
 @Composable
 fun WhiteCaptures(pieces: List<ChessPiece>) {
-    println(pieces)
     LazyRow(
         Modifier
             .fillMaxWidth()
@@ -45,7 +46,7 @@ fun WhiteCaptures(pieces: List<ChessPiece>) {
 
 @Composable
 fun BlackCaptures(pieces: List<ChessPiece>) {
-    println(pieces)
+    //println(pieces)
     LazyRow(
         Modifier
             .fillMaxWidth()
@@ -82,4 +83,20 @@ fun PieceIcon(piece: ChessPiece) {
             .aspectRatio(1f)
     )
 
+}
+
+@Composable
+fun WhiteCaptures(viewModel: GameViewModel){
+    val capturedPieces = remember {
+        viewModel.capturedPieces.value
+    }
+    WhiteCaptures(pieces = capturedPieces)
+}
+
+@Composable
+fun BlackCaptures(viewModel: GameViewModel){
+    val capturedPieces = remember {
+        viewModel.capturedPieces.value
+    }
+    BlackCaptures(pieces = capturedPieces)
 }

@@ -28,7 +28,6 @@ fun SoundFX(viewModel: GameViewModel) {
     }
     if (captureSound.value) {
         LaunchedEffect(0) {
-
             captureSound.value = false
             viewModel.playSound(R.raw.capture_sound)
         }

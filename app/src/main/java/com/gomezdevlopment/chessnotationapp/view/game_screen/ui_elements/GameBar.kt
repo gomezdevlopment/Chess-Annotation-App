@@ -24,7 +24,7 @@ fun GameBar(viewModel: GameViewModel){
                 .weight(1f)
                 .clickable {
                     onBackPressedDispatcher?.onBackPressed()
-                    viewModel.resetGame()
+                    //viewModel.resetGame()
                 }) {
 
             val home: ImageVector =
