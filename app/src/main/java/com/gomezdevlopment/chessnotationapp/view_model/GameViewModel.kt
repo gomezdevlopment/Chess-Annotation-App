@@ -58,7 +58,7 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     //private val _piecesOnBoard = gameRepository.getPiecesOnBoard()
-    //val piecesOnBoard: MutableState<List<ChessPiece>> = mutableStateOf(gameRepository.getPiecesOnBoard())
+    //val piecesOnBoard: MutableState<List<ChessPiece>> = mutableStateOf(gameRepository.piecesOnBoard)
     val piecesOnBoard: List<ChessPiece> = gameRepository.piecesOnBoard
 
     fun setPromotionDialogState(clicked: Boolean) {

@@ -6,20 +6,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.tealDarker
 
 @Composable()
-fun Coordinates(size: Float) {
+fun Coordinates(size: Dp) {
     Ranks(size = size, darkColor = tealDarker, lightColor = Color.White)
     Files(size = size, darkColor = tealDarker, lightColor = Color.White)
 }
 
 @Composable
 fun Ranks(
-    size: Float, darkColor: Color, lightColor: Color
+    size: Dp, darkColor: Color, lightColor: Color
 ) {
     val ranks = listOf("1", "2", "3", "4", "5", "6", "7", "8")
     ranks.forEachIndexed() { index, rank ->
@@ -27,14 +28,14 @@ fun Ranks(
         if (index % 2 == 0) {
             color = darkColor
         }
-        val offsetY = (7 - index).toFloat() * size
+        val offsetY = size * (7 - index).toFloat()
         val offsetX = (size * 7f)
 
         Column(
             modifier = Modifier
-                .height(size.dp)
+                .height(size)
                 .aspectRatio(1f)
-                .absoluteOffset(offsetX.dp, offsetY.dp)
+                .absoluteOffset(offsetX, offsetY)
                 .zIndex(3f),
             verticalArrangement = Arrangement.Top
         ) {
@@ -47,7 +48,7 @@ fun Ranks(
 
 @Composable
 fun Files(
-    size: Float, darkColor: Color, lightColor: Color
+    size: Dp, darkColor: Color, lightColor: Color
 ) {
     val files = listOf("a", "b", "c", "d", "e", "f", "g", "h")
     files.forEachIndexed() { index, file ->
@@ -60,9 +61,9 @@ fun Files(
 
         Column(
             modifier = Modifier
-                .height(size.dp)
+                .height(size)
                 .aspectRatio(1f)
-                .absoluteOffset(offsetX.dp, offsetY.dp)
+                .absoluteOffset(offsetX, offsetY)
                 .zIndex(3f),
             verticalArrangement = Arrangement.Bottom
         ) {

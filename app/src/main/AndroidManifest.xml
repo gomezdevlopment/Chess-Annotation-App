@@ -21,7 +21,9 @@
 
         <activity
             android:name=".view.MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.ChessNotationApp"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -42,11 +42,11 @@ class AddNotationFragment : Fragment() {
         binding.enter.setOnClickListener {
             val annotation = binding.textView.text.toString()
             if(annotation.isNotEmpty()){
-                if(homeViewModel.getWhiteMoves().value?.size == homeViewModel.getBlackMoves().value?.size || homeViewModel.getWhiteMoves().value == null){
-                    homeViewModel.addWhiteMove(annotation)
-                }else{
-                    homeViewModel.addBlackMove(annotation)
-                }
+//                if(homeViewModel.getWhiteMoves().value?.size == homeViewModel.getBlackMoves().value?.size || homeViewModel.getWhiteMoves().value == null){
+//                    homeViewModel.addWhiteMove(annotation)
+//                }else{
+//                    homeViewModel.addBlackMove(annotation)
+//                }
                 Navigation.findNavController(view).navigate(R.id.action_addNotationFragment_to_homeFragment)
             }else{
                 Toast.makeText(view.context, "Please enter your notation.", Toast.LENGTH_SHORT).show()

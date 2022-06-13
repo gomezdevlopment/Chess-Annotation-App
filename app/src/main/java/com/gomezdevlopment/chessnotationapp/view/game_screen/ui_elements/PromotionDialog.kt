@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.R
@@ -21,7 +22,7 @@ import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable
 fun Promotion(
-    width: Float,
+    width: Dp,
     chessPiece: ChessPiece,
     promotionSelectionShowing: MutableState<Boolean>,
     rank: Int,
@@ -50,9 +51,9 @@ fun Promotion(
     }
 
     val offsetX = width * file
-    var offsetY = (7 - rank) * width
+    var offsetY = width * (7 - rank)
     if (rank == 0) {
-        offsetY = 4 * width
+        offsetY =width * 4
     }
 
     Box(
@@ -65,9 +66,9 @@ fun Promotion(
     {
         Card(
             modifier = Modifier
-                .width(width.dp)
-                .height((width * 4).dp)
-                .absoluteOffset(offsetX.dp, offsetY.dp),
+                .width(width)
+                .height((width * 4))
+                .absoluteOffset(offsetX, offsetY),
             elevation = 5.dp,
             shape = RoundedCornerShape(10.dp)
         ) {

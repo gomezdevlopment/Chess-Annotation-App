@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/batmi/Desktop/ChessNotationApp/app/src/main/res/drawable/ic_chessbackground.xml" value="0.1" />
         <entry key="..\:/Users/batmi/Desktop/ChessNotationApp/app/src/main/res/drawable/ic_chessboard.xml" value="0.2685" />
         <entry key="..\:/Users/batmi/Desktop/ChessNotationApp/app/src/main/res/layout/activity_main.xml" value="0.25" />
         <entry key="..\:/Users/batmi/Desktop/ChessNotationApp/app/src/main/res/layout/fragment_add_notation.xml" value="0.22" />

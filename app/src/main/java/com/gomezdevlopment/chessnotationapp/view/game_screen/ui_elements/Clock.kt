@@ -16,6 +16,7 @@ import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.tealDarker
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import java.util.concurrent.TimeUnit
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.StateFlow
 
@@ -38,7 +39,7 @@ fun CountDownIndicator(
     modifier: Modifier = Modifier,
     progress: Float,
     time: String,
-    size: Int,
+    size: Dp,
     stroke: Int
 ) {
 
@@ -53,8 +54,8 @@ fun CountDownIndicator(
             CircularProgressIndicator(
                 progress = animatedProgress,
                 modifier = Modifier
-                    .height(size.dp)
-                    .width(size.dp),
+                    .height(size)
+                    .width(size),
                 color = tealDarker,
                 strokeWidth = stroke.dp,
             )
@@ -75,7 +76,7 @@ fun CountDownIndicator(
 @Composable
 fun CountDownView(
     viewModel: GameViewModel,
-    width: Float,
+    size: Dp,
     playerStartingTime: Long,
     playerTime: StateFlow<String>,
     playerProgress: StateFlow<Float>,
@@ -87,7 +88,7 @@ fun CountDownView(
     val isPlaying by playerTimeIsPlaying.collectAsState(false)
     
     CountDownViewWithData(
-        width = width,
+        size = size,
         time = time,
         progress = progress,
         isPlaying = isPlaying
@@ -99,7 +100,7 @@ fun CountDownView(
 
 @Composable
 fun CountDownViewWithData(
-    width: Float,
+    size: Dp,
     time: String,
     progress: Float,
     isPlaying: Boolean,
@@ -109,7 +110,7 @@ fun CountDownViewWithData(
         Modifier.padding(top = 5.dp),
         progress = progress,
         time = time,
-        size = width.toInt(),
+        size = size,
         stroke = 5
     )
 }

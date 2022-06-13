@@ -22,6 +22,7 @@ class AuthenticationRepository(private val application: Application) {
 
     fun checkIfUserIsSignedIn(view: View) {
         if (firebaseAuth.currentUser != null) {
+            println("Home")
             Navigation.findNavController(view).navigate(R.id.action_signInFragment_to_homeFragment)
         }
     }
