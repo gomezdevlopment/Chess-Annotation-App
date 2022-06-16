@@ -44,6 +44,50 @@ fun GameBar(viewModel: GameViewModel, navController: NavController){
                 Modifier
                     .weight(1f)
                     .clickable {
+                        //navController.navigate("home")
+                        //viewModel.resetGame()
+                    }) {
+
+                val home: ImageVector =
+                    ImageVector.vectorResource(id = R.drawable.ic_resign)
+                Icon(
+                    imageVector = home,
+                    contentDescription = "Resign",
+                    tint = tealDarker,
+                    modifier = Modifier
+                        .height(50.dp)
+                        .padding(15.dp)
+                        .aspectRatio(1f)
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
+
+            Column(
+                Modifier
+                    .weight(1f)
+                    .clickable {
+                        //navController.navigate("home")
+                        //viewModel.resetGame()
+                    }) {
+
+                val home: ImageVector =
+                    ImageVector.vectorResource(id = R.drawable.ic_draw_offer)
+                Icon(
+                    imageVector = home,
+                    contentDescription = "Offer Draw",
+                    tint = tealDarker,
+                    modifier = Modifier
+                        .height(50.dp)
+                        .padding(5.dp)
+                        .aspectRatio(1f)
+                        .align(Alignment.CenterHorizontally)
+                )
+            }
+
+            Column(
+                Modifier
+                    .weight(1f)
+                    .clickable {
                         viewModel.previousNotation()
                         //viewModel.undoMove()
                     }

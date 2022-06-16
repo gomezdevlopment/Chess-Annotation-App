@@ -40,7 +40,7 @@ class GameRepository() : ViewModel() {
     var annotations: MutableList<String> = mutableStateListOf("start:")
     private var currentNotation: StringBuilder = StringBuilder("")
 
-    var initialTime = 180000L
+    var initialTime = 12000L
     var whiteTimer = mutableStateOf(initialTime)
     var blackTimer = mutableStateOf(initialTime)
 
@@ -63,6 +63,8 @@ class GameRepository() : ViewModel() {
     var promotions = mutableStateOf(0)
 
     //Enf of Game Booleans
+    var resignation: MutableState<Boolean> = mutableStateOf(false)
+    var timeOut: MutableState<Boolean> = mutableStateOf(false)
     var checkmate: MutableState<Boolean> = mutableStateOf(false)
     var stalemate: MutableState<Boolean> = mutableStateOf(false)
     var insufficientMaterial: MutableState<Boolean> = mutableStateOf(false)
@@ -101,11 +103,11 @@ class GameRepository() : ViewModel() {
 
     init {
         //testPosition4()
-        //promotionPosition()
+        promotionPosition()
         //addPieces()
         //testPositionKiwipete()
         //testPosition3()
-        initialPosition()
+        //initialPosition()
     }
 
     fun resetGame() {
@@ -216,7 +218,8 @@ class GameRepository() : ViewModel() {
 
     private fun setXRayAttacks(
         list: MutableList<Square>,
-        lookForChecks: Boolean) {
+        lookForChecks: Boolean
+    ) {
         list.clear()
         piecesOnBoard.forEach() { piece ->
             if (piece.color != playerTurn.value) {
@@ -653,10 +656,30 @@ class GameRepository() : ViewModel() {
 
         if (fiftyMoveRule.value) {
             endOfGameResult.value = "Draw"
-            endOfGameMessage.value = "by Fifty Move Rule"
+            endOfGameMessage.value = "by The Fifty Move Rule"
             endOfGame.value = true
             endOfGameCardVisible.value = true
         }
+    }
+
+    fun timeout() {
+        var winner = "White"
+        if (playerTurn.value == "white") {
+            winner = "Black"
+        }
+
+        endOfGameResult.value = "$winner Wins!"
+        endOfGameMessage.value = "on Time"
+        if (EndOfGameConditions(gameEndSound).checkIfPlayerHasInsufficientMaterial(
+                piecesOnBoard,
+                winner.lowercase()
+            )
+        ) {
+            endOfGameResult.value = "Draw"
+            endOfGameMessage.value = "by Time Out vs Insufficient Material"
+        }
+        endOfGame.value = true
+        endOfGameCardVisible.value = true
     }
 
     private fun addNotation() {

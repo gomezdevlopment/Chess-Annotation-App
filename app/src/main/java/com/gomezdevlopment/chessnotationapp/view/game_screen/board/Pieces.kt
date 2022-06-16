@@ -45,7 +45,7 @@ fun Piece(
         Highlight(height = height, square = piece.square, orange, 1f)
     }
     if (piece.square == viewModel.getCurrentSquare().value) {
-        Highlight(height = height, square = piece.square, yellow, 1f)
+        Highlight(height = height, square = piece.square, yellow, .9f)
     }
     val end = System.currentTimeMillis()
     //println(end-start)
@@ -93,6 +93,6 @@ fun Pieces(viewModel: GameViewModel, height: Dp) {
     println("Time for piece recomposition: ${end - start}ms")
     val previousSquare = viewModel.getPreviousSquare().value
     if (previousSquare.rank != 10) {
-        Highlight(height = height, square = previousSquare, color = yellow, 1f)
+        Highlight(height = height, square = previousSquare, color = yellow, .9f)
     }
 }

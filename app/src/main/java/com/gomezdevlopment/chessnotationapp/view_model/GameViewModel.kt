@@ -312,7 +312,7 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
         initialTime: Long
     ) {
         _isPlaying.value = true
-        countDownTimer = object : CountDownTimer(time.value, 1000) {
+        countDownTimer = object : CountDownTimer(time.value, 1) {
 
             override fun onTick(millisRemaining: Long) {
                 time.value = millisRemaining
@@ -329,6 +329,8 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
 
             override fun onFinish() {
                 pauseTimer(_isPlaying, _time, _progress, time)
+                //gameRepository.timeOut.value = true
+                gameRepository.timeout()
             }
         }.start()
     }
