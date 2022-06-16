@@ -2,10 +2,7 @@ package com.gomezdevlopment.chessnotationapp.view_model
 
 import android.app.Application
 import android.os.CountDownTimer
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.lifecycle.AndroidViewModel
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.*
@@ -36,6 +33,9 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     val endOfGameMessage = gameRepository.endOfGameMessage
 
     val capturedPieces = mutableStateOf(gameRepository.capturedPieces)
+
+    val openResignDialog =  mutableStateOf(false)
+    val openDrawOfferDialog =  mutableStateOf(false)
 
     fun previousNotation() {
         if (selectedNotationIndex.value > 0) {

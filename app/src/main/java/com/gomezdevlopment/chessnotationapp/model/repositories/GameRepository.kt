@@ -64,7 +64,6 @@ class GameRepository() : ViewModel() {
 
     //Enf of Game Booleans
     var resignation: MutableState<Boolean> = mutableStateOf(false)
-    var timeOut: MutableState<Boolean> = mutableStateOf(false)
     var checkmate: MutableState<Boolean> = mutableStateOf(false)
     var stalemate: MutableState<Boolean> = mutableStateOf(false)
     var insufficientMaterial: MutableState<Boolean> = mutableStateOf(false)

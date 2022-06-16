@@ -35,13 +35,9 @@ class SignInFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        signInViewModel.checkIfUserIsSignedIn(view)
-
         signInViewModel.getUserMutableLiveDate().observe(viewLifecycleOwner, Observer {
             if(it != null){
                 Navigation.findNavController(view).navigate(R.id.action_signInFragment_to_homeFragment)
-                println("Home")
             }
         })
 

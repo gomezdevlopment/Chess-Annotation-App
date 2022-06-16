@@ -90,4 +90,16 @@ class HomeRepository() : ViewModel() {
                 Log.w(ContentValues.TAG, "Error getting documents: ", exception)
             }
     }
+
+    fun generateUserID() {
+
+    }
+
+    private fun getRandomString(): String {
+        val charset = ('a'..'z') + ('A'..'Z') + ('0'..'9')
+
+        return List(7) { charset.random() }
+            .joinToString("")
+    }
 }
+

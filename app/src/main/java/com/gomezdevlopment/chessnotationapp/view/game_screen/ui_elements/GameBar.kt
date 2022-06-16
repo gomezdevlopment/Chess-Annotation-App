@@ -44,8 +44,7 @@ fun GameBar(viewModel: GameViewModel, navController: NavController){
                 Modifier
                     .weight(1f)
                     .clickable {
-                        //navController.navigate("home")
-                        //viewModel.resetGame()
+                        viewModel.openResignDialog.value = true
                     }) {
 
                 val home: ImageVector =
@@ -66,6 +65,7 @@ fun GameBar(viewModel: GameViewModel, navController: NavController){
                 Modifier
                     .weight(1f)
                     .clickable {
+                        viewModel.openDrawOfferDialog.value = true
                         //navController.navigate("home")
                         //viewModel.resetGame()
                     }) {

@@ -30,7 +30,7 @@ class SignInViewModel(application: Application) : AndroidViewModel(application) 
         return userMutableLiveData
     }
 
-    fun checkIfUserIsSignedIn(view: View){
-        appRepository.checkIfUserIsSignedIn(view)
+    fun checkIfUserIsSignedIn(){
+        appRepository.checkIfUserIsSignedIn()
     }
 }

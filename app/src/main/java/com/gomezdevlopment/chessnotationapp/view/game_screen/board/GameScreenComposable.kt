@@ -2,12 +2,17 @@ package com.gomezdevlopment.chessnotationapp.view.game_screen.board
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -19,6 +24,8 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleCapture
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleMove
+import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.tealDarker
+import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.textWhite
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable
@@ -27,6 +34,8 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
         ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
 
     println("Recomposing")
+    ResignAlertDialog(viewModel = viewModel)
+    DrawOfferAlertDialog(viewModel = viewModel)
     Column(Modifier.fillMaxHeight()) {
         Row(verticalAlignment = Alignment.Top) {
             AnnotationBar(viewModel)
@@ -184,5 +193,67 @@ fun ChessUILogic(height: Dp, viewModel: GameViewModel) {
             val message by viewModel.endOfGameMessage
             EndOfGameCard(header, message = message, cardVisible, viewModel)
         }
+    }
+}
+
+@Composable
+fun ResignAlertDialog(viewModel: GameViewModel) {
+    if (viewModel.openResignDialog.value) {
+        AlertDialog(
+            onDismissRequest = { viewModel.openResignDialog.value = false },
+            title = { Text(text = "Resign?", color = tealDarker, fontWeight = FontWeight.Bold) },
+            //text = { Text("Hello! This is our Alert Dialog..", color = textWhite) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.openResignDialog.value = false
+                    }
+                ) {
+                    Text("Confirm", color = tealDarker)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.openResignDialog.value = false
+                    }
+                ) {
+                    Text("Cancel", color = tealDarker)
+                }
+            },
+            backgroundColor = textWhite,
+            contentColor = textWhite
+        )
+    }
+}
+
+@Composable
+fun DrawOfferAlertDialog(viewModel: GameViewModel) {
+    if (viewModel.openDrawOfferDialog.value) {
+        AlertDialog(
+            onDismissRequest = { viewModel.openDrawOfferDialog.value = false },
+            title = { Text(text = "Offer Draw?", color = tealDarker, fontWeight = FontWeight.Bold) },
+            //text = { Text("Hello! This is our Alert Dialog..", color = textWhite) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.openDrawOfferDialog.value = false
+                    }
+                ) {
+                    Text("Confirm", color = tealDarker)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.openDrawOfferDialog.value = false
+                    }
+                ) {
+                    Text("Cancel", color = tealDarker)
+                }
+            },
+            backgroundColor = textWhite,
+            contentColor = textWhite
+        )
     }
 }
