@@ -23,13 +23,14 @@ fun Ranks(
     size: Dp, darkColor: Color, lightColor: Color
 ) {
     val ranks = listOf("1", "2", "3", "4", "5", "6", "7", "8")
-    ranks.forEachIndexed() { index, rank ->
+    ranks.asReversed().forEachIndexed() { index, rank ->
         var color = lightColor
         if (index % 2 == 0) {
             color = darkColor
         }
-        val offsetY = size * (7 - index).toFloat()
+
         val offsetX = (size * 7f)
+        val offsetY = size * (7 - index).toFloat()
 
         Column(
             modifier = Modifier
@@ -51,7 +52,7 @@ fun Files(
     size: Dp, darkColor: Color, lightColor: Color
 ) {
     val files = listOf("a", "b", "c", "d", "e", "f", "g", "h")
-    files.forEachIndexed() { index, file ->
+    files.asReversed().forEachIndexed { index, file ->
         var color = darkColor
         if (index % 2 == 0) {
             color = lightColor

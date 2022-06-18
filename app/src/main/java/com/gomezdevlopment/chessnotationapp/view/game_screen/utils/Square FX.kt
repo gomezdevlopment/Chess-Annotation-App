@@ -15,18 +15,19 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
+import com.gomezdevlopment.chessnotationapp.model.utils.Utils
 
 @Composable
 fun Highlight(
     height: Dp, square: Square, color: Color, transparency: Float
 ) {
-    val offsetX = height * square.file
-    val offsetY = height * (7 - square.rank)
+    val offsetX = Utils().offsetX(height.value, square.file)
+    val offsetY = Utils().offsetY(height.value, square.rank)
     Canvas(
         modifier = Modifier
             .height(height)
             .aspectRatio(1f)
-            .absoluteOffset(offsetX, offsetY)
+            .absoluteOffset(offsetX.dp, offsetY.dp)
             .zIndex(2f)
     ) {
         drawRect(
@@ -45,13 +46,13 @@ fun PossibleMove(
     targetFile: MutableState<Int>,
     squareClicked: MutableState<Boolean>
 ) {
-    val offsetX = height * square.file
-    val offsetY = height * (7 - square.rank)
+    val offsetX = Utils().offsetX(height.value, square.file)
+    val offsetY = Utils().offsetY(height.value, square.rank)
     Canvas(
         modifier = Modifier
             .height(height)
             .aspectRatio(1f)
-            .absoluteOffset(offsetX, offsetY)
+            .absoluteOffset(offsetX.dp, offsetY.dp)
             .zIndex(2f)
             .clickable {
                 targetRank.value = square.rank
@@ -75,13 +76,13 @@ fun PossibleCapture(
     targetFile: MutableState<Int>,
     squareClicked: MutableState<Boolean>
 ) {
-    val offsetX = height * square.file
-    val offsetY = height * (7 - square.rank)
+    val offsetX = Utils().offsetX(height.value, square.file)
+    val offsetY = Utils().offsetY(height.value, square.rank)
     Canvas(
         modifier = Modifier
             .height(height)
             .aspectRatio(1f)
-            .absoluteOffset(offsetX, offsetY)
+            .absoluteOffset(offsetX.dp, offsetY.dp)
             .zIndex(2f)
             .clickable {
                 targetRank.value = square.rank
@@ -104,13 +105,13 @@ fun Outline(
     square: Square,
     color: Color
 ) {
-    val offsetX = height * square.file
-    val offsetY = height * (7 - square.rank)
+    val offsetX = Utils().offsetX(height.value, square.file)
+    val offsetY = Utils().offsetY(height.value, square.rank)
     Canvas(
         modifier = Modifier
             .height(height)
             .aspectRatio(1f)
-            .absoluteOffset(offsetX, offsetY)
+            .absoluteOffset(offsetX.dp, offsetY.dp)
             .padding(1.dp)
             .zIndex(2f)
 

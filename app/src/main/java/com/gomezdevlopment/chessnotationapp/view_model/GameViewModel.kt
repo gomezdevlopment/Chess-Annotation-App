@@ -146,43 +146,43 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     fun changePiecePosition(newSquare: Square, piece: ChessPiece) {
         gameRepository.changePiecePosition(newSquare, piece, 0)
         //setPlayerTurnClockValues()
-        when (gameRepository.playerTurn.value) {
-            "white" -> {
-                pauseTimer(
-                    _blackTimeIsPlaying,
-                    _blackTime,
-                    gameRepository.blackProgress,
-                    blackTimer
-                )
-                startTimer(
-                    _whiteTimeIsPlaying,
-                    _whiteTime,
-                    gameRepository.whiteProgress,
-                    whiteTimer,
-                    initialTime
-                )
-            }
-            "black" -> {
-                pauseTimer(
-                    _whiteTimeIsPlaying,
-                    _whiteTime,
-                    gameRepository.whiteProgress,
-                    whiteTimer
-                )
-                startTimer(
-                    _blackTimeIsPlaying,
-                    _blackTime,
-                    gameRepository.blackProgress,
-                    blackTimer,
-                    initialTime
-                )
-            }
-        }
-
-        if (endOfGame.value) {
-            pauseTimer(_whiteTimeIsPlaying, _whiteTime, gameRepository.whiteProgress, whiteTimer)
-            pauseTimer(_blackTimeIsPlaying, _blackTime, gameRepository.blackProgress, blackTimer)
-        }
+//        when (gameRepository.playerTurn.value) {
+//            "white" -> {
+//                pauseTimer(
+//                    _blackTimeIsPlaying,
+//                    _blackTime,
+//                    gameRepository.blackProgress,
+//                    blackTimer
+//                )
+//                startTimer(
+//                    _whiteTimeIsPlaying,
+//                    _whiteTime,
+//                    gameRepository.whiteProgress,
+//                    whiteTimer,
+//                    initialTime
+//                )
+//            }
+//            "black" -> {
+//                pauseTimer(
+//                    _whiteTimeIsPlaying,
+//                    _whiteTime,
+//                    gameRepository.whiteProgress,
+//                    whiteTimer
+//                )
+//                startTimer(
+//                    _blackTimeIsPlaying,
+//                    _blackTime,
+//                    gameRepository.blackProgress,
+//                    blackTimer,
+//                    initialTime
+//                )
+//            }
+//        }
+//
+//        if (endOfGame.value) {
+//            pauseTimer(_whiteTimeIsPlaying, _whiteTime, gameRepository.whiteProgress, whiteTimer)
+//            pauseTimer(_blackTimeIsPlaying, _blackTime, gameRepository.blackProgress, blackTimer)
+//        }
     }
 
     fun promotion(newSquare: Square, promotionSelection: ChessPiece) {

@@ -18,6 +18,8 @@ import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
+import com.gomezdevlopment.chessnotationapp.model.utils.Utils
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable
@@ -50,10 +52,15 @@ fun Promotion(
         pieces.addAll(blackPieceImages)
     }
 
-    val offsetX = width * file
-    var offsetY = width * (7 - rank)
-    if (rank == 0) {
-        offsetY =width * 4
+    val offsetX = Utils().offsetX(width.value, file).dp
+    var offsetY = Utils().offsetY(width.value, rank).dp
+
+    if (rank == 0 && userColor == "white") {
+        offsetY = width * 4
+    }
+
+    if(rank == 7 && userColor == "black"){
+        offsetY = width * 4
     }
 
     Box(

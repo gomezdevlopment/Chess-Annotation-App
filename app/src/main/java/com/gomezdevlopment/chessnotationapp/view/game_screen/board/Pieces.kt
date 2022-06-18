@@ -14,6 +14,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
+import com.gomezdevlopment.chessnotationapp.model.utils.Utils
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
@@ -31,14 +33,14 @@ fun Piece(
         imageVector = imageVector,
         contentDescription = "Chess Piece",
         modifier =
-        (if (piece.color == viewModel.getPlayerTurn()) Modifier.clickable(
+        (if (piece.color == viewModel.getPlayerTurn() && piece.color == userColor) Modifier.clickable(
             viewModel,
             piece,
             height, offset
         ) else Modifier.notClickable(height, offset))
     )
     // }
-    if (piece == viewModel.getSelectedPiece().value && piece.color == viewModel.getPlayerTurn()) {
+    if (piece == viewModel.getSelectedPiece().value && piece.color == viewModel.getPlayerTurn() && piece.color == userColor) {
         Highlight(height = height, square = piece.square, color = blue, transparency = 1f)
     }
     if (viewModel.kingInCheck() && piece.square == viewModel.kingSquare()) {
@@ -77,9 +79,9 @@ fun Pieces(viewModel: GameViewModel, height: Dp) {
         //val square by derivedStateOf{occupiedSquare}
         key(piece) {
             val square = piece.square
-            val offsetX = (height * (square.file).toFloat())
-            val offsetY = (height * (7 - square.rank).toFloat())
-            val offset = Offset(offsetX.value, offsetY.value)
+            val offsetX = Utils().offsetX(height.value, square.file)
+            val offsetY = Utils().offsetY(height.value, square.rank)
+            val offset = Offset(offsetX, offsetY)
             //val animatedOffset by animateOffsetAsState(targetValue = offset, tween(100, easing = LinearEasing))
             Piece(
                 piece = piece,
