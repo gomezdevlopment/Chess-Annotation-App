@@ -1,6 +1,5 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -9,30 +8,24 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.teal
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.tealDarker
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.textWhite
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.GameScreen
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.cardWhite
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
-import com.gomezdevlopment.chessnotationapp.view_model.OnlineGameViewModel
+import com.gomezdevlopment.chessnotationapp.view_model.MatchmakingViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.SignOutViewModel
-import kotlinx.coroutines.flow.collect
 
 
 @Composable
@@ -50,7 +43,7 @@ fun Settings(signOutViewModel: SignOutViewModel, navController: NavController) {
 }
 
 @Composable
-fun PregameLobby(onlineGameViewModel: OnlineGameViewModel, navController: NavController) {
+fun PregameLobby(gameViewModel: GameViewModel, matchmakingViewModel: MatchmakingViewModel, navController: NavController) {
     Column(verticalArrangement = Arrangement.Center) {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
             Text("Searching for Match...")
@@ -62,38 +55,43 @@ fun PregameLobby(onlineGameViewModel: OnlineGameViewModel, navController: NavCon
             )
         }
     }
-    GameNavigation(onlineGameViewModel = onlineGameViewModel, navController = navController)
+    GameNavigation(gameViewModel = gameViewModel, matchmakingViewModel = matchmakingViewModel, navController = navController)
 }
 
 @Composable
-fun GameNavigation(onlineGameViewModel: OnlineGameViewModel, navController: NavController){
+fun GameNavigation(
+    gameViewModel: GameViewModel,
+    matchmakingViewModel: MatchmakingViewModel,
+    navController: NavController
+) {
     println("recomposing navigation of game")
-    when(onlineGameViewModel.navDestination.value){
-        "game" -> LaunchedEffect(Unit){
+    when (matchmakingViewModel.navDestination.value) {
+        "game" -> LaunchedEffect(Unit) {
             navController.navigate("game")
+            gameViewModel.createNewGame(matchmakingViewModel.time)
         }
     }
 }
 
 @Composable
 fun Navigation(
-    viewModel: GameViewModel,
-    onlineGameViewModel: OnlineGameViewModel,
+    gameViewModel: GameViewModel,
+    matchmakingViewModel: MatchmakingViewModel,
     signOutViewModel: SignOutViewModel
 ) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "home") {
-        composable("home") { Home(navController, onlineGameViewModel) }
-        composable("game") { GameScreen(viewModel, navController) }
+        composable("home") { Home(navController, matchmakingViewModel) }
+        composable("game") { GameScreen(gameViewModel, navController) }
         composable("settings") { Settings(signOutViewModel, navController) }
-        composable("pregameLobby") { PregameLobby(onlineGameViewModel, navController) }
+        composable("pregameLobby") { PregameLobby(gameViewModel, matchmakingViewModel, navController) }
         /*...*/
     }
 }
 
 @Composable
-fun Home(navController: NavController, onlineGameViewModel: OnlineGameViewModel) {
+fun Home(navController: NavController, matchmakingViewModel: MatchmakingViewModel) {
     val gameModes = arrayListOf("Rapid", "Blitz", "Bullet")
     val timeControls = arrayListOf(600000L, 300000L, 60000L)
     val gameModeImageIDs =
@@ -111,7 +109,7 @@ fun Home(navController: NavController, onlineGameViewModel: OnlineGameViewModel)
         LazyRow() {
             itemsIndexed(gameModes) { index, mode ->
                 GameSelectionCard(drawableID = gameModeImageIDs[index], title = mode) {
-                    onlineGameViewModel.joinGame(timeControls[index])
+                    matchmakingViewModel.joinGame(timeControls[index])
                     navController.navigate("pregameLobby")
                 }
             }

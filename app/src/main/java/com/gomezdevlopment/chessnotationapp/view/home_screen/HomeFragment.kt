@@ -1,29 +1,16 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen
 
-import android.content.Context
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.view.ContextThemeWrapper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.compose.ui.platform.ComposeView
-import androidx.core.content.FileProvider
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.Navigation
-import androidx.recyclerview.widget.LinearLayoutManager
-import com.gomezdevlopment.chessnotationapp.R
-import com.gomezdevlopment.chessnotationapp.adapter.MoveAdapter
-import com.gomezdevlopment.chessnotationapp.databinding.FragmentHomeBinding
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.HomeViewModel
-import com.gomezdevlopment.chessnotationapp.view_model.OnlineGameViewModel
+import com.gomezdevlopment.chessnotationapp.view_model.MatchmakingViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.SignOutViewModel
-import java.io.File
 
 class HomeFragment : Fragment() {
 
@@ -41,10 +28,10 @@ class HomeFragment : Fragment() {
         // Inflate the layout for this fragment
         return ComposeView(requireContext()).apply {
             val viewModel = GameViewModel(requireActivity().application)
-            val onlineGameViewModel = OnlineGameViewModel()
+            val matchmakingViewModel = MatchmakingViewModel()
             val signOutViewModel = SignOutViewModel(requireActivity().application)
             setContent {
-                Navigation(viewModel, onlineGameViewModel, signOutViewModel)
+                Navigation(viewModel, matchmakingViewModel, signOutViewModel)
                 //val contextThemeWrapper: Context = ContextThemeWrapper(requireContext(), R.style.Theme_ChessSplash)
                 //inflater.cloneInContext(contextThemeWrapper)
                 //GameScreen(viewModel)

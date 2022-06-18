@@ -10,6 +10,7 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
 import com.gomezdevlopment.chessnotationapp.model.repositories.GameRepository
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.formatTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +24,7 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     private var pieceClicked: MutableState<Boolean> = mutableStateOf(false)
     private var promotionDialogShowing: MutableState<Boolean> = mutableStateOf(false)
 
-    var selectedNotationIndex: MutableState<Int> = mutableStateOf(0)
+    var selectedNotationIndex: MutableState<Int> = gameRepository.selectedNotationIndex
     var currentPosition: MutableState<Boolean> = mutableStateOf(true)
     var onUpdate = mutableStateOf(0)
 
@@ -37,10 +38,8 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     val openResignDialog =  mutableStateOf(false)
     val openDrawOfferDialog =  mutableStateOf(false)
 
-    fun createNewGame(time: Long, playerColor: String){
-        gameRepository.resetGame()
-        gameRepository.initialTime.value = time
-        gameRepository.playerColor.value = playerColor
+    fun createNewGame(time: Long){
+        gameRepository.resetGame(time)
     }
 
     fun previousNotation() {
@@ -72,7 +71,8 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun resetGame() {
-        gameRepository.resetGame()
+        gameRepository.resetGame(300000L)
+
         handleTimerValues(
             false,
             formatTime(initialTime),
@@ -81,6 +81,7 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
             _whiteTime,
             gameRepository.whiteProgress
         )
+
         handleTimerValues(
             false,
             formatTime(initialTime),
@@ -109,7 +110,9 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
                 setPieceClickedState(false)
                 selectedPiece.value = piece
                 if (getPlayerTurn() == getSelectedPiece().value.color) {
-                    setPieceClickedState(true)
+                    if(getPlayerTurn() == userColor){
+                        setPieceClickedState(true)
+                    }
                 }
             }
         }
@@ -142,7 +145,6 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
 
     fun changePiecePosition(newSquare: Square, piece: ChessPiece) {
         gameRepository.changePiecePosition(newSquare, piece, 0)
-        selectedNotationIndex.value += 1
         //setPlayerTurnClockValues()
         when (gameRepository.playerTurn.value) {
             "white" -> {
@@ -252,24 +254,24 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
         return gameRepository.annotations
     }
 
-    //Timer
+//    //Timer
     private var countDownTimer: CountDownTimer? = null
     var whiteTimer = gameRepository.whiteTimer
     var blackTimer = gameRepository.blackTimer
     private val initialTime by gameRepository.initialTime
-
+//
     private var _whiteTime = MutableStateFlow(formatTime(whiteTimer.value))
     val whiteTime: StateFlow<String> = _whiteTime
     val whiteProgress: StateFlow<Float> = gameRepository.whiteProgress
     private val _whiteTimeIsPlaying = MutableStateFlow(false)
     val whiteTimeIsPlaying: StateFlow<Boolean> = _whiteTimeIsPlaying
-
+//
     private val _blackTime = MutableStateFlow(formatTime(blackTimer.value))
     val blackTime: StateFlow<String> = _blackTime
     val blackProgress: StateFlow<Float> = gameRepository.blackProgress
     private val _blackTimeIsPlaying = MutableStateFlow(false)
     val blackTimeIsPlaying: StateFlow<Boolean> = _blackTimeIsPlaying
-
+//
     fun handleCountDownTimer() {
         if (whiteTimeIsPlaying.value) {
             pauseTimer(_whiteTimeIsPlaying, _whiteTime, gameRepository.whiteProgress, whiteTimer)

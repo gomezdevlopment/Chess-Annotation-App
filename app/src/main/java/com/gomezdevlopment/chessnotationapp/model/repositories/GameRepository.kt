@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.model.repositories
 
+import android.os.CountDownTimer
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
@@ -10,8 +11,11 @@ import com.gomezdevlopment.chessnotationapp.model.game_logic.FEN
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
 import com.gomezdevlopment.chessnotationapp.model.game_logic.Notation
 import com.gomezdevlopment.chessnotationapp.model.pieces.*
-import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.EndOfGameCard
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.gameDocumentReference
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
+import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.formatTime
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 
 class GameRepository() : ViewModel() {
@@ -78,12 +82,8 @@ class GameRepository() : ViewModel() {
     var castlingSound: MutableState<Boolean> = mutableStateOf(false)
     var gameEndSound: MutableState<Boolean> = mutableStateOf(false)
 
-    var playerColor: MutableState<String> = mutableStateOf("white")
-
-//    fun destroy() {
-//        INSTANCE = null
-//        initialPosition()
-//    }
+    var selectedNotationIndex: MutableState<Int> = mutableStateOf(0)
+    //var playerColor: MutableState<String> = mutableStateOf("white")
 
     companion object {
         @Volatile
@@ -111,7 +111,7 @@ class GameRepository() : ViewModel() {
         initialPosition()
     }
 
-    fun resetGame() {
+    fun resetGame(time: Long) {
         previousGameStates.clear()
         checkmate.value = (false)
         stalemate.value = (false)
@@ -127,11 +127,46 @@ class GameRepository() : ViewModel() {
         currentNotation = StringBuilder("")
         endOfGame.value = false
         endOfGameCardVisible.value = false
-        whiteTimer.value = initialTime.value
-        blackTimer.value = initialTime.value
+        whiteTimer.value = time
+        blackTimer.value = time
         blackProgress.value = 1.00F
         whiteProgress.value = 1.00F
         initialPosition()
+
+        gameDocumentReference.addSnapshotListener { value, error ->
+            value?.let {
+                val previousMoveString = it.get("previousMove").toString()
+                if(previousMoveString != ""){
+                    println(previousMoveString)
+                    val piece = getPieceFromDocument(previousMoveString)
+                    val square: Square = getSquareFromDocument(previousMoveString)
+                    println(piece)
+                    println(square)
+                    if (piece != null && piece.color != userColor) {
+                        changePiecePosition(square, piece, 0)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getPieceFromDocument(previousMoveString: String): ChessPiece? {
+        val pieceRank = previousMoveString[0].digitToInt()
+        val pieceFile = previousMoveString[1].digitToInt()
+        val square = Square(pieceRank, pieceFile)
+        println(square)
+        println(occupiedSquares)
+        if(occupiedSquares.containsKey(square)) {
+            println("contains")
+            return occupiedSquares[square]
+        }
+        return null
+    }
+
+    private fun getSquareFromDocument(previousMoveString: String): Square {
+        val squareRank = previousMoveString[2].digitToInt()
+        val squareFile = previousMoveString[3].digitToInt()
+        return Square(squareRank, squareFile)
     }
 
     private fun getGameStateAsFEN(): String {
@@ -505,7 +540,21 @@ class GameRepository() : ViewModel() {
         checkIfKingOrRooksMoved(piece)
     }
 
+    private fun convertMoveToStringOfRanksAndFiles(piece: ChessPiece, square: Square): String {
+        return "${piece.square.rank}${piece.square.file}${square.rank}${square.file}"
+    }
+
     fun changePiecePosition(newSquare: Square, piece: ChessPiece, depth: Int) {
+        if(playerTurn.value == userColor){
+            val string = convertMoveToStringOfRanksAndFiles(piece, newSquare)
+            gameDocumentReference.update("previousMove", string)
+                .addOnSuccessListener {
+                    println("Success")
+                }
+                .addOnFailureListener { e ->
+                    println(e)
+                }
+        }
         val previousPieceSquare = piece.square
         val notation = Notation(currentNotation, newSquare)
         val castled = mutableStateOf(false)
@@ -590,7 +639,8 @@ class GameRepository() : ViewModel() {
                 getGameStateAsFEN()
             )
         )
-        setPositionFromFen(getGameStateAsFEN())
+        //setPositionFromFen(getGameStateAsFEN())
+        println(getGameStateAsFEN())
         if (kingInCheck.value) {
             checkSound.value = true
         } else {
@@ -612,6 +662,45 @@ class GameRepository() : ViewModel() {
         notation.checkmateOrCheck(checkmate.value, kingInCheck.value)
         annotations.add(currentNotation.toString())
         currentNotation.clear()
+        selectedNotationIndex.value += 1
+
+//        when (playerTurn.value) {
+//            "white" -> {
+//                pauseTimer(
+//                    _blackTimeIsPlaying,
+//                    _blackTime,
+//                    blackProgress,
+//                    blackTimer
+//                )
+//                startTimer(
+//                    _whiteTimeIsPlaying,
+//                    _whiteTime,
+//                    whiteProgress,
+//                    whiteTimer,
+//                    initialTime.value
+//                )
+//            }
+//            "black" -> {
+//                pauseTimer(
+//                    _whiteTimeIsPlaying,
+//                    _whiteTime,
+//                    whiteProgress,
+//                    whiteTimer
+//                )
+//                startTimer(
+//                    _blackTimeIsPlaying,
+//                    _blackTime,
+//                    blackProgress,
+//                    blackTimer,
+//                    initialTime.value
+//                )
+//            }
+//        }
+//
+//        if (endOfGame.value) {
+//            pauseTimer(_whiteTimeIsPlaying, _whiteTime, whiteProgress, whiteTimer)
+//            pauseTimer(_blackTimeIsPlaying, _blackTime, blackProgress, blackTimer)
+//        }
     }
 
     private fun checkIfGameOver() {
@@ -713,4 +802,97 @@ class GameRepository() : ViewModel() {
             currentSquare.value
         ).moves()
     }
+
+
+    //Timer
+//    private var countDownTimer: CountDownTimer? = null
+//    private var _whiteTime = MutableStateFlow(formatTime(whiteTimer.value))
+//    private val _whiteTimeIsPlaying = MutableStateFlow(false)
+//    val whiteTimeIsPlaying: StateFlow<Boolean> = _whiteTimeIsPlaying
+//    private val _blackTime = MutableStateFlow(formatTime(blackTimer.value))
+//    private val _blackTimeIsPlaying = MutableStateFlow(false)
+//    val blackTimeIsPlaying: StateFlow<Boolean> = _blackTimeIsPlaying
+//
+//    fun handleCountDownTimer() {
+//        if (whiteTimeIsPlaying.value) {
+//            pauseTimer(_whiteTimeIsPlaying, _whiteTime, whiteProgress, whiteTimer)
+//            startTimer(
+//                _blackTimeIsPlaying,
+//                _blackTime,
+//                blackProgress,
+//                blackTimer,
+//                initialTime.value
+//            )
+//        } else if (blackTimeIsPlaying.value) {
+//            pauseTimer(_blackTimeIsPlaying, _blackTime, blackProgress, blackTimer)
+//            startTimer(
+//                _whiteTimeIsPlaying,
+//                _whiteTime,
+//                whiteProgress,
+//                whiteTimer,
+//                initialTime.value
+//            )
+//        }
+//    }
+//
+//    private fun pauseTimer(
+//        _isPlaying: MutableStateFlow<Boolean>,
+//        _time: MutableStateFlow<String>,
+//        _progress: MutableStateFlow<Float>,
+//        time: MutableState<Long>
+//    ) {
+//        countDownTimer?.cancel()
+//        handleTimerValues(
+//            false,
+//            formatTime(time.value),
+//            _progress.value,
+//            _isPlaying,
+//            _time,
+//            _progress
+//        )
+//    }
+//
+//    private fun startTimer(
+//        _isPlaying: MutableStateFlow<Boolean>,
+//        _time: MutableStateFlow<String>,
+//        _progress: MutableStateFlow<Float>,
+//        time: MutableState<Long>,
+//        initialTime: Long
+//    ) {
+//        _isPlaying.value = true
+//        countDownTimer = object : CountDownTimer(time.value, 1) {
+//
+//            override fun onTick(millisRemaining: Long) {
+//                time.value = millisRemaining
+//                _progress.value = millisRemaining / initialTime.toFloat()
+//                handleTimerValues(
+//                    true,
+//                    formatTime(millisRemaining),
+//                    _progress.value,
+//                    _isPlaying,
+//                    _time,
+//                    _progress
+//                )
+//            }
+//
+//            override fun onFinish() {
+//                pauseTimer(_isPlaying, _time, _progress, time)
+//                timeout()
+//            }
+//        }.start()
+//    }
+//
+//    private fun handleTimerValues(
+//        isPlaying: Boolean,
+//        text: String,
+//        progress: Float,
+//        _isPlaying: MutableStateFlow<Boolean>,
+//        _time: MutableStateFlow<String>,
+//        _progress: MutableStateFlow<Float>
+//    ) {
+//        _isPlaying.value = isPlaying
+//        _time.value = text
+//        _progress.value = progress
+//    }
+
 }

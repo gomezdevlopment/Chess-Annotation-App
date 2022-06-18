@@ -6,23 +6,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.gomezdevlopment.chessnotationapp.model.data_classes.OnlineGame
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.gameDocumentReference
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
-class OnlineGameRepository : ViewModel() {
+class MatchmakingRepository : ViewModel() {
+
     private val db = Firebase.firestore
-
     private val gamePoolCollection = "gamePool"
-
-    val startGame = mutableStateOf(false)
-    val enterPregameLobby = mutableStateOf(false)
-
     val navDestination = mutableStateOf("")
-
+    val time = mutableStateOf(60000L)
+    //lateinit var gameDocumentReference: DocumentReference
 
     fun joinGame(timeControl: Long) {
+        time.value = timeControl
         db.collection(gamePoolCollection)
             .whereEqualTo("joinable", true)
             .whereEqualTo("timeControl", timeControl)
@@ -32,14 +32,15 @@ class OnlineGameRepository : ViewModel() {
                 if (gamePool.isEmpty) {
                     createGame(timeControl, MainActivity.user.username)
                 } else {
-                    val docIdRef = db.collection(gamePoolCollection).document(gamePool.documents[0].id)
+                    val docRef = db.collection(gamePoolCollection).document(gamePool.documents[0].id)
                     val game = gamePool.documents[0].toObject(OnlineGame::class.java)
-                    docIdRef.update("joinable", false)
+                    gameDocumentReference = docRef
+                    docRef.update("joinable", false)
                     if (game?.blackPlayer == "") {
                         println("Assigned black")
-                        docIdRef.update("blackPlayer", MainActivity.user.username)
+                        userColor = "black"
+                        docRef.update("blackPlayer", MainActivity.user.username)
                             .addOnSuccessListener {
-                                startGame.value = true
                                 navDestination.value = "game"
                                 println("Success")
                             }
@@ -48,9 +49,9 @@ class OnlineGameRepository : ViewModel() {
                             }
                     } else {
                         println("Assigned white")
-                        docIdRef.update("whitePlayer", MainActivity.user.username)
+                        userColor ="white"
+                        docRef.update("whitePlayer", MainActivity.user.username)
                             .addOnSuccessListener {
-                                startGame.value = true
                                 navDestination.value = "game"
                                 println("Success")
                             }
@@ -70,17 +71,19 @@ class OnlineGameRepository : ViewModel() {
         var whitePlayer = ""
         var blackPlayer = ""
         var playerColor = ""
-        var opponentColor =""
+        var opponentColor = ""
 
         when (randomColor) {
             0 -> {
                 whitePlayer = username
                 playerColor = "whitePlayer"
+                userColor = "white"
                 opponentColor = "blackPlayer"
             }
             1 -> {
                 blackPlayer = username
                 playerColor = "blackPlayer"
+                userColor = "black"
                 opponentColor = "whitePlayer"
             }
         }
@@ -101,7 +104,7 @@ class OnlineGameRepository : ViewModel() {
                     .get()
                     .addOnSuccessListener { gamePool ->
                         val docRef = db.collection(gamePoolCollection).document(gamePool.documents[0].id)
-                        //enterPregameLobby.value = true
+                        //val doc = db.collection(gamePoolCollection).document(gamePool.documents[0].id)
                         waitForMatch(docRef, opponentColor)
                     }
                     .addOnFailureListener {
@@ -118,19 +121,9 @@ class OnlineGameRepository : ViewModel() {
         feedback = docRef.addSnapshotListener { value, error ->
             if(value?.get(opponentColor) != ""){
                 navDestination.value = "game"
+                gameDocumentReference = docRef
                 feedback?.remove()
             }
-
-//            value?.let {
-//                if(it.get(opponentColor) != ""){
-//                    navDestination.value = "game"
-//                    //navDestination.value = "game"
-//                    println(navDestination.value)
-//                    //feedback?.remove()
-//                }
-//            }
         }
     }
-
-
 }
