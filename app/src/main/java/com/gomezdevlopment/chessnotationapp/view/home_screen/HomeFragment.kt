@@ -21,6 +21,8 @@ import com.gomezdevlopment.chessnotationapp.adapter.MoveAdapter
 import com.gomezdevlopment.chessnotationapp.databinding.FragmentHomeBinding
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.HomeViewModel
+import com.gomezdevlopment.chessnotationapp.view_model.OnlineGameViewModel
+import com.gomezdevlopment.chessnotationapp.view_model.SignOutViewModel
 import java.io.File
 
 class HomeFragment : Fragment() {
@@ -39,8 +41,10 @@ class HomeFragment : Fragment() {
         // Inflate the layout for this fragment
         return ComposeView(requireContext()).apply {
             val viewModel = GameViewModel(requireActivity().application)
+            val onlineGameViewModel = OnlineGameViewModel()
+            val signOutViewModel = SignOutViewModel(requireActivity().application)
             setContent {
-                Navigation(viewModel)
+                Navigation(viewModel, onlineGameViewModel, signOutViewModel)
                 //val contextThemeWrapper: Context = ContextThemeWrapper(requireContext(), R.style.Theme_ChessSplash)
                 //inflater.cloneInContext(contextThemeWrapper)
                 //GameScreen(viewModel)

@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.Navigation
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.User
+import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FieldValue
@@ -26,6 +27,7 @@ class AuthenticationRepository(private val application: Application) {
 
     fun checkIfUserIsSignedIn() {
         if (firebaseAuth.currentUser != null) {
+            println("running")
             db.collection("users")
                 .whereEqualTo("email", firebaseAuth.currentUser?.email)
                 .get()
@@ -33,10 +35,18 @@ class AuthenticationRepository(private val application: Application) {
                     if(it.isEmpty){
                         signOut()
                     }else{
-                        userMutableLiveData.postValue(firebaseAuth.currentUser)
+                        db.collection("users")
+                            .whereEqualTo("email", firebaseAuth.currentUser?.email)
+                            .get()
+                            .addOnSuccessListener { documents ->
+                                for (document in documents) {
+                                    MainActivity.user = document.toObject(User::class.java)
+                                }
+                            }
                     }
                 }
         }
+        userMutableLiveData.postValue(firebaseAuth.currentUser)
     }
 
 

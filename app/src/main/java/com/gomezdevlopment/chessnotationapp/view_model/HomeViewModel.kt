@@ -9,6 +9,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gomezdevlopment.chessnotationapp.model.data_classes.User
 import com.gomezdevlopment.chessnotationapp.model.repositories.HomeRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -25,7 +26,6 @@ class HomeViewModel() : ViewModel() {
         //whiteMovesMutableLiveData = homeRepository.getWhiteMoves()
         //blackMovesMutableLiveData = homeRepository.getBlackMoves()
     }
-
 
 //
 //    fun getWhiteMoves(): MutableLiveData<ArrayList<String>> {

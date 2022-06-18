@@ -40,9 +40,9 @@ class GameRepository() : ViewModel() {
     var annotations: MutableList<String> = mutableStateListOf("start:")
     private var currentNotation: StringBuilder = StringBuilder("")
 
-    var initialTime = 12000L
-    var whiteTimer = mutableStateOf(initialTime)
-    var blackTimer = mutableStateOf(initialTime)
+    var initialTime = mutableStateOf(300000L)
+    var whiteTimer = mutableStateOf(initialTime.value)
+    var blackTimer = mutableStateOf(initialTime.value)
 
     val blackProgress = MutableStateFlow(1.00F)
     val whiteProgress = MutableStateFlow(1.00F)
@@ -78,6 +78,8 @@ class GameRepository() : ViewModel() {
     var castlingSound: MutableState<Boolean> = mutableStateOf(false)
     var gameEndSound: MutableState<Boolean> = mutableStateOf(false)
 
+    var playerColor: MutableState<String> = mutableStateOf("white")
+
 //    fun destroy() {
 //        INSTANCE = null
 //        initialPosition()
@@ -102,11 +104,11 @@ class GameRepository() : ViewModel() {
 
     init {
         //testPosition4()
-        promotionPosition()
+        //promotionPosition()
         //addPieces()
         //testPositionKiwipete()
         //testPosition3()
-        //initialPosition()
+        initialPosition()
     }
 
     fun resetGame() {
@@ -125,8 +127,8 @@ class GameRepository() : ViewModel() {
         currentNotation = StringBuilder("")
         endOfGame.value = false
         endOfGameCardVisible.value = false
-        whiteTimer.value = initialTime
-        blackTimer.value = initialTime
+        whiteTimer.value = initialTime.value
+        blackTimer.value = initialTime.value
         blackProgress.value = 1.00F
         whiteProgress.value = 1.00F
         initialPosition()

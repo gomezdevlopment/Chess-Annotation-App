@@ -8,6 +8,9 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,22 +30,72 @@ import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.GameScreen
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.cardWhite
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
+import com.gomezdevlopment.chessnotationapp.view_model.OnlineGameViewModel
+import com.gomezdevlopment.chessnotationapp.view_model.SignOutViewModel
+import kotlinx.coroutines.flow.collect
 
 
 @Composable
-fun Navigation(viewModel: GameViewModel) {
+fun Settings(signOutViewModel: SignOutViewModel, navController: NavController) {
+    Column(verticalArrangement = Arrangement.Center) {
+        Button(
+            onClick = {
+                signOutViewModel.signOut()
+                navController.navigate(R.id.action_settingsFragment_to_signInFragment)
+            }
+        ) {
+            Text("Sign Out")
+        }
+    }
+}
+
+@Composable
+fun PregameLobby(onlineGameViewModel: OnlineGameViewModel, navController: NavController) {
+    Column(verticalArrangement = Arrangement.Center) {
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
+            Text("Searching for Match...")
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .width(100.dp)
+                    .aspectRatio(1f),
+                color = tealDarker
+            )
+        }
+    }
+    GameNavigation(onlineGameViewModel = onlineGameViewModel, navController = navController)
+}
+
+@Composable
+fun GameNavigation(onlineGameViewModel: OnlineGameViewModel, navController: NavController){
+    println("recomposing navigation of game")
+    when(onlineGameViewModel.navDestination.value){
+        "game" -> LaunchedEffect(Unit){
+            navController.navigate("game")
+        }
+    }
+}
+
+@Composable
+fun Navigation(
+    viewModel: GameViewModel,
+    onlineGameViewModel: OnlineGameViewModel,
+    signOutViewModel: SignOutViewModel
+) {
     val navController = rememberNavController()
 
     NavHost(navController = navController, startDestination = "home") {
-        composable("home") { Home(navController) }
+        composable("home") { Home(navController, onlineGameViewModel) }
         composable("game") { GameScreen(viewModel, navController) }
+        composable("settings") { Settings(signOutViewModel, navController) }
+        composable("pregameLobby") { PregameLobby(onlineGameViewModel, navController) }
         /*...*/
     }
 }
 
 @Composable
-fun Home(navController: NavController) {
+fun Home(navController: NavController, onlineGameViewModel: OnlineGameViewModel) {
     val gameModes = arrayListOf("Rapid", "Blitz", "Bullet")
+    val timeControls = arrayListOf(600000L, 300000L, 60000L)
     val gameModeImageIDs =
         arrayListOf(R.drawable.ic_rapid, R.drawable.ic_blitz, R.drawable.ic_bullet)
     Column() {
@@ -58,11 +111,19 @@ fun Home(navController: NavController) {
         LazyRow() {
             itemsIndexed(gameModes) { index, mode ->
                 GameSelectionCard(drawableID = gameModeImageIDs[index], title = mode) {
-                    navController.navigate("game")
+                    onlineGameViewModel.joinGame(timeControls[index])
+                    navController.navigate("pregameLobby")
                 }
             }
         }
+        Spacer(modifier = Modifier.height(100.dp))
+        Button(onClick = { navController.navigate("settings") }) {
+            Text("Settings")
+        }
+
     }
+    println("Recomposing Home Screen")
+
 //    Column(
 //        Modifier
 //            .fillMaxWidth()

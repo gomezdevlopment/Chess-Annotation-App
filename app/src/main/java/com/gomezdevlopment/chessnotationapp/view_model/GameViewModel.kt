@@ -37,6 +37,12 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     val openResignDialog =  mutableStateOf(false)
     val openDrawOfferDialog =  mutableStateOf(false)
 
+    fun createNewGame(time: Long, playerColor: String){
+        gameRepository.resetGame()
+        gameRepository.initialTime.value = time
+        gameRepository.playerColor.value = playerColor
+    }
+
     fun previousNotation() {
         if (selectedNotationIndex.value > 0) {
             selectedNotationIndex.value -= 1
@@ -250,7 +256,7 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     private var countDownTimer: CountDownTimer? = null
     var whiteTimer = gameRepository.whiteTimer
     var blackTimer = gameRepository.blackTimer
-    private val initialTime = gameRepository.initialTime
+    private val initialTime by gameRepository.initialTime
 
     private var _whiteTime = MutableStateFlow(formatTime(whiteTimer.value))
     val whiteTime: StateFlow<String> = _whiteTime
