@@ -43,9 +43,19 @@ fun Settings(signOutViewModel: SignOutViewModel, navController: NavController) {
 }
 
 @Composable
-fun PregameLobby(gameViewModel: GameViewModel, matchmakingViewModel: MatchmakingViewModel, navController: NavController) {
+fun PregameLobby(
+    gameViewModel: GameViewModel,
+    matchmakingViewModel: MatchmakingViewModel,
+    navController: NavController
+) {
     Column(verticalArrangement = Arrangement.Center) {
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Text("Searching for Match...")
             CircularProgressIndicator(
                 modifier = Modifier
@@ -55,7 +65,11 @@ fun PregameLobby(gameViewModel: GameViewModel, matchmakingViewModel: Matchmaking
             )
         }
     }
-    GameNavigation(gameViewModel = gameViewModel, matchmakingViewModel = matchmakingViewModel, navController = navController)
+    GameNavigation(
+        gameViewModel = gameViewModel,
+        matchmakingViewModel = matchmakingViewModel,
+        navController = navController
+    )
 }
 
 @Composable
@@ -85,7 +99,13 @@ fun Navigation(
         composable("home") { Home(navController, matchmakingViewModel) }
         composable("game") { GameScreen(gameViewModel, navController) }
         composable("settings") { Settings(signOutViewModel, navController) }
-        composable("pregameLobby") { PregameLobby(gameViewModel, matchmakingViewModel, navController) }
+        composable("pregameLobby") {
+            PregameLobby(
+                gameViewModel,
+                matchmakingViewModel,
+                navController
+            )
+        }
         /*...*/
     }
 }
@@ -202,10 +222,7 @@ fun GameSelectionCard(drawableID: Int, title: String, onClick: () -> Unit) {
         Modifier
             .width(200.dp)
             .wrapContentHeight()
-            .padding(10.dp)
-            .clickable {
-                //navController.navigate("game")
-            },
+            .padding(10.dp),
         backgroundColor = cardWhite,
         shape = RoundedCornerShape(10.dp),
         elevation = 5.dp,

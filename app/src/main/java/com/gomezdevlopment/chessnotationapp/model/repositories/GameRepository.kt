@@ -777,14 +777,12 @@ class GameRepository() : ViewModel() {
         when (playerTurn.value) {
             "white" -> {
                 Clock().pauseTimer(
-                    blackTimeIsPlaying,
                     blackTime,
                     blackProgress,
                     blackTimer,
                     countDownTimer.value
                 )
                 Clock().startTimer(
-                    whiteTimeIsPlaying,
                     whiteTime,
                     whiteProgress,
                     whiteTimer,
@@ -795,14 +793,12 @@ class GameRepository() : ViewModel() {
             }
             "black" -> {
                 Clock().pauseTimer(
-                    whiteTimeIsPlaying,
                     whiteTime,
                     whiteProgress,
                     whiteTimer,
                     countDownTimer.value
                 )
                 Clock().startTimer(
-                    blackTimeIsPlaying,
                     blackTime,
                     blackProgress,
                     blackTimer,
@@ -814,8 +810,8 @@ class GameRepository() : ViewModel() {
         }
 
         if (endOfGame.value) {
-            Clock().pauseTimer(whiteTimeIsPlaying, whiteTime, whiteProgress, whiteTimer, countDownTimer.value)
-            Clock().pauseTimer(blackTimeIsPlaying, blackTime, blackProgress, blackTimer, countDownTimer.value)
+            Clock().pauseTimer(whiteTime, whiteProgress, whiteTimer, countDownTimer.value)
+            Clock().pauseTimer(blackTime, blackProgress, blackTimer, countDownTimer.value)
         }
     }
 

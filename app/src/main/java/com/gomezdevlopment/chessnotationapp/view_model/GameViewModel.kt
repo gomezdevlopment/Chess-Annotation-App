@@ -21,7 +21,7 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     private var hashMap: MutableMap<Square, ChessPiece> = gameRepository.occupiedSquares
     private var previousSquare: MutableState<Square> = gameRepository.previousSquare
     private var selectedPiece: MutableState<ChessPiece> =
-        mutableStateOf(ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(7, 0), 5))
+        mutableStateOf(ChessPiece("", "", R.drawable.ic_br_alpha, Square(10, 10), 0))
     private var pieceClicked: MutableState<Boolean> = mutableStateOf(false)
     private var promotionDialogShowing: MutableState<Boolean> = mutableStateOf(false)
 
@@ -220,28 +220,9 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
 
     var whiteTimer = gameRepository.whiteTimer
     var blackTimer = gameRepository.blackTimer
-    private val initialTime by gameRepository.initialTime
     val whiteTime: StateFlow<String> = gameRepository.whiteTime
     val whiteProgress: StateFlow<Float> = gameRepository.whiteProgress
-    val whiteTimeIsPlaying: StateFlow<Boolean> = gameRepository.whiteTimeIsPlaying
     val blackTime: StateFlow<String> = gameRepository.blackTime
     val blackProgress: StateFlow<Float> = gameRepository.blackProgress
-    val blackTimeIsPlaying: StateFlow<Boolean> = gameRepository.blackTimeIsPlaying
 
-    fun handleCountDownTimer() {
-        Clock().handleCountDownTimer(
-            whiteTimeIsPlaying,
-            gameRepository.whiteTimeIsPlaying,
-            gameRepository.whiteTime,
-            gameRepository.whiteProgress,
-            whiteTimer,
-            blackTimeIsPlaying,
-            gameRepository.blackTimeIsPlaying,
-            gameRepository.blackTime,
-            gameRepository.blackProgress,
-            blackTimer,
-            initialTime,
-            gameRepository
-        )
-    }
 }
