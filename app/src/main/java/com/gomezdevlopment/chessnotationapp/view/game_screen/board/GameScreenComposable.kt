@@ -21,6 +21,7 @@ import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.GameEvent
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleCapture
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleMove
@@ -42,7 +43,10 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
         }
         Column(verticalArrangement = Arrangement.Center) {
             BoxWithConstraints(Modifier.fillMaxWidth()) {
-                BlackClock(viewModel = viewModel, size = maxWidth/6)
+                when (userColor) {
+                    "white" -> BlackClock(viewModel = viewModel, size = maxWidth / 6, Arrangement.Start)
+                    "black" -> WhiteClock(viewModel = viewModel, size = maxWidth / 6, Arrangement.Start)
+                }
             }
 
             BlackCaptures(viewModel)
@@ -53,14 +57,17 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                         .aspectRatio(1f),
                 ) {
                     ChessBoard(chessBoardVector = chessBoardVector)
-                    Pieces(viewModel = viewModel, height = maxWidth/8)
-                    Coordinates(size = maxWidth/8)
-                    ChessUILogic(height = maxWidth/8, viewModel = viewModel)
+                    Pieces(viewModel = viewModel, height = maxWidth / 8)
+                    Coordinates(size = maxWidth / 8)
+                    ChessUILogic(height = maxWidth / 8, viewModel = viewModel)
                 }
             }
             WhiteCaptures(viewModel)
             BoxWithConstraints(Modifier.fillMaxWidth()) {
-                WhiteClock(viewModel = viewModel, size = maxWidth/6)
+                when (userColor) {
+                    "white" -> WhiteClock(viewModel = viewModel, size = maxWidth / 6, Arrangement.End)
+                    "black" -> BlackClock(viewModel = viewModel, size = maxWidth / 6, Arrangement.End)
+                }
             }
         }
         Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.weight(1f)) {
@@ -70,33 +77,34 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
 }
 
 @Composable
-fun BlackClock(viewModel: GameViewModel, size: Dp) {
-    Row(modifier = Modifier.padding(10.dp)) {
+fun BlackClock(viewModel: GameViewModel, size: Dp, arrangement: Arrangement.Horizontal) {
+
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .padding(10.dp),
+        horizontalArrangement = arrangement) {
         CountDownView(
-            viewModel,
             size,
             viewModel.blackTimer.value,
             viewModel.blackTime,
-            viewModel.blackProgress,
-            viewModel.blackTimeIsPlaying
+            viewModel.blackProgress
         )
     }
 }
 
 @Composable
-fun WhiteClock(viewModel: GameViewModel, size: Dp) {
+fun WhiteClock(viewModel: GameViewModel, size: Dp, arrangement: Arrangement.Horizontal) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp), horizontalArrangement = Arrangement.End
+            .padding(10.dp),
+        horizontalArrangement = arrangement
     ) {
         CountDownView(
-            viewModel,
             size,
             viewModel.whiteTimer.value,
             viewModel.whiteTime,
-            viewModel.whiteProgress,
-            viewModel.whiteTimeIsPlaying
+            viewModel.whiteProgress
         )
     }
 }
@@ -232,7 +240,13 @@ fun DrawOfferAlertDialog(viewModel: GameViewModel) {
     if (viewModel.openDrawOfferDialog.value) {
         AlertDialog(
             onDismissRequest = { viewModel.openDrawOfferDialog.value = false },
-            title = { Text(text = "Offer Draw?", color = tealDarker, fontWeight = FontWeight.Bold) },
+            title = {
+                Text(
+                    text = "Offer Draw?",
+                    color = tealDarker,
+                    fontWeight = FontWeight.Bold
+                )
+            },
             //text = { Text("Hello! This is our Alert Dialog..", color = textWhite) },
             confirmButton = {
                 TextButton(

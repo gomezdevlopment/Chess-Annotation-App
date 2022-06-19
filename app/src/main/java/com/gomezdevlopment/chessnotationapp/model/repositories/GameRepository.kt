@@ -6,10 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
-import com.gomezdevlopment.chessnotationapp.model.game_logic.EndOfGameConditions
-import com.gomezdevlopment.chessnotationapp.model.game_logic.FEN
-import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
-import com.gomezdevlopment.chessnotationapp.model.game_logic.Notation
+import com.gomezdevlopment.chessnotationapp.model.game_logic.*
 import com.gomezdevlopment.chessnotationapp.model.pieces.*
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.gameDocumentReference
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
@@ -47,9 +44,14 @@ class GameRepository() : ViewModel() {
     var initialTime = mutableStateOf(300000L)
     var whiteTimer = mutableStateOf(initialTime.value)
     var blackTimer = mutableStateOf(initialTime.value)
-
     val blackProgress = MutableStateFlow(1.00F)
     val whiteProgress = MutableStateFlow(1.00F)
+    var whiteTime = MutableStateFlow(formatTime(whiteTimer.value))
+    val whiteTimeIsPlaying = MutableStateFlow(false)
+    val blackTime = MutableStateFlow(formatTime(blackTimer.value))
+    val blackTimeIsPlaying = MutableStateFlow(false)
+    var countDownTimer: MutableState<CountDownTimer?> = mutableStateOf(null)
+
 
     val endOfGameResult = mutableStateOf("")
     val endOfGameMessage = mutableStateOf("")
@@ -131,6 +133,11 @@ class GameRepository() : ViewModel() {
         blackTimer.value = time
         blackProgress.value = 1.00F
         whiteProgress.value = 1.00F
+        whiteTime.value = formatTime(time)
+        whiteTimeIsPlaying.value = false
+        blackTime.value = formatTime(time)
+        blackTimeIsPlaying.value = false
+        initialTime.value = time
         initialPosition()
 
         gameDocumentReference.addSnapshotListener { value, error ->
@@ -663,44 +670,7 @@ class GameRepository() : ViewModel() {
         annotations.add(currentNotation.toString())
         currentNotation.clear()
         selectedNotationIndex.value += 1
-
-//        when (playerTurn.value) {
-//            "white" -> {
-//                pauseTimer(
-//                    _blackTimeIsPlaying,
-//                    _blackTime,
-//                    blackProgress,
-//                    blackTimer
-//                )
-//                startTimer(
-//                    _whiteTimeIsPlaying,
-//                    _whiteTime,
-//                    whiteProgress,
-//                    whiteTimer,
-//                    initialTime.value
-//                )
-//            }
-//            "black" -> {
-//                pauseTimer(
-//                    _whiteTimeIsPlaying,
-//                    _whiteTime,
-//                    whiteProgress,
-//                    whiteTimer
-//                )
-//                startTimer(
-//                    _blackTimeIsPlaying,
-//                    _blackTime,
-//                    blackProgress,
-//                    blackTimer,
-//                    initialTime.value
-//                )
-//            }
-//        }
-//
-//        if (endOfGame.value) {
-//            pauseTimer(_whiteTimeIsPlaying, _whiteTime, whiteProgress, whiteTimer)
-//            pauseTimer(_blackTimeIsPlaying, _blackTime, blackProgress, blackTimer)
-//        }
+        startStopClocks()
     }
 
     private fun checkIfGameOver() {
@@ -803,96 +773,51 @@ class GameRepository() : ViewModel() {
         ).moves()
     }
 
+    private fun startStopClocks(){
+        when (playerTurn.value) {
+            "white" -> {
+                Clock().pauseTimer(
+                    blackTimeIsPlaying,
+                    blackTime,
+                    blackProgress,
+                    blackTimer,
+                    countDownTimer.value
+                )
+                Clock().startTimer(
+                    whiteTimeIsPlaying,
+                    whiteTime,
+                    whiteProgress,
+                    whiteTimer,
+                    initialTime.value,
+                    this,
+                    countDownTimer
+                )
+            }
+            "black" -> {
+                Clock().pauseTimer(
+                    whiteTimeIsPlaying,
+                    whiteTime,
+                    whiteProgress,
+                    whiteTimer,
+                    countDownTimer.value
+                )
+                Clock().startTimer(
+                    blackTimeIsPlaying,
+                    blackTime,
+                    blackProgress,
+                    blackTimer,
+                    initialTime.value,
+                    this,
+                    countDownTimer
+                )
+            }
+        }
 
-    //Timer
-//    private var countDownTimer: CountDownTimer? = null
-//    private var _whiteTime = MutableStateFlow(formatTime(whiteTimer.value))
-//    private val _whiteTimeIsPlaying = MutableStateFlow(false)
-//    val whiteTimeIsPlaying: StateFlow<Boolean> = _whiteTimeIsPlaying
-//    private val _blackTime = MutableStateFlow(formatTime(blackTimer.value))
-//    private val _blackTimeIsPlaying = MutableStateFlow(false)
-//    val blackTimeIsPlaying: StateFlow<Boolean> = _blackTimeIsPlaying
-//
-//    fun handleCountDownTimer() {
-//        if (whiteTimeIsPlaying.value) {
-//            pauseTimer(_whiteTimeIsPlaying, _whiteTime, whiteProgress, whiteTimer)
-//            startTimer(
-//                _blackTimeIsPlaying,
-//                _blackTime,
-//                blackProgress,
-//                blackTimer,
-//                initialTime.value
-//            )
-//        } else if (blackTimeIsPlaying.value) {
-//            pauseTimer(_blackTimeIsPlaying, _blackTime, blackProgress, blackTimer)
-//            startTimer(
-//                _whiteTimeIsPlaying,
-//                _whiteTime,
-//                whiteProgress,
-//                whiteTimer,
-//                initialTime.value
-//            )
-//        }
-//    }
-//
-//    private fun pauseTimer(
-//        _isPlaying: MutableStateFlow<Boolean>,
-//        _time: MutableStateFlow<String>,
-//        _progress: MutableStateFlow<Float>,
-//        time: MutableState<Long>
-//    ) {
-//        countDownTimer?.cancel()
-//        handleTimerValues(
-//            false,
-//            formatTime(time.value),
-//            _progress.value,
-//            _isPlaying,
-//            _time,
-//            _progress
-//        )
-//    }
-//
-//    private fun startTimer(
-//        _isPlaying: MutableStateFlow<Boolean>,
-//        _time: MutableStateFlow<String>,
-//        _progress: MutableStateFlow<Float>,
-//        time: MutableState<Long>,
-//        initialTime: Long
-//    ) {
-//        _isPlaying.value = true
-//        countDownTimer = object : CountDownTimer(time.value, 1) {
-//
-//            override fun onTick(millisRemaining: Long) {
-//                time.value = millisRemaining
-//                _progress.value = millisRemaining / initialTime.toFloat()
-//                handleTimerValues(
-//                    true,
-//                    formatTime(millisRemaining),
-//                    _progress.value,
-//                    _isPlaying,
-//                    _time,
-//                    _progress
-//                )
-//            }
-//
-//            override fun onFinish() {
-//                pauseTimer(_isPlaying, _time, _progress, time)
-//                timeout()
-//            }
-//        }.start()
-//    }
-//
-//    private fun handleTimerValues(
-//        isPlaying: Boolean,
-//        text: String,
-//        progress: Float,
-//        _isPlaying: MutableStateFlow<Boolean>,
-//        _time: MutableStateFlow<String>,
-//        _progress: MutableStateFlow<Float>
-//    ) {
-//        _isPlaying.value = isPlaying
-//        _time.value = text
-//        _progress.value = progress
-//    }
+        if (endOfGame.value) {
+            Clock().pauseTimer(whiteTimeIsPlaying, whiteTime, whiteProgress, whiteTimer, countDownTimer.value)
+            Clock().pauseTimer(blackTimeIsPlaying, blackTime, blackProgress, blackTimer, countDownTimer.value)
+        }
+    }
+
 
 }

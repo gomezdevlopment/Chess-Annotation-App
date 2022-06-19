@@ -20,11 +20,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.StateFlow
 
-@Composable
-fun Clock(viewModel: GameViewModel) {
-
-}
-
 fun formatTime(time: Long): String {
     val timeFormat = "%02d:%02d:%02d"
     return String.format(
@@ -76,26 +71,20 @@ fun CountDownIndicator(
 
 @Composable
 fun CountDownView(
-    viewModel: GameViewModel,
     size: Dp,
     playerStartingTime: Long,
     playerTime: StateFlow<String>,
     playerProgress: StateFlow<Float>,
-    playerTimeIsPlaying: StateFlow<Boolean>
 ) {
 
     val time by playerTime.collectAsState(formatTime(playerStartingTime))
     val progress by playerProgress.collectAsState(1.00F)
-    val isPlaying by playerTimeIsPlaying.collectAsState(false)
     
     CountDownViewWithData(
         size = size,
         time = time,
-        progress = progress,
-        isPlaying = isPlaying
-    ) {
-        viewModel.handleCountDownTimer()
-    }
+        progress = progress
+    )
 
 }
 
@@ -103,9 +92,7 @@ fun CountDownView(
 fun CountDownViewWithData(
     size: Dp,
     time: String,
-    progress: Float,
-    isPlaying: Boolean,
-    optionSelected: () -> Unit,
+    progress: Float
 ) {
     CountDownIndicator(
         Modifier.padding(top = 5.dp),
