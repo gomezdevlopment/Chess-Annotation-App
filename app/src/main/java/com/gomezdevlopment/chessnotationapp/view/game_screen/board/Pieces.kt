@@ -33,7 +33,7 @@ fun Piece(
         imageVector = imageVector,
         contentDescription = "Chess Piece",
         modifier =
-        (if (piece.color == viewModel.getPlayerTurn() && piece.color == userColor) Modifier.clickable(
+        (if (piece.color == viewModel.getPlayerTurn() /*&& piece.color == userColor*/) Modifier.clickable(
             viewModel,
             piece,
             height, offset

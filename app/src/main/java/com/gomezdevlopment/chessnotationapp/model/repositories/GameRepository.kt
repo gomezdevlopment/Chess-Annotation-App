@@ -3,16 +3,24 @@ package com.gomezdevlopment.chessnotationapp.model.repositories
 import android.os.CountDownTimer
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
+import com.gomezdevlopment.chessnotationapp.model.data_classes.OnlineGame
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.*
 import com.gomezdevlopment.chessnotationapp.model.pieces.*
+import com.gomezdevlopment.chessnotationapp.model.utils.FirestoreGameInteraction
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.gameDocumentReference
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.formatTime
+import com.google.firebase.firestore.ListenerRegistration
+import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 
 class GameRepository() : ViewModel() {
@@ -87,21 +95,24 @@ class GameRepository() : ViewModel() {
     var selectedNotationIndex: MutableState<Int> = mutableStateOf(0)
     //var playerColor: MutableState<String> = mutableStateOf("white")
 
-    companion object {
-        @Volatile
-        private var INSTANCE: GameRepository? = null
+    val openDrawOfferedDialog = mutableStateOf(false)
 
-        fun getGameRepository(): GameRepository {
-            val tempInstance = INSTANCE
-            if (tempInstance != null) {
-                return tempInstance
-            }
-            synchronized(this) {
-                val instance = GameRepository()
-                INSTANCE = instance
-                return instance
-            }
-        }
+
+    companion object {
+//        @Volatile
+//        private var INSTANCE: GameRepository? = null
+//
+//        fun getGameRepository(): GameRepository {
+//            val tempInstance = INSTANCE
+//            if (tempInstance != null) {
+//                return tempInstance
+//            }
+//            synchronized(this) {
+//                val instance = GameRepository()
+//                INSTANCE = instance
+//                return instance
+//            }
+//        }
     }
 
     init {
@@ -139,23 +150,69 @@ class GameRepository() : ViewModel() {
         blackTimeIsPlaying.value = false
         initialTime.value = time
         initialPosition()
+        snapshotListener()
+    }
 
-        gameDocumentReference.addSnapshotListener { value, error ->
-            value?.let {
-                val previousMoveString = it.get("previousMove").toString()
-                if(previousMoveString != ""){
-                    println(previousMoveString)
+    private fun snapshotListener() {
+        if (gameDocumentReference != null) {
+            gameDocumentReference?.addSnapshotListener { value, error ->
+                val onlineGame = value?.toObject(OnlineGame::class.java)
+                if(onlineGame?.resignation != ""){
+                    resignation(onlineGame?.resignation)
+                }
+                val drawOffer = onlineGame?.drawOffer
+                if(drawOffer != null){
+                    if(drawOffer == "white" || drawOffer == "black"){
+                        if(drawOffer != userColor){
+                            openDrawOfferedDialog.value = true
+                        }
+                    }
+                    if(drawOffer == "accept"){
+                        drawAccepted()
+                    }
+                }
+                //Move
+                val previousMoveString = onlineGame?.previousMove.toString()
+                if (previousMoveString != "") {
                     val piece = getPieceFromDocument(previousMoveString)
                     val square: Square = getSquareFromDocument(previousMoveString)
-                    println(piece)
-                    println(square)
                     if (piece != null && piece.color != userColor) {
-                        changePiecePosition(square, piece, 0)
+                        if (piece.piece == "pawn" && (square.rank == 0 || square.rank == 7)) {
+                            movePiece(square, piece, 0)
+                            getPromotionSelectionFromDocument(previousMoveString, square)
+                        } else {
+                            changePiecePosition(square, piece, 0)
+                        }
                     }
                 }
             }
         }
     }
+
+    private fun setEndOfGameValues(result: String, message: String){
+        endOfGameResult.value = result
+        endOfGameMessage.value = message
+        endOfGame.value = true
+        endOfGameCardVisible.value = true
+    }
+
+    private fun drawAccepted(){
+        setEndOfGameValues("Draw", "by Agreement")
+    }
+
+    private fun resignation(playerColor: String?){
+        if(playerColor != null){
+            when(playerColor) {
+                "white" -> {
+                    setEndOfGameValues("Black Wins!", "by Resignation")
+                }
+                "black" -> {
+                    setEndOfGameValues("White Wins!", "by Resignation")
+                }
+            }
+        }
+    }
+
 
     private fun getPieceFromDocument(previousMoveString: String): ChessPiece? {
         val pieceRank = previousMoveString[0].digitToInt()
@@ -163,7 +220,7 @@ class GameRepository() : ViewModel() {
         val square = Square(pieceRank, pieceFile)
         println(square)
         println(occupiedSquares)
-        if(occupiedSquares.containsKey(square)) {
+        if (occupiedSquares.containsKey(square)) {
             println("contains")
             return occupiedSquares[square]
         }
@@ -174,6 +231,38 @@ class GameRepository() : ViewModel() {
         val squareRank = previousMoveString[2].digitToInt()
         val squareFile = previousMoveString[3].digitToInt()
         return Square(squareRank, squareFile)
+    }
+
+    private fun getPromotionSelectionFromDocument(
+        previousMoveString: String,
+        newSquare: Square
+    ) {
+        var piece: ChessPiece? = null
+        when (playerTurn.value) {
+            "black" -> {
+                if (previousMoveString.contains("queen"))
+                    piece = ChessPiece("black", "queen", R.drawable.ic_bq_alpha, newSquare, 9)
+                if (previousMoveString.contains("rook"))
+                    piece = ChessPiece("black", "rook", R.drawable.ic_br_alpha, newSquare, 5)
+                if (previousMoveString.contains("bishop"))
+                    piece = ChessPiece("black", "bishop", R.drawable.ic_bb_alpha, newSquare, 3)
+                if (previousMoveString.contains("knight"))
+                    piece = ChessPiece("black", "knight", R.drawable.ic_bn_alpha, newSquare, 3)
+            }
+            "white" -> {
+                if (previousMoveString.contains("queen"))
+                    piece = ChessPiece("white", "queen", R.drawable.ic_wq_alpha, newSquare, 9)
+                if (previousMoveString.contains("rook"))
+                    piece = ChessPiece("white", "rook", R.drawable.ic_wr_alpha, newSquare, 5)
+                if (previousMoveString.contains("bishop"))
+                    piece = ChessPiece("white", "bishop", R.drawable.ic_wb_alpha, newSquare, 3)
+                if (previousMoveString.contains("knight"))
+                    piece = ChessPiece("white", "knight", R.drawable.ic_wn_alpha, newSquare, 3)
+            }
+        }
+        if (piece != null) {
+            promotion(newSquare, piece, 0)
+        }
     }
 
     private fun getGameStateAsFEN(): String {
@@ -451,6 +540,10 @@ class GameRepository() : ViewModel() {
     }
 
     fun promotion(newSquare: Square, promotionSelection: ChessPiece, depth: Int) {
+        val string = convertPromotionToString(previousSquare.value, promotionSelection.square)
+        viewModelScope.launch {
+            FirestoreGameInteraction().writePromotion(playerTurn.value, string, promotionSelection)
+        }
         val notation = Notation(currentNotation, newSquare)
         notation.promotion(promotionSelection)
         if (depth == 1) {
@@ -491,17 +584,10 @@ class GameRepository() : ViewModel() {
     private fun changePieceSquare(piece: ChessPiece, newSquare: Square): ChessPiece {
         piece.square = newSquare
         return piece
-//        val updatedPiece = piece.copy(square = newSquare)
-//        piecesOnBoard[piecesOnBoard.indexOf(piece)] = updatedPiece
-//        return updatedPiece
     }
 
     private fun removePiece(square: Square) {
         println(piecesOnBoard.remove(occupiedSquares.remove(square)))
-    }
-
-    fun playerMove() {
-
     }
 
     fun checkIfCastled(
@@ -551,16 +637,14 @@ class GameRepository() : ViewModel() {
         return "${piece.square.rank}${piece.square.file}${square.rank}${square.file}"
     }
 
+    private fun convertPromotionToString(previousSquare: Square, square: Square): String {
+        return "${previousSquare.rank}${previousSquare.file}${square.rank}${square.file}"
+    }
+
     fun changePiecePosition(newSquare: Square, piece: ChessPiece, depth: Int) {
-        if(playerTurn.value == userColor){
-            val string = convertMoveToStringOfRanksAndFiles(piece, newSquare)
-            gameDocumentReference.update("previousMove", string)
-                .addOnSuccessListener {
-                    println("Success")
-                }
-                .addOnFailureListener { e ->
-                    println(e)
-                }
+        val string = convertMoveToStringOfRanksAndFiles(piece, newSquare)
+        viewModelScope.launch {
+            FirestoreGameInteraction().writeMove(playerTurn.value, string)
         }
         val previousPieceSquare = piece.square
         val notation = Notation(currentNotation, newSquare)
@@ -590,7 +674,6 @@ class GameRepository() : ViewModel() {
                 capturedPieces.add(it)
             }
             removePiece(newSquare)
-            //captureSound.value = true
             capture = true
             notation.capture()
         } else if (gameLogic.isEnPassant(
@@ -611,13 +694,11 @@ class GameRepository() : ViewModel() {
             occupiedSquares[currentSquare.value]?.let { capturedPieces.add(it) }
             removePiece(currentSquare.value)
             capture = true
-            //captureSound.value = true
             notation.capture()
         } else {
             if (!castled.value) {
                 notation.square(false)
                 move = true
-                //pieceSound.value = true
             }
         }
 
@@ -647,7 +728,6 @@ class GameRepository() : ViewModel() {
             )
         )
         //setPositionFromFen(getGameStateAsFEN())
-        println(getGameStateAsFEN())
         if (kingInCheck.value) {
             checkSound.value = true
         } else {
@@ -687,38 +767,23 @@ class GameRepository() : ViewModel() {
             if (playerTurn.value == "white") {
                 winner = "Black"
             }
-            endOfGameResult.value = "Checkmate"
-            endOfGameMessage.value = "$winner Wins!"
-            endOfGame.value = true
-            endOfGameCardVisible.value = true
+            setEndOfGameValues("Checkmate", "$winner Wins!")
         }
 
         if (insufficientMaterial.value) {
-            endOfGameResult.value = "Draw"
-            endOfGameMessage.value = "by Insufficient Material"
-            endOfGame.value = true
-            endOfGameCardVisible.value = true
+            setEndOfGameValues("Draw", "by Insufficient Material")
         }
 
         if (stalemate.value) {
-            endOfGameResult.value = "Draw"
-            endOfGameMessage.value = "by Stalemate"
-            endOfGame.value = true
-            endOfGameCardVisible.value = true
+            setEndOfGameValues("Draw", "by Stalemate")
         }
 
         if (threeFoldRepetition.value) {
-            endOfGameResult.value = "Draw"
-            endOfGameMessage.value = "by Threefold Repetition"
-            endOfGame.value = true
-            endOfGameCardVisible.value = true
+            setEndOfGameValues("Draw", "by Threefold Repetition")
         }
 
         if (fiftyMoveRule.value) {
-            endOfGameResult.value = "Draw"
-            endOfGameMessage.value = "by The Fifty Move Rule"
-            endOfGame.value = true
-            endOfGameCardVisible.value = true
+            setEndOfGameValues("Draw", "by The Fifty Move Rule")
         }
     }
 
@@ -773,7 +838,7 @@ class GameRepository() : ViewModel() {
         ).moves()
     }
 
-    private fun startStopClocks(){
+    private fun startStopClocks() {
         when (playerTurn.value) {
             "white" -> {
                 Clock().pauseTimer(

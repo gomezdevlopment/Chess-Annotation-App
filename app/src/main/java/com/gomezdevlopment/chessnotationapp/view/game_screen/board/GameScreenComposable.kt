@@ -37,19 +37,34 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     println("Recomposing")
     ResignAlertDialog(viewModel = viewModel)
     DrawOfferAlertDialog(viewModel = viewModel)
+    DrawOfferedAlertDialog(viewModel = viewModel)
     Column(Modifier.fillMaxHeight()) {
         Row(verticalAlignment = Alignment.Top) {
             AnnotationBar(viewModel)
         }
-        Column(verticalArrangement = Arrangement.Center) {
+        Column(verticalArrangement = Arrangement.Center, modifier = Modifier.weight(1f)) {
             BoxWithConstraints(Modifier.fillMaxWidth()) {
+                val size = maxWidth / 7
                 when (userColor) {
-                    "white" -> BlackClock(viewModel = viewModel, size = maxWidth / 6, Arrangement.Start)
-                    "black" -> WhiteClock(viewModel = viewModel, size = maxWidth / 6, Arrangement.Start)
+                    "white" -> {
+                        Column() {
+                            BlackClock(viewModel = viewModel, size = size, Arrangement.Start)
+                        }
+                        Column() {
+                            BlackCaptures(viewModel)
+                        }
+                    }
+                    "black" -> {
+                        Column() {
+                            WhiteClock(viewModel = viewModel, size = size, Arrangement.Start)
+                        }
+                        Column() {
+                            WhiteCaptures(viewModel)
+                        }
+                    }
                 }
-            }
 
-            BlackCaptures(viewModel)
+            }
             Row(verticalAlignment = CenterVertically) {
                 BoxWithConstraints(
                     modifier = Modifier
@@ -62,15 +77,30 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                     ChessUILogic(height = maxWidth / 8, viewModel = viewModel)
                 }
             }
-            WhiteCaptures(viewModel)
             BoxWithConstraints(Modifier.fillMaxWidth()) {
+                val size = maxWidth / 7
                 when (userColor) {
-                    "white" -> WhiteClock(viewModel = viewModel, size = maxWidth / 6, Arrangement.End)
-                    "black" -> BlackClock(viewModel = viewModel, size = maxWidth / 6, Arrangement.End)
+                    "white" -> {
+                        Column() {
+                            WhiteClock(viewModel = viewModel, size = size, Arrangement.End)
+                        }
+                        Column() {
+                            WhiteCaptures(viewModel)
+                        }
+                    }
+                    "black" -> {
+                        Column() {
+                            BlackClock(viewModel = viewModel, size = size, Arrangement.End)
+                        }
+                        Column() {
+                            BlackCaptures(viewModel)
+                        }
+                    }
                 }
             }
         }
-        Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.weight(1f)) {
+
+        Row(verticalAlignment = Alignment.Bottom) {
             GameBar(viewModel = viewModel, navController = navController)
         }
     }
@@ -79,10 +109,12 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
 @Composable
 fun BlackClock(viewModel: GameViewModel, size: Dp, arrangement: Arrangement.Horizontal) {
 
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .padding(10.dp),
-        horizontalArrangement = arrangement) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(7.dp),
+        horizontalArrangement = arrangement
+    ) {
         CountDownView(
             size,
             viewModel.blackTimer.value,
@@ -97,7 +129,7 @@ fun WhiteClock(viewModel: GameViewModel, size: Dp, arrangement: Arrangement.Hori
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(7.dp),
         horizontalArrangement = arrangement
     ) {
         CountDownView(
@@ -214,6 +246,7 @@ fun ResignAlertDialog(viewModel: GameViewModel) {
             confirmButton = {
                 TextButton(
                     onClick = {
+                        viewModel.resign()
                         viewModel.openResignDialog.value = false
                     }
                 ) {
@@ -251,6 +284,7 @@ fun DrawOfferAlertDialog(viewModel: GameViewModel) {
             confirmButton = {
                 TextButton(
                     onClick = {
+                        viewModel.drawOffer(userColor)
                         viewModel.openDrawOfferDialog.value = false
                     }
                 ) {
@@ -264,6 +298,45 @@ fun DrawOfferAlertDialog(viewModel: GameViewModel) {
                     }
                 ) {
                     Text("Cancel", color = tealDarker)
+                }
+            },
+            backgroundColor = textWhite,
+            contentColor = textWhite
+        )
+    }
+}
+
+@Composable
+fun DrawOfferedAlertDialog(viewModel: GameViewModel) {
+    if (viewModel.openDrawOfferedDialog.value) {
+        AlertDialog(
+            onDismissRequest = { viewModel.openDrawOfferedDialog.value = false },
+            title = {
+                Text(
+                    text = "Accept Draw Offer?",
+                    color = tealDarker,
+                    fontWeight = FontWeight.Bold
+                )
+            },
+            //text = { Text("Hello! This is our Alert Dialog..", color = textWhite) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.drawOffer("accept")
+                        viewModel.openDrawOfferedDialog.value = false
+                    }
+                ) {
+                    Text("Accept", color = tealDarker)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.drawOffer("decline")
+                        viewModel.openDrawOfferedDialog.value = false
+                    }
+                ) {
+                    Text("Decline", color = tealDarker)
                 }
             },
             backgroundColor = textWhite,

@@ -1,5 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen
 
+import android.app.Application
+import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -21,6 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.tealDarker
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.textWhite
 import com.gomezdevlopment.chessnotationapp.R
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.GameScreen
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.cardWhite
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
@@ -94,7 +97,6 @@ fun Navigation(
     signOutViewModel: SignOutViewModel
 ) {
     val navController = rememberNavController()
-
     NavHost(navController = navController, startDestination = "home") {
         composable("home") { Home(navController, matchmakingViewModel) }
         composable("game") { GameScreen(gameViewModel, navController) }
@@ -106,7 +108,6 @@ fun Navigation(
                 navController
             )
         }
-        /*...*/
     }
 }
 
@@ -134,6 +135,7 @@ fun Home(navController: NavController, matchmakingViewModel: MatchmakingViewMode
                 }
             }
         }
+        VSPlayerCard(navController = navController)
         Spacer(modifier = Modifier.height(100.dp))
         Button(onClick = { navController.navigate("settings") }) {
             Text("Settings")
@@ -141,80 +143,83 @@ fun Home(navController: NavController, matchmakingViewModel: MatchmakingViewMode
 
     }
     println("Recomposing Home Screen")
-
-//    Column(
-//        Modifier
-//            .fillMaxWidth()
-//            .fillMaxHeight()
-//    ) {
-//        BoxWithConstraints(
-//            Modifier
-//                .fillMaxWidth()
-//                .fillMaxHeight()
-//                .padding(0.dp, 50.dp),
-//            contentAlignment = Alignment.TopCenter
-//        ) {
-//            Card(
-//                Modifier
-//                    .width(maxWidth * 0.9f)
-//                    .wrapContentHeight()
-//                    .clickable {
-//                        navController.navigate("game")
-//                    },
-//                backgroundColor = tealDarker,
-//                shape = RoundedCornerShape(10.dp),
-//                elevation = 5.dp,
-//            )
-//            {
-//                Column(
-//                    horizontalAlignment = Alignment.CenterHorizontally,
-//                    verticalArrangement = Arrangement.Center
-//                ) {
-//                    Row(
-//                        horizontalArrangement = Arrangement.Center,
-//                        verticalAlignment = Alignment.CenterVertically
-//                    ) {
-//                        Text(
-//                            "Play Now",
-//                            fontWeight = FontWeight.Bold,
-//                            style = MaterialTheme.typography.h4,
-//                            color = textWhite,
-//                            modifier = Modifier.padding(20.dp)
-//                        )
-//                    }
-//                    Row(
-//                        horizontalArrangement = Arrangement.Center,
-//                        verticalAlignment = Alignment.CenterVertically
-//                    ) {
-//                        val userIcon: ImageVector =
-//                            ImageVector.vectorResource(id = R.drawable.ic_user_icon)
-//                        Icon(
-//                            imageVector = userIcon, contentDescription = "Play Game",
-//                            Modifier
-//                                .size(50.dp)
-//                                .padding(10.dp), tint = textWhite
-//                        )
-//                        Text(
-//                            "vs",
-//                            fontWeight = FontWeight.Bold,
-//                            style = MaterialTheme.typography.h4,
-//                            color = textWhite,
-//                            modifier = Modifier.padding(20.dp)
-//                        )
-//                        Icon(
-//                            imageVector = userIcon, contentDescription = "Play Game",
-//                            Modifier
-//                                .size(50.dp)
-//                                .padding(10.dp), tint = textWhite
-//                        )
-//                    }
-//                }
-//
-//            }
-//        }
-//    }
 }
 
+@Composable 
+fun VSPlayerCard(navController: NavController){
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+    ) {
+        BoxWithConstraints(
+            Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()
+                .padding(0.dp, 50.dp),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Card(
+                Modifier
+                    .width(maxWidth * 0.9f)
+                    .wrapContentHeight()
+                    .clickable {
+                        userColor = "white"
+                        navController.navigate("game")
+                    },
+                backgroundColor = tealDarker,
+                shape = RoundedCornerShape(10.dp),
+                elevation = 5.dp,
+            )
+            {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.Center
+                ) {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            "Play Now",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.h4,
+                            color = textWhite,
+                            modifier = Modifier.padding(20.dp)
+                        )
+                    }
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val userIcon: ImageVector =
+                            ImageVector.vectorResource(id = R.drawable.ic_user_icon)
+                        Icon(
+                            imageVector = userIcon, contentDescription = "Play Game",
+                            Modifier
+                                .size(50.dp)
+                                .padding(10.dp), tint = textWhite
+                        )
+                        Text(
+                            "vs",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.h4,
+                            color = textWhite,
+                            modifier = Modifier.padding(20.dp)
+                        )
+                        Icon(
+                            imageVector = userIcon, contentDescription = "Play Game",
+                            Modifier
+                                .size(50.dp)
+                                .padding(10.dp), tint = textWhite
+                        )
+                    }
+                }
+
+            }
+        }
+    }
+}
 //@Preview
 @Composable
 fun GameSelectionCard(drawableID: Int, title: String, onClick: () -> Unit) {

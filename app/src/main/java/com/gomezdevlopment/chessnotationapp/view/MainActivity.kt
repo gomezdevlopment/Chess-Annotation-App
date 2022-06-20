@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
     companion object{
         lateinit var user: User
         lateinit var userColor: String
-        lateinit var gameDocumentReference: DocumentReference
+        var gameDocumentReference: DocumentReference? = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        gameDocumentReference.delete().addOnFailureListener {
+        gameDocumentReference?.delete()?.addOnFailureListener {
             println("fail to delete")
         }
         super.onDestroy()

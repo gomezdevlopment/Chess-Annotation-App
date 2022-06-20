@@ -5,5 +5,8 @@ data class OnlineGame(
     val whitePlayer: String = "",
     val blackPlayer: String = "",
     val timeControl: Long = 300000L,
-    val previousMove: String = ""
+    val previousMove: String = "",
+    val resignation: String = "",
+    val drawOffer: String = "",
+    val rematchOffer: String = ""
 )

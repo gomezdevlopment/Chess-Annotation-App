@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.lifecycle.ViewModelProvider
+import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.SoundFX
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.HomeViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.MatchmakingViewModel
@@ -32,10 +33,7 @@ class HomeFragment : Fragment() {
             val signOutViewModel = SignOutViewModel(requireActivity().application)
             setContent {
                 Navigation(viewModel, matchmakingViewModel, signOutViewModel)
-                //val contextThemeWrapper: Context = ContextThemeWrapper(requireContext(), R.style.Theme_ChessSplash)
-                //inflater.cloneInContext(contextThemeWrapper)
-                //GameScreen(viewModel)
-                //SoundFX(viewModel = viewModel)
+                SoundFX(viewModel = viewModel)
             }
         }
     }

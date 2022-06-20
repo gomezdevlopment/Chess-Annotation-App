@@ -93,7 +93,10 @@ class MatchmakingRepository : ViewModel() {
             "whitePlayer" to whitePlayer,
             "blackPlayer" to blackPlayer,
             "timeControl" to timeControl,
-            "previousMove" to ""
+            "previousMove" to "",
+            "resignation" to "",
+            "drawOffer" to "",
+            "rematchOffer" to ""
         )
         db.collection(gamePoolCollection)
             .add(newGame)

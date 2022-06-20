@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.CountDownTimer
 import androidx.compose.runtime.*
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.*
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
@@ -11,13 +12,15 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
 import com.gomezdevlopment.chessnotationapp.model.game_logic.Clock
 import com.gomezdevlopment.chessnotationapp.model.repositories.GameRepository
+import com.gomezdevlopment.chessnotationapp.model.utils.FirestoreGameInteraction
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.formatTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 
 class GameViewModel(private val app: Application) : AndroidViewModel(app) {
-    private var gameRepository: GameRepository = GameRepository.getGameRepository()
+    private var gameRepository: GameRepository = GameRepository() //GameRepository.getGameRepository()
     private var hashMap: MutableMap<Square, ChessPiece> = gameRepository.occupiedSquares
     private var previousSquare: MutableState<Square> = gameRepository.previousSquare
     private var selectedPiece: MutableState<ChessPiece> =
@@ -38,6 +41,7 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
 
     val openResignDialog = mutableStateOf(false)
     val openDrawOfferDialog = mutableStateOf(false)
+    val openDrawOfferedDialog = gameRepository.openDrawOfferedDialog
 
     fun createNewGame(time: Long) {
         gameRepository.resetGame(time)
@@ -72,8 +76,7 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun resetGame() {
-        gameRepository.resetGame(300000L)
-
+        //gameRepository.resetGame(300000L)
 //        handleTimerValues(
 //            false,
 //            formatTime(initialTime),
@@ -111,9 +114,10 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
                 setPieceClickedState(false)
                 selectedPiece.value = piece
                 if (getPlayerTurn() == getSelectedPiece().value.color) {
-                    if (getPlayerTurn() == userColor) {
-                        setPieceClickedState(true)
-                    }
+                    setPieceClickedState(true)
+//                    if (getPlayerTurn() == userColor) {
+//                        setPieceClickedState(true)
+//                    }
                 }
             }
         }
@@ -133,6 +137,26 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
             GameEvent.OnPieceClicked -> {
                 return gameRepository.mapOfPiecesAndTheirLegalMoves[piece]
             }
+        }
+    }
+
+    fun drawOffer(value: String){
+        viewModelScope.launch {
+            FirestoreGameInteraction().writeDrawOffer(getPlayerTurn(), value)
+        }
+    }
+
+    fun rematchOffer(value: String){
+        viewModelScope.launch {
+            FirestoreGameInteraction().writeRematchOffer(getPlayerTurn(), value)
+        }
+    }
+
+
+
+    fun resign(){
+        viewModelScope.launch {
+            FirestoreGameInteraction().writeResignation(getPlayerTurn(), userColor)
         }
     }
 
