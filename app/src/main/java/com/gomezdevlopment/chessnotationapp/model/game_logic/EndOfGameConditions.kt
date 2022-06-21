@@ -7,10 +7,6 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 
 class EndOfGameConditions(private val gameEndSound: MutableState<Boolean>) {
 
-    fun checkResignation() {
-
-    }
-
     fun checkCheckmate(
         allLegalMoves: MutableList<Square>,
         kingInCheck: Boolean,
@@ -83,45 +79,6 @@ class EndOfGameConditions(private val gameEndSound: MutableState<Boolean>) {
             insufficientMaterial.value = true
             gameEndSound.value = true
         }
-//        if (piecesOnBoard.size == 2) {
-//            insufficientMaterial.value = (piecesOnBoard.size == 2)
-//        } else {
-//            var blackBishopsAndKnights = 0
-//            var whiteBishopsAndKnights = 0
-//            var onlyKnightsOrBishops = true
-//            if (piecesOnBoard.size < 5) {
-//                for (piece in piecesOnBoard) {
-//                    when (piece.color) {
-//                        "white" -> {
-//                            whiteBishopsAndKnights += when (piece.piece) {
-//                                "bishop" -> 1
-//                                "knight" -> 1
-//                                "king" -> 0
-//                                else -> {
-//                                    onlyKnightsOrBishops = false
-//                                    break
-//                                }
-//                            }
-//                        }
-//                        "black" -> {
-//                            blackBishopsAndKnights += when (piece.piece) {
-//                                "bishop" -> 1
-//                                "knight" -> 1
-//                                "king" -> 0
-//                                else -> {
-//                                    onlyKnightsOrBishops = false
-//                                    break
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//                if (whiteBishopsAndKnights < 2 && blackBishopsAndKnights < 2 && onlyKnightsOrBishops) {
-//                    insufficientMaterial.value = true
-//                    gameEndSound.value = true
-//                }
-//            }
-//        }
     }
 
     fun checkIfPlayerHasInsufficientMaterial(

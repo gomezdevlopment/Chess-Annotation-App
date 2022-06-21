@@ -10,10 +10,13 @@ import androidx.navigation.Navigation
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.User
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userDocumentReference
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import java.io.Serializable
 
@@ -27,28 +30,33 @@ class AuthenticationRepository(private val application: Application) {
 
     fun checkIfUserIsSignedIn() {
         if (firebaseAuth.currentUser != null) {
-            println("running")
-            db.collection("users")
-                .whereEqualTo("email", firebaseAuth.currentUser?.email)
-                .get()
-                .addOnSuccessListener {
-                    if(it.isEmpty){
-                        signOut()
-                    }else{
-                        db.collection("users")
-                            .whereEqualTo("email", firebaseAuth.currentUser?.email)
-                            .get()
-                            .addOnSuccessListener { documents ->
-                                for (document in documents) {
-                                    MainActivity.user = document.toObject(User::class.java)
-                                }
-                            }
-                    }
-                }
+            getUserDocument()
+            userMutableLiveData.postValue(firebaseAuth.currentUser)
+        }else{
+            userMutableLiveData.postValue(null)
         }
-        userMutableLiveData.postValue(firebaseAuth.currentUser)
+
     }
 
+    private fun getUserDocument() {
+        db.collection("users")
+            .whereEqualTo("email", firebaseAuth.currentUser?.email)
+            .get()
+            .addOnSuccessListener {
+                if (it.isEmpty) {
+                    signOut()
+                } else {
+                    val docRef = db.collection("users").document(it.documents[0].id)
+                    userDocumentReference = docRef
+                    val userDocumentToObject = it.documents[0].toObject(User::class.java)
+                    if (userDocumentToObject != null) {
+                        user = userDocumentToObject
+                    } else {
+                        println("userDocument is null")
+                    }
+                }
+            }
+    }
 
     fun signUp(email: String, password: String, confirmPassword: String) {
         if (email.isNotEmpty() && password.isNotEmpty() && confirmPassword.isNotEmpty()) {
@@ -81,6 +89,7 @@ class AuthenticationRepository(private val application: Application) {
             firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener {
                 if (it.isSuccessful) {
                     userMutableLiveData.postValue(firebaseAuth.currentUser)
+                    getUserDocument()
                     createUsername()
                 } else {
                     Toast.makeText(application, it.exception.toString(), Toast.LENGTH_LONG).show()
@@ -93,6 +102,7 @@ class AuthenticationRepository(private val application: Application) {
 
     fun signOut() {
         firebaseAuth.signOut()
+        userMutableLiveData.postValue(null)
         signedOutMutableLiveData.postValue(true)
     }
 
@@ -105,17 +115,19 @@ class AuthenticationRepository(private val application: Application) {
     }
 
     private fun createUser(email: String, password: String): HashMap<String, Serializable> {
-        //val username = "Player${getRandomString()}"
         return hashMapOf(
             "email" to email,
             "password" to password,
             "games" to arrayListOf<String>(),
-            "username" to "Player"
+            "username" to "Player",
+            "wins" to 0,
+            "losses" to 0,
+            "draws" to 0
         )
     }
 
     private fun createUsername() {
-        var username = "Player"
+        var username = "Player${getRandomString()}"
 
         fun checkIfUsernameIsUnique(name: String) {
             db.collection("users")
@@ -123,29 +135,12 @@ class AuthenticationRepository(private val application: Application) {
                 .get()
                 .addOnSuccessListener {
                     if (!it.isEmpty) {
-                        println("creating new username")
                         username = "Player${getRandomString()}"
-                        println(username)
                         checkIfUsernameIsUnique(username)
-                    }else{
-                        db.collection("users")
-                            .whereEqualTo("email", firebaseAuth.currentUser?.email)
-                            .get()
-                            .addOnSuccessListener { documents ->
-                                for (document in documents) {
-                                    val user = document.toObject(User::class.java)
-                                    println(user)
-                                    if(user.username == "Player"){
-                                        val docIdRef = db.collection("users").document(document.id)
+                    } else {
+                        userDocumentReference?.update("username", username)?.addOnCompleteListener {
 
-                                        docIdRef.update("username", username)
-                                            .addOnCompleteListener {
-                                                println("Username updated to : $username")
-                                            }
-                                    }
-
-                                }
-                            }
+                        }
                     }
                 }
         }
@@ -163,10 +158,8 @@ class AuthenticationRepository(private val application: Application) {
     private fun addFirestoreDocument(user: HashMap<String, Serializable>) {
         db.collection("users")
             .add(user)
-            .addOnSuccessListener {
-            }
             .addOnFailureListener { e ->
-                Toast.makeText(application, "Error Updating Database", Toast.LENGTH_LONG).show()
+                Toast.makeText(application, e.toString(), Toast.LENGTH_LONG).show()
             }
     }
 }

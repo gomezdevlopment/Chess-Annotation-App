@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class GameRepositoryTest {
-    private val gameRepository: GameRepository = GameRepository.getGameRepository()
+    private val gameRepository: GameRepository = GameRepository()
 
     private fun analyzePositions(depth: Int): Int {
         if (depth == 0) {
@@ -53,7 +53,7 @@ class GameRepositoryTest {
                             //piece.square = originalPieceSquare
                         }
                     }else{
-                        gameRepository.changePiecePosition(legalMove, piece, depth)
+                        gameRepository.makeMove(piece, legalMove, depth)
                         numberOfMoves += analyzePositions(depth - 1)
                         gameRepository.undoMove()
                         piece.square = originalPieceSquare

@@ -2,6 +2,7 @@ package com.gomezdevlopment.chessnotationapp.view.home_screen
 
 import android.app.Application
 import android.content.Context
+import android.widget.Space
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -16,6 +17,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -46,29 +49,51 @@ fun Settings(signOutViewModel: SignOutViewModel, navController: NavController) {
 }
 
 @Composable
-fun PregameLobby(
+fun MatchSearch(
     gameViewModel: GameViewModel,
     matchmakingViewModel: MatchmakingViewModel,
     navController: NavController
 ) {
-    Column(verticalArrangement = Arrangement.Center) {
-        Column(
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .weight(1f),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
-            Text("Searching for Match...")
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .width(100.dp)
-                    .aspectRatio(1f),
-                color = tealDarker
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    "Searching for Match...",
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 16.sp,
+                )
+                Spacer(modifier = Modifier.height(20.dp))
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .aspectRatio(1f),
+                    strokeWidth = 5.dp,
+                    color = tealDarker
+                )
+            }
+
+        }
+        Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.padding(0.dp, 20.dp)) {
+            TextButton(onClick = { matchmakingViewModel.cancelSearch() }) {
+                Text(
+                    text = "Cancel",
+                    fontWeight = FontWeight.ExtraBold,
+                    color = tealDarker,
+                    fontSize = 24.sp
+                )
+            }
         }
     }
-    GameNavigation(
+    NavigationFromMatchSearch(
         gameViewModel = gameViewModel,
         matchmakingViewModel = matchmakingViewModel,
         navController = navController
@@ -76,16 +101,19 @@ fun PregameLobby(
 }
 
 @Composable
-fun GameNavigation(
+fun NavigationFromMatchSearch(
     gameViewModel: GameViewModel,
     matchmakingViewModel: MatchmakingViewModel,
     navController: NavController
 ) {
-    println("recomposing navigation of game")
     when (matchmakingViewModel.navDestination.value) {
         "game" -> LaunchedEffect(Unit) {
             navController.navigate("game")
-            gameViewModel.createNewGame(matchmakingViewModel.time)
+            gameViewModel.createNewGame(matchmakingViewModel.time, gameViewModel.isOnline.value)
+        }
+        "home" -> LaunchedEffect(Unit) {
+            navController.navigate("home")
+            matchmakingViewModel.navDestination.value = ""
         }
     }
 }
@@ -98,11 +126,11 @@ fun Navigation(
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "home") {
-        composable("home") { Home(navController, matchmakingViewModel) }
+        composable("home") { Home(navController, matchmakingViewModel, gameViewModel) }
         composable("game") { GameScreen(gameViewModel, navController) }
         composable("settings") { Settings(signOutViewModel, navController) }
-        composable("pregameLobby") {
-            PregameLobby(
+        composable("matchSearch") {
+            MatchSearch(
                 gameViewModel,
                 matchmakingViewModel,
                 navController
@@ -112,7 +140,11 @@ fun Navigation(
 }
 
 @Composable
-fun Home(navController: NavController, matchmakingViewModel: MatchmakingViewModel) {
+fun Home(
+    navController: NavController,
+    matchmakingViewModel: MatchmakingViewModel,
+    gameViewModel: GameViewModel
+) {
     val gameModes = arrayListOf("Rapid", "Blitz", "Bullet")
     val timeControls = arrayListOf(600000L, 300000L, 60000L)
     val gameModeImageIDs =
@@ -131,22 +163,21 @@ fun Home(navController: NavController, matchmakingViewModel: MatchmakingViewMode
             itemsIndexed(gameModes) { index, mode ->
                 GameSelectionCard(drawableID = gameModeImageIDs[index], title = mode) {
                     matchmakingViewModel.joinGame(timeControls[index])
-                    navController.navigate("pregameLobby")
+                    navController.navigate("matchSearch")
                 }
             }
         }
-        VSPlayerCard(navController = navController)
-        Spacer(modifier = Modifier.height(100.dp))
-        Button(onClick = { navController.navigate("settings") }) {
-            Text("Settings")
-        }
+        VSPlayerCard(navController = navController, viewModel = gameViewModel)
+//        Spacer(modifier = Modifier.height(100.dp))
+//        Button(onClick = { navController.navigate("settings") }) {
+//            Text("Settings")
+//        }
 
     }
-    println("Recomposing Home Screen")
 }
 
-@Composable 
-fun VSPlayerCard(navController: NavController){
+@Composable
+fun VSPlayerCard(navController: NavController, viewModel: GameViewModel) {
     Column(
         Modifier
             .fillMaxWidth()
@@ -165,6 +196,7 @@ fun VSPlayerCard(navController: NavController){
                     .wrapContentHeight()
                     .clickable {
                         userColor = "white"
+                        viewModel.isOnline.value = false
                         navController.navigate("game")
                     },
                 backgroundColor = tealDarker,
@@ -220,6 +252,7 @@ fun VSPlayerCard(navController: NavController){
         }
     }
 }
+
 //@Preview
 @Composable
 fun GameSelectionCard(drawableID: Int, title: String, onClick: () -> Unit) {

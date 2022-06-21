@@ -46,7 +46,6 @@ fun WhiteCaptures(pieces: List<ChessPiece>) {
 
 @Composable
 fun BlackCaptures(pieces: List<ChessPiece>) {
-    //println(pieces)
     LazyRow(
         Modifier
             .fillMaxWidth()
@@ -88,7 +87,7 @@ fun PieceIcon(piece: ChessPiece) {
 @Composable
 fun WhiteCaptures(viewModel: GameViewModel){
     val capturedPieces = remember {
-        viewModel.capturedPieces.value
+        viewModel.capturedPieces
     }
     WhiteCaptures(pieces = capturedPieces)
 }
@@ -96,7 +95,7 @@ fun WhiteCaptures(viewModel: GameViewModel){
 @Composable
 fun BlackCaptures(viewModel: GameViewModel){
     val capturedPieces = remember {
-        viewModel.capturedPieces.value
+        viewModel.capturedPieces
     }
     BlackCaptures(pieces = capturedPieces)
 }

@@ -18,27 +18,28 @@ import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 @Composable
 fun GameBar(viewModel: GameViewModel, navController: NavController){
         Row(Modifier.wrapContentHeight(), verticalAlignment = Alignment.Bottom) {
-            Column(
-                Modifier
-                    .weight(1f)
-                    .clickable {
-                        navController.navigate("home")
-                        //viewModel.resetGame()
-                    }) {
-
-                val home: ImageVector =
-                    ImageVector.vectorResource(id = R.drawable.ic_home)
-                Icon(
-                    imageVector = home,
-                    contentDescription = "Go to Home Screen",
-                    tint = tealDarker,
-                    modifier = Modifier
-                        .height(50.dp)
-                        .padding(10.dp)
-                        .aspectRatio(1f)
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
+//            Column(
+//                Modifier
+//                    .weight(1f)
+//                    .clickable {
+//                        navController.navigate("home")
+//                        viewModel.isOnline.value = true
+//                        //viewModel.resetGame()
+//                    }) {
+//
+//                val home: ImageVector =
+//                    ImageVector.vectorResource(id = R.drawable.ic_home)
+//                Icon(
+//                    imageVector = home,
+//                    contentDescription = "Go to Home Screen",
+//                    tint = tealDarker,
+//                    modifier = Modifier
+//                        .height(50.dp)
+//                        .padding(10.dp)
+//                        .aspectRatio(1f)
+//                        .align(Alignment.CenterHorizontally)
+//                )
+//            }
 
             Column(
                 Modifier
@@ -47,10 +48,10 @@ fun GameBar(viewModel: GameViewModel, navController: NavController){
                         viewModel.openResignDialog.value = true
                     }) {
 
-                val home: ImageVector =
+                val resign: ImageVector =
                     ImageVector.vectorResource(id = R.drawable.ic_resign)
                 Icon(
-                    imageVector = home,
+                    imageVector = resign,
                     contentDescription = "Resign",
                     tint = tealDarker,
                     modifier = Modifier
@@ -66,8 +67,6 @@ fun GameBar(viewModel: GameViewModel, navController: NavController){
                     .weight(1f)
                     .clickable {
                         viewModel.openDrawOfferDialog.value = true
-                        //navController.navigate("home")
-                        //viewModel.resetGame()
                     }) {
 
                 val home: ImageVector =

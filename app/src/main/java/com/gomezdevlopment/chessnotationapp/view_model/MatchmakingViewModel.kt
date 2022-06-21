@@ -11,11 +11,18 @@ class MatchmakingViewModel: ViewModel() {
 
     val navDestination = matchmakingRepository.navDestination
     val time by matchmakingRepository.time
+    val resetSearch by matchmakingRepository.resetSearch
     //val gameDocumentReference = matchmakingRepository.gameDocumentReference
 
     fun joinGame(timeControl: Long) {
         viewModelScope.launch {
             matchmakingRepository.joinGame(timeControl)
+        }
+    }
+
+    fun cancelSearch(){
+        viewModelScope.launch {
+            matchmakingRepository.cancelSearch()
         }
     }
 }

@@ -23,6 +23,12 @@ class LoadingFragment: Fragment(R.layout.loading_screen) {
         super.onViewCreated(view, savedInstanceState)
         signInViewModel.checkIfUserIsSignedIn()
 
+        signInViewModel.signedOut.observe(viewLifecycleOwner, Observer {
+            if(it){
+                Navigation.findNavController(view).navigate(R.id.action_loadingFragment_to_signInFragment)
+            }
+        })
+
         signInViewModel.getUserMutableLiveDate().observe(viewLifecycleOwner, Observer {
             if(it != null){
                 Navigation.findNavController(view).navigate(R.id.action_loadingFragment_to_homeFragment)

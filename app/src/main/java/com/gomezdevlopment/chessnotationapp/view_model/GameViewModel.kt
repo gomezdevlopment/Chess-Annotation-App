@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class GameViewModel(private val app: Application) : AndroidViewModel(app) {
+class GameViewModel(app: Application) : AndroidViewModel(app) {
     private var gameRepository: GameRepository = GameRepository() //GameRepository.getGameRepository()
     private var hashMap: MutableMap<Square, ChessPiece> = gameRepository.occupiedSquares
     private var previousSquare: MutableState<Square> = gameRepository.previousSquare
@@ -27,24 +27,31 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
         mutableStateOf(ChessPiece("", "", R.drawable.ic_br_alpha, Square(10, 10), 0))
     private var pieceClicked: MutableState<Boolean> = mutableStateOf(false)
     private var promotionDialogShowing: MutableState<Boolean> = mutableStateOf(false)
-
     var selectedNotationIndex: MutableState<Int> = gameRepository.selectedNotationIndex
-    var currentPosition: MutableState<Boolean> = mutableStateOf(true)
-    var onUpdate = mutableStateOf(0)
-
+    private var currentPosition: MutableState<Boolean> = mutableStateOf(true)
     val cardVisible = gameRepository.endOfGameCardVisible
     val endOfGame = gameRepository.endOfGame
     val endOfGameResult = gameRepository.endOfGameResult
     val endOfGameMessage = gameRepository.endOfGameMessage
-
-    val capturedPieces = mutableStateOf(gameRepository.capturedPieces)
-
+    val piecesOnBoard: List<ChessPiece> = gameRepository.piecesOnBoard
+    val capturedPieces = gameRepository.capturedPieces
     val openResignDialog = mutableStateOf(false)
     val openDrawOfferDialog = mutableStateOf(false)
     val openDrawOfferedDialog = gameRepository.openDrawOfferedDialog
+    val isOnline = mutableStateOf(true)
+    var whiteTimer = gameRepository.whiteTimer
+    var blackTimer = gameRepository.blackTimer
+    val whiteTime: StateFlow<String> = gameRepository.whiteTime
+    val whiteProgress: StateFlow<Float> = gameRepository.whiteProgress
+    val blackTime: StateFlow<String> = gameRepository.blackTime
+    val blackProgress: StateFlow<Float> = gameRepository.blackProgress
 
-    fun createNewGame(time: Long) {
-        gameRepository.resetGame(time)
+    private val soundPlayer: SoundPlayer = SoundPlayer(app)
+
+    fun createNewGame(time: Long, isOnline: Boolean) {
+        viewModelScope.launch {
+            gameRepository.resetGame(time, isOnline)
+        }
     }
 
     fun previousNotation() {
@@ -67,35 +74,6 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
         gameRepository.setGameState(index)
     }
 
-    //private val _piecesOnBoard = gameRepository.getPiecesOnBoard()
-    //val piecesOnBoard: MutableState<List<ChessPiece>> = mutableStateOf(gameRepository.piecesOnBoard)
-    val piecesOnBoard: List<ChessPiece> = gameRepository.piecesOnBoard
-
-    fun setPromotionDialogState(clicked: Boolean) {
-        promotionDialogShowing.value = clicked
-    }
-
-    fun resetGame() {
-        //gameRepository.resetGame(300000L)
-//        handleTimerValues(
-//            false,
-//            formatTime(initialTime),
-//            gameRepository.whiteProgress.value,
-//            _whiteTimeIsPlaying,
-//            _whiteTime,
-//            gameRepository.whiteProgress
-//        )
-//
-//        handleTimerValues(
-//            false,
-//            formatTime(initialTime),
-//            gameRepository.blackProgress.value,
-//            _blackTimeIsPlaying,
-//            _blackTime,
-//            gameRepository.blackProgress
-//        )
-    }
-
     fun isPromotionDialogShowing(): MutableState<Boolean> {
         return promotionDialogShowing
     }
@@ -114,10 +92,14 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
                 setPieceClickedState(false)
                 selectedPiece.value = piece
                 if (getPlayerTurn() == getSelectedPiece().value.color) {
-                    setPieceClickedState(true)
-//                    if (getPlayerTurn() == userColor) {
-//                        setPieceClickedState(true)
-//                    }
+                    //setPieceClickedState(true)
+                    if(isOnline.value){
+                        if (getPlayerTurn() == userColor) {
+                            setPieceClickedState(true)
+                        }
+                    }else{
+                        setPieceClickedState(true)
+                    }
                 }
             }
         }
@@ -152,11 +134,9 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-
-
     fun resign(){
         viewModelScope.launch {
-            FirestoreGameInteraction().writeResignation(getPlayerTurn(), userColor)
+            FirestoreGameInteraction().writeResignation(userColor)
         }
     }
 
@@ -164,21 +144,23 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
         return hashMap
     }
 
-    fun endOfGameCard(title: String, message: String) {
-
-    }
-
     fun changePiecePosition(newSquare: Square, piece: ChessPiece) {
-        gameRepository.changePiecePosition(newSquare, piece, 0)
+        viewModelScope.launch {
+            gameRepository.changePiecePosition(newSquare, piece, 0)
+        }
     }
 
     fun promotion(newSquare: Square, promotionSelection: ChessPiece) {
-        gameRepository.promotion(newSquare, promotionSelection, 0)
-        selectedNotationIndex.value += 1
+        viewModelScope.launch {
+            gameRepository.promotion(newSquare, promotionSelection, 0)
+            selectedNotationIndex.value += 1
+        }
     }
 
     fun movePiece(newSquare: Square, piece: ChessPiece) {
-        gameRepository.movePiece(newSquare, piece, 0)
+        viewModelScope.launch {
+            gameRepository.movePiece(newSquare, piece, 0)
+        }
     }
 
     fun getPreviousSquare(): MutableState<Square> {
@@ -233,20 +215,12 @@ class GameViewModel(private val app: Application) : AndroidViewModel(app) {
         return gameRepository.gameEndSound
     }
 
-    fun playSound(soundId: Int) {
-        SoundPlayer().playSound(app, soundId)
+    fun playSoundPool(soundName: String){
+        soundPlayer.playSoundPool(soundName)
     }
 
     fun getAnnotations(): MutableList<String> {
         return gameRepository.annotations
     }
-
-
-    var whiteTimer = gameRepository.whiteTimer
-    var blackTimer = gameRepository.blackTimer
-    val whiteTime: StateFlow<String> = gameRepository.whiteTime
-    val whiteProgress: StateFlow<Float> = gameRepository.whiteProgress
-    val blackTime: StateFlow<String> = gameRepository.blackTime
-    val blackProgress: StateFlow<Float> = gameRepository.blackProgress
 
 }

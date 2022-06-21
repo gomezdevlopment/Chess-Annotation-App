@@ -13,6 +13,7 @@ class SignInViewModel(application: Application) : AndroidViewModel(application) 
 
     private val appRepository = AuthenticationRepository(application)
     private val userMutableLiveData: MutableLiveData<FirebaseUser> = appRepository.getUserMutableLiveData()
+    val signedOut:MutableLiveData<Boolean> = appRepository.getSignedOutMutableLiveData()
 
     fun signUp(email: String, password: String, confirmPassword: String){
         viewModelScope.launch {

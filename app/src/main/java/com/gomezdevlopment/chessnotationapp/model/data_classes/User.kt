@@ -5,4 +5,7 @@ data class User(
     val password: String = "",
     val games: List<String> = listOf(),
     val username: String = "",
+    val wins: Int = 0,
+    val losses: Int = 0,
+    val draws: Int = 0
 )

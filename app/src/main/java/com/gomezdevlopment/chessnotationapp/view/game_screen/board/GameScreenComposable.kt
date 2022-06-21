@@ -34,7 +34,6 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     val chessBoardVector: ImageVector =
         ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
 
-    println("Recomposing")
     ResignAlertDialog(viewModel = viewModel)
     DrawOfferAlertDialog(viewModel = viewModel)
     DrawOfferedAlertDialog(viewModel = viewModel)

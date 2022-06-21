@@ -15,19 +15,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     companion object{
-        lateinit var user: User
+        var user: User? = null
         lateinit var userColor: String
         var gameDocumentReference: DocumentReference? = null
+        var userDocumentReference: DocumentReference? = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_ChessNotationApp)
-        //installSplashScreen()
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
     }
 
     override fun onBackPressed() {

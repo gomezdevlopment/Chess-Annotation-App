@@ -33,7 +33,7 @@ fun Piece(
         imageVector = imageVector,
         contentDescription = "Chess Piece",
         modifier =
-        (if (piece.color == viewModel.getPlayerTurn() /*&& piece.color == userColor*/) Modifier.clickable(
+        (if (piece.color == viewModel.getPlayerTurn() && (piece.color == userColor || !viewModel.isOnline.value)) Modifier.clickable(
             viewModel,
             piece,
             height, offset
@@ -71,7 +71,6 @@ fun Modifier.clickable(
 
 @Composable
 fun Pieces(viewModel: GameViewModel, height: Dp) {
-    println("Recomposing Pieces")
     val pieces = viewModel.piecesOnBoard
     val start = System.currentTimeMillis()
     pieces.forEach() { piece ->
@@ -92,7 +91,7 @@ fun Pieces(viewModel: GameViewModel, height: Dp) {
         }
     }
     val end = System.currentTimeMillis()
-    println("Time for piece recomposition: ${end - start}ms")
+    //println("Time for piece recomposition: ${end - start}ms")
     val previousSquare = viewModel.getPreviousSquare().value
     if (previousSquare.rank != 10) {
         Highlight(height = height, square = previousSquare, color = yellow, .9f)

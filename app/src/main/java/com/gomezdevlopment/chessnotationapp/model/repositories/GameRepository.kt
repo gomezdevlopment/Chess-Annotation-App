@@ -93,38 +93,13 @@ class GameRepository() : ViewModel() {
     var gameEndSound: MutableState<Boolean> = mutableStateOf(false)
 
     var selectedNotationIndex: MutableState<Int> = mutableStateOf(0)
-    //var playerColor: MutableState<String> = mutableStateOf("white")
-
     val openDrawOfferedDialog = mutableStateOf(false)
 
-
-    companion object {
-//        @Volatile
-//        private var INSTANCE: GameRepository? = null
-//
-//        fun getGameRepository(): GameRepository {
-//            val tempInstance = INSTANCE
-//            if (tempInstance != null) {
-//                return tempInstance
-//            }
-//            synchronized(this) {
-//                val instance = GameRepository()
-//                INSTANCE = instance
-//                return instance
-//            }
-//        }
-    }
-
     init {
-        //testPosition4()
-        //promotionPosition()
-        //addPieces()
-        //testPositionKiwipete()
-        //testPosition3()
         initialPosition()
     }
 
-    fun resetGame(time: Long) {
+    fun resetGame(time: Long, isOnline: Boolean) {
         previousGameStates.clear()
         checkmate.value = (false)
         stalemate.value = (false)
@@ -149,8 +124,14 @@ class GameRepository() : ViewModel() {
         blackTime.value = formatTime(time)
         blackTimeIsPlaying.value = false
         initialTime.value = time
+        openDrawOfferedDialog.value = false
+        capturedPieces.clear()
         initialPosition()
-        snapshotListener()
+        if(isOnline){
+            snapshotListener()
+        }else{
+            gameDocumentReference = null
+        }
     }
 
     private fun snapshotListener() {
@@ -194,34 +175,36 @@ class GameRepository() : ViewModel() {
         endOfGameMessage.value = message
         endOfGame.value = true
         endOfGameCardVisible.value = true
+        gameEndSound.value = true
     }
 
     private fun drawAccepted(){
         setEndOfGameValues("Draw", "by Agreement")
+        FirestoreGameInteraction().incrementDraws()
     }
 
     private fun resignation(playerColor: String?){
         if(playerColor != null){
             when(playerColor) {
                 "white" -> {
+                    if(userColor == "white"){FirestoreGameInteraction().incrementLosses()}
+                    if(userColor == "black"){FirestoreGameInteraction().incrementWins()}
                     setEndOfGameValues("Black Wins!", "by Resignation")
                 }
                 "black" -> {
+                    if(userColor == "black"){FirestoreGameInteraction().incrementLosses()}
+                    if(userColor == "white"){FirestoreGameInteraction().incrementWins()}
                     setEndOfGameValues("White Wins!", "by Resignation")
                 }
             }
         }
     }
 
-
     private fun getPieceFromDocument(previousMoveString: String): ChessPiece? {
         val pieceRank = previousMoveString[0].digitToInt()
         val pieceFile = previousMoveString[1].digitToInt()
         val square = Square(pieceRank, pieceFile)
-        println(square)
-        println(occupiedSquares)
         if (occupiedSquares.containsKey(square)) {
-            println("contains")
             return occupiedSquares[square]
         }
         return null
@@ -551,7 +534,6 @@ class GameRepository() : ViewModel() {
         }
         occupiedSquares[newSquare] = promotionSelection
         piecesOnBoard.add(promotionSelection)
-        //setCurrentSquare(piece.square)
         if (playerTurn.value == "white") {
             playerTurn.value = "black"
         } else {
@@ -567,7 +549,7 @@ class GameRepository() : ViewModel() {
         )
         checkAllLegalMoves()
         checkIfGameOver()
-        //setPositionFromFen(getGameStateAsFEN())
+        setPositionFromFen(getGameStateAsFEN())
         if (kingInCheck.value) {
             checkSound.value = true
             if (depth == 1) {
@@ -577,9 +559,9 @@ class GameRepository() : ViewModel() {
         }
         notation.checkmateOrCheck(checkmate.value, kingInCheck.value)
         annotations.add(currentNotation.toString())
-        //annotations.add(currentNotation.toString())
         currentNotation.clear()
     }
+
 
     private fun changePieceSquare(piece: ChessPiece, newSquare: Square): ChessPiece {
         piece.square = newSquare
@@ -593,10 +575,7 @@ class GameRepository() : ViewModel() {
     fun checkIfCastled(
         piece: ChessPiece,
         newSquare: Square,
-        depth: Int,
-        castled: MutableState<Boolean>,
-        notation: Notation
-    ) {
+        depth: Int): String{
         //Castling
         if (piece.piece == "king") {
             if (castleKingSide()) {
@@ -610,8 +589,7 @@ class GameRepository() : ViewModel() {
                         castles.value += 1
                     }
                     //castlingSound.value = true
-                    castled.value = true
-                    notation.castleKingSide()
+                    return("0-0")
                 }
             }
             if (castleQueenSide()) {
@@ -625,12 +603,12 @@ class GameRepository() : ViewModel() {
                         castles.value += 1
                     }
                     //castlingSound.value = true
-                    castled.value = true
-                    notation.castleQueenSide()
+                    return("0-0-0")
                 }
             }
         }
         checkIfKingOrRooksMoved(piece)
+        return ""
     }
 
     private fun convertMoveToStringOfRanksAndFiles(piece: ChessPiece, square: Square): String {
@@ -643,23 +621,32 @@ class GameRepository() : ViewModel() {
 
     fun changePiecePosition(newSquare: Square, piece: ChessPiece, depth: Int) {
         val string = convertMoveToStringOfRanksAndFiles(piece, newSquare)
+        val turn: String = playerTurn.value
         viewModelScope.launch {
-            FirestoreGameInteraction().writeMove(playerTurn.value, string)
+            FirestoreGameInteraction().writeMove(turn, string)
         }
         val previousPieceSquare = piece.square
         val notation = Notation(currentNotation, newSquare)
         val castled = mutableStateOf(false)
-        var capture = false
-        var move = false
+        val capture = mutableStateOf(false)
 
         fiftyMoveCount.value += 1
-        val gameLogic = GameLogic()
-
         if (piece.piece == "pawn") {
             fiftyMoveCount.value = 0
         }
+
         //Castling
-        checkIfCastled(piece, newSquare, depth, castled, notation)
+        when(checkIfCastled(piece, newSquare, depth)){
+            "0-0-0" -> {
+                castled.value = true
+                notation.castleQueenSide()
+            }
+            "0-0" -> {
+                castled.value = true
+                notation.castleKingSide()
+            }
+        }
+
         if (!castled.value) {
             notation.piece(piece, piecesOnBoard, mapOfPiecesAndTheirLegalMoves)
         }
@@ -667,38 +654,21 @@ class GameRepository() : ViewModel() {
         //Remove Defender
         if (occupiedSquares.containsKey(newSquare)) {
             fiftyMoveCount.value = 0
-            if (depth == 1) {
-                captures.value += 1
-            }
             occupiedSquares[newSquare]?.let {
                 capturedPieces.add(it)
             }
             removePiece(newSquare)
-            capture = true
+            capture.value = true
             notation.capture()
-        } else if (gameLogic.isEnPassant(
-                previousSquare.value,
-                currentSquare.value,
-                newSquare,
-                occupiedSquares,
-                piece,
-                getKingSquare(),
-                squaresToBlock
-            )
-        ) {
+        } else if (isEnPassant(piece, newSquare)) {
             fiftyMoveCount.value = 0
-            if (depth == 1) {
-                enPassants.value += 1
-                captures.value += 1
-            }
             occupiedSquares[currentSquare.value]?.let { capturedPieces.add(it) }
             removePiece(currentSquare.value)
-            capture = true
+            capture.value = true
             notation.capture()
         } else {
             if (!castled.value) {
                 notation.square(false)
-                move = true
             }
         }
 
@@ -727,30 +697,90 @@ class GameRepository() : ViewModel() {
                 getGameStateAsFEN()
             )
         )
-        //setPositionFromFen(getGameStateAsFEN())
-        if (kingInCheck.value) {
-            checkSound.value = true
-        } else {
-            if (castled.value) {
-                castlingSound.value = true
-            } else if (capture) {
-                captureSound.value = true
-            } else {
-                pieceSound.value = true
+        checkIfGameOver()
+        if(!gameEndSound.value){
+            if (kingInCheck.value) {
+                checkSound.value = true
+            }
+            else {
+                if (castled.value) {
+                    castlingSound.value = true
+                } else if (capture.value) {
+                    captureSound.value = true
+                } else {
+                    pieceSound.value = true
+                }
             }
         }
-
-        if (kingInCheck.value && depth == 1) {
-            checks.value += 1
-        }
-
-        checkIfGameOver()
-
         notation.checkmateOrCheck(checkmate.value, kingInCheck.value)
         annotations.add(currentNotation.toString())
         currentNotation.clear()
         selectedNotationIndex.value += 1
         startStopClocks()
+    }
+
+    fun makeMove(piece: ChessPiece, newSquare: Square, depth: Int){
+        val previousPieceSquare = piece.square
+        checkIfCastled(piece, newSquare, depth)
+        //Remove Defender
+        if (occupiedSquares.containsKey(newSquare)) {
+            fiftyMoveCount.value = 0
+            if (depth == 1) {
+                captures.value += 1
+            }
+            occupiedSquares[newSquare]?.let {
+                capturedPieces.add(it)
+            }
+            removePiece(newSquare)
+        } else if (isEnPassant(piece, newSquare)) {
+            fiftyMoveCount.value = 0
+            if (depth == 1) {
+                enPassants.value += 1
+                captures.value += 1
+            }
+            occupiedSquares[currentSquare.value]?.let { capturedPieces.add(it) }
+            removePiece(currentSquare.value)
+        }
+
+        occupiedSquares.remove(previousPieceSquare)
+        changePieceSquare(piece, newSquare)
+        occupiedSquares[newSquare] = piece
+        previousSquare.value = previousPieceSquare
+        currentSquare.value = newSquare
+        if (piece.color == "white") {
+            if (piece.piece == "king") {
+                whiteKingSquare.value = newSquare
+            }
+            playerTurn.value = "black"
+            checkAttacks()
+        } else {
+            if (piece.piece == "king") {
+                blackKingSquare.value = newSquare
+            }
+            playerTurn.value = "white"
+            checkAttacks()
+        }
+        previousGameStates.add(
+            GameState(
+                previousSquare.value,
+                currentSquare.value,
+                getGameStateAsFEN()
+            )
+        )
+        if (kingInCheck.value && depth == 1) {
+            checks.value += 1
+        }
+        setPositionFromFen(getGameStateAsFEN())
+    }
+
+    private fun isEnPassant(piece: ChessPiece, square: Square): Boolean {
+        //If pawn moves to an empty diagonal square it should be en passant
+        if(piece.square.file != square.file && piece.piece == "pawn"){
+            if(!occupiedSquares.containsKey(square)){
+                return true
+            }
+        }
+        return false
     }
 
     private fun checkIfGameOver() {
@@ -767,22 +797,32 @@ class GameRepository() : ViewModel() {
             if (playerTurn.value == "white") {
                 winner = "Black"
             }
+            if(userColor == playerTurn.value){
+                FirestoreGameInteraction().incrementLosses()
+            }
+            if(userColor != playerTurn.value){
+                FirestoreGameInteraction().incrementWins()
+            }
             setEndOfGameValues("Checkmate", "$winner Wins!")
         }
 
         if (insufficientMaterial.value) {
+            FirestoreGameInteraction().incrementDraws()
             setEndOfGameValues("Draw", "by Insufficient Material")
         }
 
         if (stalemate.value) {
+            FirestoreGameInteraction().incrementDraws()
             setEndOfGameValues("Draw", "by Stalemate")
         }
 
         if (threeFoldRepetition.value) {
+            FirestoreGameInteraction().incrementDraws()
             setEndOfGameValues("Draw", "by Threefold Repetition")
         }
 
         if (fiftyMoveRule.value) {
+            FirestoreGameInteraction().incrementDraws()
             setEndOfGameValues("Draw", "by The Fifty Move Rule")
         }
     }
@@ -800,8 +840,16 @@ class GameRepository() : ViewModel() {
                 winner.lowercase()
             )
         ) {
+            FirestoreGameInteraction().incrementDraws()
             endOfGameResult.value = "Draw"
             endOfGameMessage.value = "by Time Out vs Insufficient Material"
+        }else{
+            if(userColor == playerTurn.value){
+                FirestoreGameInteraction().incrementLosses()
+            }
+            if(userColor != playerTurn.value){
+                FirestoreGameInteraction().incrementWins()
+            }
         }
         endOfGame.value = true
         endOfGameCardVisible.value = true

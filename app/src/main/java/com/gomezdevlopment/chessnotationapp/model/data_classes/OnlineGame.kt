@@ -8,5 +8,6 @@ data class OnlineGame(
     val previousMove: String = "",
     val resignation: String = "",
     val drawOffer: String = "",
-    val rematchOffer: String = ""
+    val rematchOffer: String = "",
+    val cancel: Boolean = false
 )

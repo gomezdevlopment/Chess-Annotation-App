@@ -2,16 +2,13 @@ package com.gomezdevlopment.chessnotationapp.model.utils
 
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
+import com.google.firebase.firestore.FieldValue
 
 class FirestoreGameInteraction {
     fun writePromotion(playerTurn: String, string: String, promotionSelection: ChessPiece){
         if (MainActivity.gameDocumentReference != null) {
             if (playerTurn == MainActivity.userColor) {
-                //val string = convertPromotionToString(previousSquare.value, promotionSelection.square)
                 MainActivity.gameDocumentReference?.update("previousMove", "$string${promotionSelection.piece}")
-                    ?.addOnSuccessListener {
-                        println("Success")
-                    }
                     ?.addOnFailureListener { e ->
                         println(e)
                     }
@@ -23,13 +20,15 @@ class FirestoreGameInteraction {
         if (MainActivity.gameDocumentReference != null) {
             if (playerTurn == MainActivity.userColor) {
                 MainActivity.gameDocumentReference?.update("previousMove", string)
-                    ?.addOnSuccessListener {
-                        println("Success")
-                    }
                     ?.addOnFailureListener { e ->
                         println(e)
                     }
             }
+            else{
+                println("not your turn ${MainActivity.userColor}")
+            }
+        }else{
+            println("document null")
         }
     }
 
@@ -37,18 +36,12 @@ class FirestoreGameInteraction {
         if (MainActivity.gameDocumentReference != null) {
             if(value == "accept" || value == "decline"){
                 MainActivity.gameDocumentReference?.update("drawOffer", value)
-                    ?.addOnSuccessListener {
-                        println("Success")
-                    }
                     ?.addOnFailureListener { e ->
                         println(e)
                     }
             }
             if (playerTurn == MainActivity.userColor) {
                 MainActivity.gameDocumentReference?.update("drawOffer", value)
-                    ?.addOnSuccessListener {
-                        println("Success")
-                    }
                     ?.addOnFailureListener { e ->
                         println(e)
                     }
@@ -60,9 +53,6 @@ class FirestoreGameInteraction {
         if (MainActivity.gameDocumentReference != null) {
             if (playerTurn == MainActivity.userColor) {
                 MainActivity.gameDocumentReference?.update("rematchOffer", value)
-                    ?.addOnSuccessListener {
-                        println("Success")
-                    }
                     ?.addOnFailureListener { e ->
                         println(e)
                     }
@@ -70,17 +60,32 @@ class FirestoreGameInteraction {
         }
     }
 
-    fun writeResignation(playerTurn: String, userColor: String){
+    fun writeResignation(userColor: String){
         if (MainActivity.gameDocumentReference != null) {
             //if (playerTurn == MainActivity.userColor) {
                 MainActivity.gameDocumentReference?.update("resignation", userColor)
-                    ?.addOnSuccessListener {
-                        println("Success")
-                    }
                     ?.addOnFailureListener { e ->
                         println(e)
                     }
             }
-       // }
     }
+
+    fun incrementWins(){
+        if (MainActivity.userDocumentReference != null) {
+            MainActivity.userDocumentReference?.update("wins", FieldValue.increment(1))
+        }
+    }
+
+    fun incrementLosses(){
+        if (MainActivity.userDocumentReference != null) {
+            MainActivity.userDocumentReference?.update("losses", FieldValue.increment(1))
+        }
+    }
+
+    fun incrementDraws(){
+        if (MainActivity.userDocumentReference != null) {
+            MainActivity.userDocumentReference?.update("draws", FieldValue.increment(1))
+        }
+    }
+
 }

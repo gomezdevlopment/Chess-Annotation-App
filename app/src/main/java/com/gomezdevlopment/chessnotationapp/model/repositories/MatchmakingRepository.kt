@@ -19,6 +19,10 @@ class MatchmakingRepository : ViewModel() {
     private val gamePoolCollection = "gamePool"
     val navDestination = mutableStateOf("")
     val time = mutableStateOf(60000L)
+
+    var matchSearch: ListenerRegistration? = null
+
+    var resetSearch = mutableStateOf(0)
     //lateinit var gameDocumentReference: DocumentReference
 
     fun joinGame(timeControl: Long) {
@@ -30,30 +34,27 @@ class MatchmakingRepository : ViewModel() {
             .get()
             .addOnSuccessListener { gamePool ->
                 if (gamePool.isEmpty) {
-                    createGame(timeControl, MainActivity.user.username)
+                    println("empty")
+                    createGame(timeControl, MainActivity.user?.username.toString())
                 } else {
                     val docRef = db.collection(gamePoolCollection).document(gamePool.documents[0].id)
                     val game = gamePool.documents[0].toObject(OnlineGame::class.java)
                     gameDocumentReference = docRef
                     docRef.update("joinable", false)
                     if (game?.blackPlayer == "") {
-                        println("Assigned black")
                         userColor = "black"
-                        docRef.update("blackPlayer", MainActivity.user.username)
+                        docRef.update("blackPlayer", MainActivity.user?.username)
                             .addOnSuccessListener {
                                 navDestination.value = "game"
-                                println("Success")
                             }
                             .addOnFailureListener { e ->
                                 println(e)
                             }
                     } else {
-                        println("Assigned white")
                         userColor ="white"
-                        docRef.update("whitePlayer", MainActivity.user.username)
+                        docRef.update("whitePlayer", MainActivity.user?.username)
                             .addOnSuccessListener {
                                 navDestination.value = "game"
-                                println("Success")
                             }
                             .addOnFailureListener { e ->
                                 println(e)
@@ -96,37 +97,47 @@ class MatchmakingRepository : ViewModel() {
             "previousMove" to "",
             "resignation" to "",
             "drawOffer" to "",
-            "rematchOffer" to ""
+            "rematchOffer" to "",
+            "cancel" to false
         )
         db.collection(gamePoolCollection)
             .add(newGame)
             .addOnSuccessListener {
-                db.collection(gamePoolCollection)
-                    .whereEqualTo(playerColor, username)
-                    .limit(1)
-                    .get()
-                    .addOnSuccessListener { gamePool ->
-                        val docRef = db.collection(gamePoolCollection).document(gamePool.documents[0].id)
-                        //val doc = db.collection(gamePoolCollection).document(gamePool.documents[0].id)
-                        waitForMatch(docRef, opponentColor)
-                    }
-                    .addOnFailureListener {
-                        println("Fail")
-                    }
+                waitForMatch(it, opponentColor)
             }
             .addOnFailureListener { e ->
-
+                println(e.message)
             }
     }
 
     private fun waitForMatch(docRef: DocumentReference, opponentColor: String){
-        var feedback: ListenerRegistration? = null
-        feedback = docRef.addSnapshotListener { value, error ->
-            if(value?.get(opponentColor) != ""){
-                navDestination.value = "game"
-                gameDocumentReference = docRef
-                feedback?.remove()
+        matchSearch = docRef.addSnapshotListener { value, error ->
+            val game = value?.toObject(OnlineGame::class.java)
+            gameDocumentReference = docRef
+            if(opponentColor == "whitePlayer"){
+                if(game?.whitePlayer != ""){
+                    navDestination.value = "game"
+                    matchSearch?.remove()
+                }
+            }else{
+                if(game?.blackPlayer != ""){
+                    navDestination.value = "game"
+                    matchSearch?.remove()
+                }
+            }
+
+            if(game?.cancel == true){
+                matchSearch?.remove()
             }
         }
+    }
+
+    fun cancelSearch(){
+        gameDocumentReference?.update("cancel", true)
+        gameDocumentReference?.delete()?.addOnFailureListener {
+            println(it.message)
+        }
+        navDestination.value = "home"
+        resetSearch.value += 1
     }
 }

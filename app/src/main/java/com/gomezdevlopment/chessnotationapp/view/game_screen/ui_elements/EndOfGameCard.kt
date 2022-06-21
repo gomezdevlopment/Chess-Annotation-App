@@ -68,7 +68,6 @@ fun EndOfGameCard(
                     RoundDialogButton("Rematch")
                     {
                         cardVisible.value = false
-                        viewModel.resetGame()
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                 }

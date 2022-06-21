@@ -2,6 +2,7 @@ package com.gomezdevlopment.chessnotationapp.view.game_screen.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
@@ -17,31 +18,33 @@ fun SoundFX(viewModel: GameViewModel) {
     if (pieceSound.value) {
         LaunchedEffect(0) {
             pieceSound.value = false
-            viewModel.playSound(R.raw.piece_sound)
+            viewModel.playSoundPool("piece")
         }
     }
     if (checkSound.value) {
         LaunchedEffect(0) {
             checkSound.value = false
-            viewModel.playSound(R.raw.check_sound)
+            viewModel.playSoundPool("check")
         }
     }
     if (captureSound.value) {
         LaunchedEffect(0) {
             captureSound.value = false
-            viewModel.playSound(R.raw.capture_sound)
+            viewModel.playSoundPool("capture")
         }
     }
     if (castlingSound.value) {
         LaunchedEffect(0) {
             castlingSound.value = false
-            viewModel.playSound(R.raw.castling_sound)
+            viewModel.playSoundPool("castle")
         }
     }
     if (gameEndSound.value) {
         LaunchedEffect(0) {
             gameEndSound.value = false
-            viewModel.playSound(R.raw.end_of_game_sound)
+            viewModel.playSoundPool("end")
         }
     }
+
+
 }
