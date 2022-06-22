@@ -19,6 +19,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
@@ -27,7 +28,8 @@ fun EndOfGameCard(
     header: String,
     message: String,
     cardVisible: MutableState<Boolean>,
-    viewModel: GameViewModel
+    viewModel: GameViewModel,
+    navController: NavController
 ) {
     Box(
         modifier = Modifier
@@ -64,6 +66,7 @@ fun EndOfGameCard(
                     RoundDialogButton("Close")
                     {
                         cardVisible.value = false
+                        navController.navigate("home")
                     }
                     RoundDialogButton("Rematch")
                     {

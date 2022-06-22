@@ -14,6 +14,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -110,6 +111,7 @@ fun NavigationFromMatchSearch(
         "game" -> LaunchedEffect(Unit) {
             navController.navigate("game")
             gameViewModel.createNewGame(matchmakingViewModel.time, gameViewModel.isOnline.value)
+            matchmakingViewModel.navDestination.value = ""
         }
         "home" -> LaunchedEffect(Unit) {
             navController.navigate("home")

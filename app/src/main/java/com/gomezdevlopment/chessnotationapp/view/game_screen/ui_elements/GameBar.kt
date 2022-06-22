@@ -16,7 +16,7 @@ import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.tealDarker
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable
-fun GameBar(viewModel: GameViewModel, navController: NavController){
+fun GameBar(viewModel: GameViewModel){
         Row(Modifier.wrapContentHeight(), verticalAlignment = Alignment.Bottom) {
 //            Column(
 //                Modifier

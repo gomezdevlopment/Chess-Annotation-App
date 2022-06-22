@@ -73,7 +73,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                     ChessBoard(chessBoardVector = chessBoardVector)
                     Pieces(viewModel = viewModel, height = maxWidth / 8)
                     Coordinates(size = maxWidth / 8)
-                    ChessUILogic(height = maxWidth / 8, viewModel = viewModel)
+                    ChessUILogic(height = maxWidth / 8, viewModel = viewModel, navController)
                 }
             }
             BoxWithConstraints(Modifier.fillMaxWidth()) {
@@ -100,7 +100,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
         }
 
         Row(verticalAlignment = Alignment.Bottom) {
-            GameBar(viewModel = viewModel, navController = navController)
+            GameBar(viewModel = viewModel)
         }
     }
 }
@@ -154,7 +154,7 @@ fun ChessBoard(chessBoardVector: ImageVector) {
 }
 
 @Composable
-fun ChessUILogic(height: Dp, viewModel: GameViewModel) {
+fun ChessUILogic(height: Dp, viewModel: GameViewModel, navController: NavController) {
     val cardVisible = remember { viewModel.cardVisible }
     val hashMap = viewModel.getHashMap()
     val showMoves by remember { viewModel.isPieceClicked() }
@@ -230,7 +230,7 @@ fun ChessUILogic(height: Dp, viewModel: GameViewModel) {
         if (cardVisible.value) {
             val header by viewModel.endOfGameResult
             val message by viewModel.endOfGameMessage
-            EndOfGameCard(header, message = message, cardVisible, viewModel)
+            EndOfGameCard(header, message = message, cardVisible, viewModel, navController)
         }
     }
 }
