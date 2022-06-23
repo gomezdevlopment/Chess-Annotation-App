@@ -39,11 +39,10 @@ class GameRepositoryTest {
                 val originalPieceSquare = piece.square
                 val originalLegalMoves = mutableListOf<Square>()
                 originalLegalMoves.addAll(piece.legalMoves)
-                if(piece.piece == "pawn"){
-                    println(originalLegalMoves)
-                }
+
                 for (legalMove in originalLegalMoves) {
                     if (piece.piece == "pawn" && (legalMove.rank == 7 || legalMove.rank == 0)) {
+                        promotionPieces.clear()
                         if (piece.color == "white") {
                             promotionPieces.addAll(whitePieceImages)
                         } else {

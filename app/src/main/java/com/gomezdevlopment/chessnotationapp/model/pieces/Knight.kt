@@ -12,7 +12,7 @@ class Knight {
     fun moves(
         piece: ChessPiece,
         occupiedSquares: MutableMap<Square, ChessPiece>,
-        piecesCheckingKing: MutableList<Square>,
+        piecesCheckingKing: MutableList<ChessPiece>,
         pinnedPieces: MutableList<ChessPiece>
     ){
 

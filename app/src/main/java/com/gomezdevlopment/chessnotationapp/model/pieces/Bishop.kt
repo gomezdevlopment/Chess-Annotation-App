@@ -15,7 +15,7 @@ class Bishop {
         occupiedSquares: MutableMap<Square, ChessPiece>,
         kingInCheck: MutableState<Boolean>,
         kingSquare: Square,
-        piecesCheckingKing: MutableList<Square>,
+        piecesCheckingKing: MutableList<ChessPiece>,
         pinnedPieces: MutableList<ChessPiece>,
     ) {
         if(!pinnedPieces.contains(piece)){

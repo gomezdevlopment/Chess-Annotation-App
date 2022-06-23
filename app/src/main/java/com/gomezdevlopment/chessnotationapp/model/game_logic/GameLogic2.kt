@@ -11,8 +11,7 @@ class GameLogic2() {
     private val kingFound = mutableStateOf(false)
     private val firstPieceFound = mutableStateOf(false)
     private val secondPieceFound = mutableStateOf(false)
-
-    private var pinnedPiece: ChessPiece? = null
+    private val pinnedPiece = mutableListOf<ChessPiece>()
 
     fun addMove(
         occupiedSquares: MutableMap<Square, ChessPiece>,
@@ -21,13 +20,13 @@ class GameLogic2() {
         piece: ChessPiece,
         moves: List<Square>,
         kingInCheck: MutableState<Boolean>,
-        piecesCheckingKing: MutableList<Square>,
+        piecesCheckingKing: MutableList<ChessPiece>,
         pinnedPieces: MutableList<ChessPiece>
     ) {
-
         piece.pseudoLegalMoves.add(square)
 
         if (!firstPieceFound.value) {
+            piece.attacks.add(square)
             if (isLegalMove(square, occupiedSquares, piece, piecesCheckingKing)) {
                 piece.legalMoves.add(square)
             }
@@ -40,13 +39,12 @@ class GameLogic2() {
 
                 val pieceOnSquare = occupiedSquares[square]
                 if (pieceOnSquare?.color != piece.color && pieceOnSquare?.piece != "king") {
-                    pinnedPiece = pieceOnSquare
                     if (pieceOnSquare != null) {
-                        pinnedPieces.add(pieceOnSquare)
+                        pinnedPiece.add(pieceOnSquare)
                     }
                 }
 
-                piece.attacks.addAll(moves)
+                piece.attacks.add(square)
 
                 firstPieceFound.value = true
 
@@ -62,7 +60,11 @@ class GameLogic2() {
                 secondPieceFound.value = true
                 if (square == enemyKing) {
                     piece.xRays.addAll(moves)
-                    pinnedPiece?.pinnedMoves?.addAll(moves)
+                    if(pinnedPiece.isNotEmpty()){
+                        pinnedPieces.addAll(pinnedPiece)
+                        pinnedPieces.last().pinnedMoves.add(piece.square)
+                        pinnedPieces.last().pinnedMoves.addAll(moves)
+                    }
                     kingFound.value = true
                 }
                 return
@@ -75,35 +77,40 @@ class GameLogic2() {
         square: Square,
         occupiedSquares: MutableMap<Square, ChessPiece>,
         piece: ChessPiece,
-        piecesCheckingKing: MutableList<Square>,
+        piecesCheckingKing: MutableList<ChessPiece>,
     ): Boolean {
         if (!isOnBoard(square)) return false
         if (squareContainsFriendlyPiece(square, occupiedSquares, piece)) return false
+
         if (piece.pinnedMoves.isNotEmpty()) {
+            println("piece ${piece.piece} pinned")
             if (piece.pinnedMoves.contains(square)) {
-                if (piecesCheckingKing.contains(square)) {
-                    return true
-                }
+                //if(piecesCheckingKing[0].square == square) return true
+                if(piece.pinnedMoves.contains(square)) return true
                 return false
             }
             return false
 
         }
+
         if (piecesCheckingKing.isNotEmpty()) {
             if (piece.piece == "king") {
                 piecesCheckingKing.forEach {
-                    val checkingPiece = occupiedSquares[it]
-                    if (checkingPiece?.piece != "pawn") {
-                        if (checkingPiece?.pseudoLegalMoves?.contains(square) == true) {
+                    val checkingPiece = it
+                    if (checkingPiece.piece != "pawn") {
+                        if (checkingPiece.pseudoLegalMoves.contains(square)) {
                             return false
                         }
                     }
                 }
                 return true
             }
-            if (piecesCheckingKing.contains(square)) {
-                return true
-            }
+
+            if(piecesCheckingKing.size > 1) return false
+
+            if (piecesCheckingKing[0].square == square) return true
+
+            if(piecesCheckingKing[0].xRays.contains(square)) return true
             return false
         }
 

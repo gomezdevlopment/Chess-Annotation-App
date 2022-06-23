@@ -10,25 +10,24 @@ class Pawn {
     private val gameLogic = GameLogic()
     private val gameLogic2 = GameLogic2()
 
-    private val wasPinned = mutableStateOf(false)
-
     fun moves(
         piece: ChessPiece,
         occupiedSquares: MutableMap<Square, ChessPiece>,
         previousSquare: Square,
         currentSquare: Square,
-        piecesCheckingKing: MutableList<Square>,
+        piecesCheckingKing: MutableList<ChessPiece>,
         pinnedPieces: MutableList<ChessPiece>
     ) {
-        if (piece.pinnedMoves.isNotEmpty()) {
-            wasPinned.value = true
-        }
+        val pinnedMovesCopy = mutableListOf<Square>()
+        pinnedMovesCopy.addAll(piece.pinnedMoves)
+        val wasPinned = pinnedMovesCopy.isNotEmpty()
 
         if (!pinnedPieces.contains(piece)) {
             piece.pinnedMoves.clear()
         }
 
         gameLogic2.clearMoves(piece)
+
         var moveSquare: Square
         if (piece.color == "white") {
             moveSquare = Square(piece.square.rank + 1, piece.square.file)
@@ -85,13 +84,13 @@ class Pawn {
             piece.attacks.add(moveSquare)
         }
 
-        piece.pseudoLegalMoves.forEach { move ->
+        piece.attacks.forEach { move ->
             if (occupiedSquares.containsKey(move)) {
                 if (gameLogic2.isLegalMove(move, occupiedSquares, piece, piecesCheckingKing)) {
                     piece.legalMoves.add(move)
                 }
             }
-            if (gameLogic2.isEnPassant(previousSquare, currentSquare, move, occupiedSquares, piece, wasPinned.value)) {
+            if (gameLogic2.isEnPassant(previousSquare, currentSquare, move, occupiedSquares, piece, wasPinned)) {
                 piece.legalMoves.add(move)
             }
         }

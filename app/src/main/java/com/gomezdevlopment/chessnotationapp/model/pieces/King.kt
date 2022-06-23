@@ -16,7 +16,7 @@ class King {
         kingCanCastleKingSide: Boolean,
         kingCanCastleQueenSide: Boolean,
         kingSquare: Square,
-        piecesCheckingKing: MutableList<Square>
+        piecesCheckingKing: MutableList<ChessPiece>
     ) {
         gameLogic2.clearMoves(piece)
         var moveSquare = Square(piece.square.rank + 1, piece.square.file + 1)

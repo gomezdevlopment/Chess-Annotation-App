@@ -166,15 +166,15 @@ fun ChessUILogic(height: Dp, viewModel: GameViewModel, navController: NavControl
     val xRays = remember {
         viewModel.xRays()
     }
-
+//
     val attacks = remember {
         viewModel.getAttacks()
     }
-
+//
     for(attack in attacks){
         Highlight(height = height, square = attack, color = Color.Red, .5f)
     }
-
+//
     for(attack in xRays){
         Outline(height = height, square = attack, color = Color.Blue)
     }

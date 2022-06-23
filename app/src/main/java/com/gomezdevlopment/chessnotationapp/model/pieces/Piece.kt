@@ -12,7 +12,7 @@ class Piece(
     private val canCastleQueenSide: Boolean,
     private val kingInCheck: MutableState<Boolean>,
     private val kingSquare: Square,
-    private val piecesCheckingKing: MutableList<Square>,
+    private val piecesCheckingKing: MutableList<ChessPiece>,
     private val previousSquare: Square,
     private val currentSquare: Square,
     private val pinnedPieces: MutableList<ChessPiece>

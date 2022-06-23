@@ -66,7 +66,7 @@ class GameRepository() : ViewModel() {
     private var blackCanCastleKingSide: MutableState<Boolean> = mutableStateOf(false)
     private var blackCanCastleQueenSide: MutableState<Boolean> = mutableStateOf(false)
     var kingInCheck: MutableState<Boolean> = mutableStateOf(false)
-    private var piecesCheckingKing = mutableListOf<Square>()
+    private var piecesCheckingKing = mutableListOf<ChessPiece>()
     private var checksOnKing = mutableListOf<Square>()
     private var previousGameStates = mutableListOf<GameState>()
     var annotations: MutableList<String> = mutableStateListOf("start:")
@@ -122,7 +122,8 @@ class GameRepository() : ViewModel() {
     init {
         //initialPosition()
         //testPositionKiwipete()
-        testPosition3()
+        //testPosition3()
+        testPosition4()
     }
 
     fun resetGame(time: Long, isOnline: Boolean) {
@@ -565,10 +566,10 @@ class GameRepository() : ViewModel() {
                 attacks.addAll(piece.attacks)
                 if (piece.legalMoves.contains(kingSquare().value)) {
                     if (piece.piece == "pawn" || piece.piece == "knight") {
-                        piecesCheckingKing.add(piece.square)
+                        piecesCheckingKing.add(piece)
                     }
                     if (kingInCheck.value) {
-                        piecesCheckingKing.add(piece.square)
+                        piecesCheckingKing.add(piece)
                     }
                 }
             }
