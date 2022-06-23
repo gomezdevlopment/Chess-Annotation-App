@@ -22,21 +22,44 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+//data class CurrentGameState(
+//    var piecesOnBoard: List<ChessPiece>,
+//    var capturedPieces: List<ChessPiece>,
+//    var occupiedSquares: Map<Square, ChessPiece>,
+//    var previousSquare: Square,
+//    var currentSquare: Square,
+//    var playerTurn: String,
+//    var whiteKingSquare: Square,
+//    var blackKingSquare: Square,
+//    var xRayAttacks: List<Square>,
+//    var attacks: List<Square>,
+//    var allLegalMoves: List<Square>,
+//    var whiteCanCastleKingSide: Boolean,
+//    var whiteCanCastleQueenSide: Boolean,
+//    var blackCanCastleKingSide: Boolean,
+//    var blackCanCastleQueenSide: Boolean,
+//    var kingInCheck: Boolean,
+//    var piecesCheckingKing: List<Square>,
+//    val pinnedPieces: List<ChessPiece>,
+//    val pieceMoved: ChessPiece?,
+//    val pieceCaptured: ChessPiece?
+//)
 
 class GameRepository() : ViewModel() {
     var piecesOnBoard: MutableList<ChessPiece> = mutableStateListOf()
     var capturedPieces: MutableList<ChessPiece> = mutableStateListOf()
     var occupiedSquares: MutableMap<Square, ChessPiece> = mutableMapOf()
+
     //var mapOfPiecesAndTheirLegalMoves: MutableMap<ChessPiece, MutableList<Square>> =
-       // mutableMapOf()
+    // mutableMapOf()
     var previousSquare: MutableState<Square> = mutableStateOf(Square(10, 10))
     var currentSquare: MutableState<Square> = mutableStateOf(Square(10, 10))
     var playerTurn: MutableState<String> = mutableStateOf("white")
-    var squaresToBlock: MutableList<Square> = mutableListOf()
     private var whiteKingSquare: MutableState<Square> = mutableStateOf(Square(0, 4))
     private var blackKingSquare: MutableState<Square> = mutableStateOf(Square(7, 4))
     var xRayAttacks: MutableList<Square> = mutableListOf()
     var attacks: MutableList<Square> = mutableListOf()
+    var pinnedPieces = mutableListOf<ChessPiece>()
     private var allLegalMoves: MutableList<Square> = mutableListOf()
     private var whiteCanCastleKingSide: MutableState<Boolean> = mutableStateOf(false)
     private var whiteCanCastleQueenSide: MutableState<Boolean> = mutableStateOf(false)
@@ -95,8 +118,11 @@ class GameRepository() : ViewModel() {
     var selectedNotationIndex: MutableState<Int> = mutableStateOf(0)
     val openDrawOfferedDialog = mutableStateOf(false)
 
+
     init {
-        initialPosition()
+        //initialPosition()
+        //testPositionKiwipete()
+        testPosition3()
     }
 
     fun resetGame(time: Long, isOnline: Boolean) {
@@ -374,6 +400,7 @@ class GameRepository() : ViewModel() {
             occupiedSquares[piece.square] = piece
         }
         checkAllLegalMoves()
+
         //checkAttacks()
     }
 
@@ -387,6 +414,7 @@ class GameRepository() : ViewModel() {
             )
         )
     }
+
 
     fun testPositionKiwipete() {
         setPositionFromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ")
@@ -433,7 +461,8 @@ class GameRepository() : ViewModel() {
     ) {
         list.clear()
         piecesOnBoard.forEach() { piece ->
-            xRayAttacks.addAll(piece.xRays)
+            if (piece.color != playerTurn.value)
+                xRayAttacks.addAll(piece.xRays)
         }
     }
 
@@ -458,15 +487,6 @@ class GameRepository() : ViewModel() {
 //            setSquaresToBlock()
 //        }
 //    }
-
-    private fun setSquaresToBlock(): MutableList<Square> {
-        for (square in checksOnKing) {
-            if (!attacks.contains(square)) {
-                squaresToBlock.remove(square)
-            }
-        }
-        return squaresToBlock
-    }
 
     private fun checkIfKingOrRooksMoved(piece: ChessPiece) {
         if (piece.color == "white") {
@@ -537,33 +557,25 @@ class GameRepository() : ViewModel() {
         allLegalMoves.clear()
         piecesCheckingKing.clear()
         attacks.clear()
-        squaresToBlock.clear()
-
-        println("Checking All Legal Moves for ${playerTurn.value}")
-
+        pinnedPieces.clear()
         piecesOnBoard.forEach { piece ->
             kingInCheck.value = false
-            if(piece.color != playerTurn.value){
+            if (piece.color != playerTurn.value) {
                 checkLegalMoves(piece, kingSquare().value)
                 attacks.addAll(piece.attacks)
-            }
-
-            if(piece.legalMoves.contains(kingSquare().value)){
-                if(piece.piece == "pawn" || piece.piece == "knight"){
-                    piecesCheckingKing.add(piece.square)
-                }
-                if(kingInCheck.value){
-                    piecesCheckingKing.add(piece.square)
+                if (piece.legalMoves.contains(kingSquare().value)) {
+                    if (piece.piece == "pawn" || piece.piece == "knight") {
+                        piecesCheckingKing.add(piece.square)
+                    }
+                    if (kingInCheck.value) {
+                        piecesCheckingKing.add(piece.square)
+                    }
                 }
             }
         }
 
         setXRayAttacks(xRayAttacks, false)
         kingInCheck.value = piecesCheckingKing.isNotEmpty()
-        if (kingInCheck.value) {
-            setSquaresToBlock()
-        }
-
         piecesOnBoard.forEach { piece ->
             if (piece.color == playerTurn.value) {
                 checkLegalMoves(piece, getEnemyKingSquare())
@@ -624,7 +636,7 @@ class GameRepository() : ViewModel() {
         } else {
             playerTurn.value = "white"
         }
-       // checkAttacks()
+        // checkAttacks()
         previousGameStates.add(
             GameState(
                 previousSquare.value,
@@ -653,7 +665,7 @@ class GameRepository() : ViewModel() {
     }
 
     private fun removePiece(square: Square) {
-        println(piecesOnBoard.remove(occupiedSquares.remove(square)))
+        piecesOnBoard.remove(occupiedSquares.remove(square))
     }
 
     fun checkIfCastled(
@@ -808,7 +820,6 @@ class GameRepository() : ViewModel() {
         checkIfCastled(piece, newSquare, depth)
         //Remove Defender
         if (occupiedSquares.containsKey(newSquare)) {
-            fiftyMoveCount.value = 0
             if (depth == 1) {
                 captures.value += 1
             }
@@ -817,12 +828,13 @@ class GameRepository() : ViewModel() {
             }
             removePiece(newSquare)
         } else if (isEnPassant(piece, newSquare)) {
-            fiftyMoveCount.value = 0
             if (depth == 1) {
                 enPassants.value += 1
                 captures.value += 1
             }
-            occupiedSquares[currentSquare.value]?.let { capturedPieces.add(it) }
+            occupiedSquares[currentSquare.value]?.let {
+                capturedPieces.add(it)
+            }
             removePiece(currentSquare.value)
         }
 
@@ -851,10 +863,10 @@ class GameRepository() : ViewModel() {
                 getGameStateAsFEN()
             )
         )
+        setPositionFromFen(getGameStateAsFEN())
         if (kingInCheck.value && depth == 1) {
             checks.value += 1
         }
-        setPositionFromFen(getGameStateAsFEN())
     }
 
     private fun isEnPassant(piece: ChessPiece, square: Square): Boolean {
@@ -946,16 +958,15 @@ class GameRepository() : ViewModel() {
         return Piece(
             piece,
             occupiedSquares,
-            squaresToBlock,
             attacks,
             castleKingSide(),
             castleQueenSide(),
             kingInCheck,
             kingSquare,
-            checksOnKing,
             piecesCheckingKing,
             previousSquare.value,
-            currentSquare.value
+            currentSquare.value,
+            pinnedPieces
         ).moves()
     }
 

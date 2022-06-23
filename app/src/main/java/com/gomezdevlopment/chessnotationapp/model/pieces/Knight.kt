@@ -12,9 +12,14 @@ class Knight {
     fun moves(
         piece: ChessPiece,
         occupiedSquares: MutableMap<Square, ChessPiece>,
-        squaresToBlock: MutableList<Square>,
-        piecesCheckingKing: MutableList<Square>
+        piecesCheckingKing: MutableList<Square>,
+        pinnedPieces: MutableList<ChessPiece>
     ){
+
+        if(!pinnedPieces.contains(piece)){
+            piece.pinnedMoves.clear()
+        }
+
         gameLogic2.clearMoves(piece)
 
         var moveSquare = Square(piece.square.rank + 2, piece.square.file + 1)
@@ -38,7 +43,7 @@ class Knight {
             if(gameLogic2.isOnBoard(it)){
                 piece.attacks.add(it)
             }
-            if(gameLogic2.isLegalMove(it, occupiedSquares, piece, piecesCheckingKing, squaresToBlock)){
+            if(gameLogic2.isLegalMove(it, occupiedSquares, piece, piecesCheckingKing)){
                 piece.legalMoves.add(it)
             }
         }

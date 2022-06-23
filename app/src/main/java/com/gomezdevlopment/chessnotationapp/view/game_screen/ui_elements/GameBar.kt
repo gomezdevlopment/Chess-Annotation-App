@@ -87,8 +87,8 @@ fun GameBar(viewModel: GameViewModel){
                 Modifier
                     .weight(1f)
                     .clickable {
-                        viewModel.previousNotation()
-                        //viewModel.undoMove()
+                        //viewModel.previousNotation()
+                        viewModel.undoMove()
                     }
             ) {
                 val leftArrow: ImageVector =

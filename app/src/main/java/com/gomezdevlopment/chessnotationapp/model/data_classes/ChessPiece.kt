@@ -9,7 +9,7 @@ data class ChessPiece(
     val pseudoLegalMoves: MutableList<Square>,
     val attacks: MutableList<Square>,
     val xRays: MutableList<Square>,
-    val legalMoves: MutableList<Square>,
+    var legalMoves: MutableList<Square>,
     val pinnedMoves: MutableList<Square>
     )
 

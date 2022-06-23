@@ -13,11 +13,15 @@ class Bishop {
     fun moves(
         piece: ChessPiece,
         occupiedSquares: MutableMap<Square, ChessPiece>,
-        squaresToBlock: MutableList<Square>,
         kingInCheck: MutableState<Boolean>,
         kingSquare: Square,
-        piecesCheckingKing: MutableList<Square>
+        piecesCheckingKing: MutableList<Square>,
+        pinnedPieces: MutableList<ChessPiece>,
     ) {
+        if(!pinnedPieces.contains(piece)){
+            piece.pinnedMoves.clear()
+        }
+
         GameLogic2().clearMoves(piece)
         val listOfMoves = mutableListOf<Square>()
 
@@ -34,7 +38,7 @@ class Bishop {
                     moves,
                     kingInCheck,
                     piecesCheckingKing,
-                    squaresToBlock
+                    pinnedPieces
                 )
             }
             listOfMoves.clear()

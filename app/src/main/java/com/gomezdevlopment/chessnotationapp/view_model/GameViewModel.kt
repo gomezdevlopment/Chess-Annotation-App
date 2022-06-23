@@ -93,11 +93,11 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                 setPieceClickedState(false)
                 selectedPiece.value = piece
                 if (getPlayerTurn() == getSelectedPiece().value.color) {
-//                    println("Xrays ${piece.xRays}")
-//                    println("Attacks ${piece.attacks}")
-//                    println("legal moves ${piece.legalMoves}")
-//                    println("pinned moves ${piece.pinnedMoves}")
-//                    println("pinned pseudo ${piece.pseudoLegalMoves}")
+                    println("Xrays ${piece.xRays}")
+                    println("Attacks ${piece.attacks}")
+                    println("legal moves ${piece.legalMoves}")
+                    println("pinned moves ${piece.pinnedMoves}")
+                    println("pinned pseudo ${piece.pseudoLegalMoves}")
                     //setPieceClickedState(true)
                     if(isOnline.value){
                         if (getPlayerTurn() == userColor) {
@@ -191,10 +191,6 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     fun xRays(): MutableList<Square> {
         return gameRepository.xRayAttacks
-    }
-
-    fun getSquaresToBlock(): MutableList<Square> {
-        return gameRepository.squaresToBlock
     }
 
     fun getAttacks(): MutableList<Square> {

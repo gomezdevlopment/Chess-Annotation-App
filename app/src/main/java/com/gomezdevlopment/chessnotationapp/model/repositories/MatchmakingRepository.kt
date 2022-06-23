@@ -34,7 +34,6 @@ class MatchmakingRepository : ViewModel() {
             .get()
             .addOnSuccessListener { gamePool ->
                 if (gamePool.isEmpty) {
-                    println("empty")
                     createGame(timeControl, MainActivity.user?.username.toString())
                 } else {
                     val docRef = db.collection(gamePoolCollection).document(gamePool.documents[0].id)

@@ -11,6 +11,20 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class GameRepositoryTest {
     private val gameRepository: GameRepository = GameRepository()
+    private val promotionPieces = mutableListOf<ChessPiece>()
+    private val blackPieceImages = listOf(
+        ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(10, 10), 9, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
+        ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(10, 10), 5, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
+        ChessPiece("black", "bishop", R.drawable.ic_bb_alpha, Square(10, 10), 3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
+        ChessPiece("black", "knight", R.drawable.ic_bn_alpha, Square(10, 10), 3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf())
+    )
+
+    private val whitePieceImages = listOf(
+        ChessPiece("white", "queen", R.drawable.ic_wq_alpha, Square(10, 10), 9, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
+        ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(10, 10), 5, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
+        ChessPiece("white", "bishop", R.drawable.ic_wb_alpha, Square(10, 10), 3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
+        ChessPiece("white", "knight", R.drawable.ic_wn_alpha, Square(10, 10), 3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf())
+    )
 
     private fun analyzePositions(depth: Int): Int {
         if (depth == 0) {
@@ -23,29 +37,20 @@ class GameRepositoryTest {
         for (piece in pieces) {
             if (piece.color == playerTurn) {
                 val originalPieceSquare = piece.square
-                for (legalMove in gameRepository.checkLegalMoves(piece, false)) {
+                val originalLegalMoves = mutableListOf<Square>()
+                originalLegalMoves.addAll(piece.legalMoves)
+                if(piece.piece == "pawn"){
+                    println(originalLegalMoves)
+                }
+                for (legalMove in originalLegalMoves) {
                     if (piece.piece == "pawn" && (legalMove.rank == 7 || legalMove.rank == 0)) {
-                        val promotionPieces = mutableListOf<ChessPiece>()
-                        val blackPieceImages = listOf(
-                            ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(legalMove.rank, legalMove.file), 9, listOf()),
-                            ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(legalMove.rank, legalMove.file), 5, listOf()),
-                            ChessPiece("black", "bishop", R.drawable.ic_bb_alpha, Square(legalMove.rank, legalMove.file), 3, listOf()),
-                            ChessPiece("black", "knight", R.drawable.ic_bn_alpha, Square(legalMove.rank, legalMove.file), 3, listOf())
-                        )
-
-                        val whitePieceImages = listOf(
-                            ChessPiece("white", "queen", R.drawable.ic_wq_alpha, Square(legalMove.rank, legalMove.file), 9, listOf()),
-                            ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(legalMove.rank, legalMove.file), 5, listOf()),
-                            ChessPiece("white", "bishop", R.drawable.ic_wb_alpha, Square(legalMove.rank, legalMove.file), 3, listOf()),
-                            ChessPiece("white", "knight", R.drawable.ic_wn_alpha, Square(legalMove.rank, legalMove.file), 3, listOf())
-                        )
-
                         if (piece.color == "white") {
                             promotionPieces.addAll(whitePieceImages)
                         } else {
                             promotionPieces.addAll(blackPieceImages)
                         }
                         for(promotionPiece in promotionPieces){
+                            promotionPiece.square = Square(legalMove.rank, legalMove.file)
                             gameRepository.movePiece(Square(legalMove.rank, legalMove.file), piece, depth)
                             gameRepository.promotion(legalMove, promotionPiece, depth)
                             numberOfMoves += analyzePositions(depth - 1)
@@ -59,6 +64,7 @@ class GameRepositoryTest {
                         piece.square = originalPieceSquare
                     }
                 }
+                piece.legalMoves = originalLegalMoves
             }
         }
         return numberOfMoves

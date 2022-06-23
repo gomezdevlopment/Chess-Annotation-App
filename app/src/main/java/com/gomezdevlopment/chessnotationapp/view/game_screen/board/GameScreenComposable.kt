@@ -167,10 +167,6 @@ fun ChessUILogic(height: Dp, viewModel: GameViewModel, navController: NavControl
         viewModel.xRays()
     }
 
-    val attackedSquares = remember {
-        viewModel.getSquaresToBlock()
-    }
-
     val attacks = remember {
         viewModel.getAttacks()
     }

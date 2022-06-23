@@ -15,24 +15,28 @@ class Pawn {
     fun moves(
         piece: ChessPiece,
         occupiedSquares: MutableMap<Square, ChessPiece>,
-        squaresToBlock: MutableList<Square>,
         previousSquare: Square,
         currentSquare: Square,
         piecesCheckingKing: MutableList<Square>,
+        pinnedPieces: MutableList<ChessPiece>
     ) {
-        if(piece.pinnedMoves.isNotEmpty()){
+        if (piece.pinnedMoves.isNotEmpty()) {
             wasPinned.value = true
+        }
+
+        if (!pinnedPieces.contains(piece)) {
+            piece.pinnedMoves.clear()
         }
 
         gameLogic2.clearMoves(piece)
         var moveSquare: Square
         if (piece.color == "white") {
             moveSquare = Square(piece.square.rank + 1, piece.square.file)
-            if(!occupiedSquares.containsKey(moveSquare)){
+            if (!occupiedSquares.containsKey(moveSquare)) {
                 piece.pseudoLegalMoves.add(moveSquare)
                 if (piece.square.rank == 1) {
                     moveSquare = Square(piece.square.rank + 2, piece.square.file)
-                    if(!occupiedSquares.containsKey(moveSquare)){
+                    if (!occupiedSquares.containsKey(moveSquare)) {
                         piece.pseudoLegalMoves.add(moveSquare)
                     }
                 }
@@ -41,11 +45,11 @@ class Pawn {
 
         if (piece.color == "black") {
             moveSquare = Square(piece.square.rank - 1, piece.square.file)
-            if(!occupiedSquares.containsKey(moveSquare)){
+            if (!occupiedSquares.containsKey(moveSquare)) {
                 piece.pseudoLegalMoves.add(moveSquare)
                 if (piece.square.rank == 6) {
                     moveSquare = Square(piece.square.rank - 2, piece.square.file)
-                    if(!occupiedSquares.containsKey(moveSquare)){
+                    if (!occupiedSquares.containsKey(moveSquare)) {
                         piece.pseudoLegalMoves.add(moveSquare)
                     }
                 }
@@ -53,7 +57,13 @@ class Pawn {
         }
 
         piece.pseudoLegalMoves.forEach {
-            if(gameLogic2.isLegalMove(it, occupiedSquares, piece, piecesCheckingKing, squaresToBlock)){
+            if (gameLogic2.isLegalMove(
+                    it,
+                    occupiedSquares,
+                    piece,
+                    piecesCheckingKing,
+                )
+            ) {
                 piece.legalMoves.add(it)
             }
         }
@@ -75,16 +85,20 @@ class Pawn {
             piece.attacks.add(moveSquare)
         }
 
-        if (occupiedSquares.containsKey(moveSquare)) {
-            if(gameLogic2.isLegalMove(moveSquare, occupiedSquares, piece, piecesCheckingKing, squaresToBlock)){
-                piece.legalMoves.add(moveSquare)
+        piece.pseudoLegalMoves.forEach { move ->
+            if (occupiedSquares.containsKey(move)) {
+                if (gameLogic2.isLegalMove(move, occupiedSquares, piece, piecesCheckingKing)) {
+                    piece.legalMoves.add(move)
+                }
             }
-            if(gameLogic2.isEnPassant(previousSquare, currentSquare,moveSquare, occupiedSquares, piece, wasPinned.value)){
-                piece.legalMoves.add(moveSquare)
+            if (gameLogic2.isEnPassant(previousSquare, currentSquare, move, occupiedSquares, piece, wasPinned.value)) {
+                piece.legalMoves.add(move)
             }
         }
         piece.pinnedMoves.clear()
     }
+
+
 
 //    fun pawnAttacks(piece: ChessPiece): MutableList<Square> {
 //        val attacks = mutableListOf<Square>()

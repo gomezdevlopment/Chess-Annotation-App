@@ -12,12 +12,10 @@ class King {
     fun moves(
         piece: ChessPiece,
         occupiedSquares: MutableMap<Square, ChessPiece>,
-        squaresToBlock: MutableList<Square>,
         attackedSquares: MutableList<Square>,
         kingCanCastleKingSide: Boolean,
         kingCanCastleQueenSide: Boolean,
         kingSquare: Square,
-        checksOnKing: MutableList<Square>,
         piecesCheckingKing: MutableList<Square>
     ) {
         gameLogic2.clearMoves(piece)
@@ -42,7 +40,7 @@ class King {
             if(gameLogic2.isOnBoard(it)){
                 piece.attacks.add(it)
             }
-            if(gameLogic2.isLegalMove(it, occupiedSquares, piece, piecesCheckingKing, squaresToBlock)
+            if(gameLogic2.isLegalMove(it, occupiedSquares, piece, piecesCheckingKing)
                 && !attackedSquares.contains(it)){
                 piece.legalMoves.add(it)
             }

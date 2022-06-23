@@ -7,16 +7,15 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 class Piece(
     private val piece: ChessPiece,
     private val occupiedSquares: MutableMap<Square, ChessPiece>,
-    private val squaresToBlock: MutableList<Square>,
     private val attacks: MutableList<Square>,
     private val canCastleKingSide: Boolean,
     private val canCastleQueenSide: Boolean,
     private val kingInCheck: MutableState<Boolean>,
     private val kingSquare: Square,
-    private val checksOnKing: MutableList<Square>,
     private val piecesCheckingKing: MutableList<Square>,
     private val previousSquare: Square,
-    private val currentSquare: Square
+    private val currentSquare: Square,
+    private val pinnedPieces: MutableList<ChessPiece>
 ) {
     fun moves(): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
@@ -36,10 +35,10 @@ class Piece(
         Pawn().moves(
             piece,
             occupiedSquares,
-            squaresToBlock,
             previousSquare,
             currentSquare,
-            piecesCheckingKing
+            piecesCheckingKing,
+            pinnedPieces
         )
         return piece.legalMoves
     }
@@ -48,12 +47,10 @@ class Piece(
         King().moves(
             piece,
             occupiedSquares,
-            squaresToBlock,
             attacks,
             canCastleKingSide,
             canCastleQueenSide,
             kingSquare,
-            checksOnKing,
             piecesCheckingKing,
         )
         return piece.legalMoves
@@ -63,10 +60,10 @@ class Piece(
         Bishop().moves(
             piece,
             occupiedSquares,
-            squaresToBlock,
             kingInCheck,
             kingSquare,
-            piecesCheckingKing
+            piecesCheckingKing,
+            pinnedPieces
         )
         return piece.legalMoves
     }
@@ -75,10 +72,10 @@ class Piece(
         Rook().moves(
             piece,
             occupiedSquares,
-            squaresToBlock,
             kingInCheck,
             kingSquare,
-            piecesCheckingKing
+            piecesCheckingKing,
+            pinnedPieces
         )
         return piece.legalMoves
     }
@@ -87,10 +84,10 @@ class Piece(
         Queen().moves(
             piece,
             occupiedSquares,
-            squaresToBlock,
             kingInCheck,
             kingSquare,
-            piecesCheckingKing
+            piecesCheckingKing,
+            pinnedPieces
         )
         return piece.legalMoves
     }
@@ -99,8 +96,8 @@ class Piece(
         Knight().moves(
             piece,
             occupiedSquares,
-            squaresToBlock,
-            piecesCheckingKing
+            piecesCheckingKing,
+            pinnedPieces
         )
         return piece.legalMoves
     }
