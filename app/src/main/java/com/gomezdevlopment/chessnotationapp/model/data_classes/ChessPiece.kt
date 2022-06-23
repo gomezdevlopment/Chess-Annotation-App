@@ -5,8 +5,13 @@ data class ChessPiece(
     val piece: String,
     val pieceDrawable: Int,
     var square: Square,
-    val value: Int
-)
+    val value: Int,
+    val pseudoLegalMoves: MutableList<Square>,
+    val attacks: MutableList<Square>,
+    val xRays: MutableList<Square>,
+    val legalMoves: MutableList<Square>,
+    val pinnedMoves: MutableList<Square>
+    )
 
 
 

@@ -9,8 +9,7 @@ class Notation(private val stringBuilder: StringBuilder, private val square: Squ
 
     fun piece(
         piece: ChessPiece,
-        piecesOnBoard: MutableList<ChessPiece>,
-        pieceLegalMoves: MutableMap<ChessPiece, MutableList<Square>>
+        piecesOnBoard: MutableList<ChessPiece>
     ) {
         pieceMoved = piece.piece
         when (piece.piece) {
@@ -22,15 +21,13 @@ class Notation(private val stringBuilder: StringBuilder, private val square: Squ
             "pawn" -> stringBuilder.append(fileLetter(piece.square.file))
         }
         for (otherPiece in piecesOnBoard) {
-            if(piece != otherPiece){
+            if (piece != otherPiece) {
                 if (piece.piece == otherPiece.piece && piece.color == otherPiece.color && piece.piece != "pawn") {
-                    if (pieceLegalMoves.containsKey(otherPiece)) {
-                        if (pieceLegalMoves[otherPiece]?.contains(square) == true) {
-                            if (piece.square.rank == otherPiece.square.rank) {
-                                stringBuilder.append(fileLetter(piece.square.file))
-                            } else {
-                                stringBuilder.append(piece.square.rank + 1)
-                            }
+                    if (otherPiece.legalMoves.contains(square)) {
+                        if (piece.square.rank == otherPiece.square.rank) {
+                            stringBuilder.append(fileLetter(piece.square.file))
+                        } else {
+                            stringBuilder.append(piece.square.rank + 1)
                         }
                     }
                 }
@@ -52,7 +49,7 @@ class Notation(private val stringBuilder: StringBuilder, private val square: Squ
     }
 
     fun square(capture: Boolean) {
-        if(pieceMoved == "pawn" && !capture){
+        if (pieceMoved == "pawn" && !capture) {
             stringBuilder.delete(0, 1)
         }
         stringBuilder.append(fileLetter(square.file))

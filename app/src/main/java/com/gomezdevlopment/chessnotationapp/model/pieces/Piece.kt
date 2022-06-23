@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.model.pieces
 
+import androidx.compose.runtime.MutableState
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 
@@ -10,11 +11,10 @@ class Piece(
     private val attacks: MutableList<Square>,
     private val canCastleKingSide: Boolean,
     private val canCastleQueenSide: Boolean,
-    private val xRayAttacks: MutableList<Square>,
+    private val kingInCheck: MutableState<Boolean>,
     private val kingSquare: Square,
     private val checksOnKing: MutableList<Square>,
     private val piecesCheckingKing: MutableList<Square>,
-    private val checkDefendedPieces: Boolean,
     private val previousSquare: Square,
     private val currentSquare: Square
 ) {
@@ -33,80 +33,75 @@ class Piece(
     }
 
     private fun pawnMoves(): MutableList<Square> {
-        return Pawn().moves(
+        Pawn().moves(
             piece,
             occupiedSquares,
             squaresToBlock,
             previousSquare,
             currentSquare,
-            xRayAttacks,
-            kingSquare,
-            piecesCheckingKing,
-            checkDefendedPieces
+            piecesCheckingKing
         )
+        return piece.legalMoves
     }
 
     private fun kingMoves(): MutableList<Square> {
-        return King().moves(
+        King().moves(
             piece,
             occupiedSquares,
             squaresToBlock,
             attacks,
             canCastleKingSide,
             canCastleQueenSide,
-            xRayAttacks,
             kingSquare,
             checksOnKing,
             piecesCheckingKing,
-            checkDefendedPieces
         )
+        return piece.legalMoves
     }
 
     private fun bishopMoves(): MutableList<Square> {
-        return Bishop().moves(
+        Bishop().moves(
             piece,
             occupiedSquares,
             squaresToBlock,
-            checkDefendedPieces,
-            xRayAttacks,
+            kingInCheck,
             kingSquare,
             piecesCheckingKing
         )
+        return piece.legalMoves
     }
 
     private fun rookMoves(): MutableList<Square> {
-        return Rook().moves(
+        Rook().moves(
             piece,
             occupiedSquares,
             squaresToBlock,
-            checkDefendedPieces,
-            xRayAttacks,
+            kingInCheck,
             kingSquare,
             piecesCheckingKing
         )
+        return piece.legalMoves
     }
 
     private fun queenMoves(): MutableList<Square> {
-        return Queen().moves(
+        Queen().moves(
             piece,
             occupiedSquares,
             squaresToBlock,
-            checkDefendedPieces,
-            xRayAttacks,
+            kingInCheck,
             kingSquare,
             piecesCheckingKing
         )
+        return piece.legalMoves
     }
 
     private fun knightMoves(): MutableList<Square> {
-        return Knight().moves(
+        Knight().moves(
             piece,
             occupiedSquares,
             squaresToBlock,
-            checkDefendedPieces,
-            xRayAttacks,
-            kingSquare,
             piecesCheckingKing
         )
+        return piece.legalMoves
     }
 }

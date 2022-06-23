@@ -3,46 +3,45 @@ package com.gomezdevlopment.chessnotationapp.model.pieces
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
+import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic2
 
 class Knight {
     private val gameLogic = GameLogic()
+    private val gameLogic2 = GameLogic2()
 
     fun moves(
         piece: ChessPiece,
-        hashMap: MutableMap<Square, ChessPiece>,
+        occupiedSquares: MutableMap<Square, ChessPiece>,
         squaresToBlock: MutableList<Square>,
-        checkDefendedPieces: Boolean,
-        xRayAttacks: MutableList<Square>,
-        kingSquare: Square,
         piecesCheckingKing: MutableList<Square>
-    ): MutableList<Square> {
-        val listOfMoves = mutableListOf<Square>()
-        var moveSquare = Square(piece.square.rank + 2, piece.square.file + 1)
-        listOfMoves.add(moveSquare)
-        moveSquare = Square(piece.square.rank + 2, piece.square.file - 1)
-        listOfMoves.add(moveSquare)
-        moveSquare = Square(piece.square.rank - 2, piece.square.file + 1)
-        listOfMoves.add(moveSquare)
-        moveSquare = Square(piece.square.rank - 2, piece.square.file - 1)
-        listOfMoves.add(moveSquare)
-        moveSquare = Square(piece.square.rank + 1, piece.square.file + 2)
-        listOfMoves.add(moveSquare)
-        moveSquare = Square(piece.square.rank - 1, piece.square.file + 2)
-        listOfMoves.add(moveSquare)
-        moveSquare = Square(piece.square.rank + 1, piece.square.file - 2)
-        listOfMoves.add(moveSquare)
-        moveSquare = Square(piece.square.rank - 1, piece.square.file - 2)
-        listOfMoves.add(moveSquare)
+    ){
+        gameLogic2.clearMoves(piece)
 
-        val moves = mutableListOf<Square>()
-        for (move in listOfMoves) {
-            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock, xRayAttacks, kingSquare, piecesCheckingKing)) {
-                moves.add(move)
+        var moveSquare = Square(piece.square.rank + 2, piece.square.file + 1)
+        piece.pseudoLegalMoves.add(moveSquare)
+        moveSquare = Square(piece.square.rank + 2, piece.square.file - 1)
+        piece.pseudoLegalMoves.add(moveSquare)
+        moveSquare = Square(piece.square.rank - 2, piece.square.file + 1)
+        piece.pseudoLegalMoves.add(moveSquare)
+        moveSquare = Square(piece.square.rank - 2, piece.square.file - 1)
+        piece.pseudoLegalMoves.add(moveSquare)
+        moveSquare = Square(piece.square.rank + 1, piece.square.file + 2)
+        piece.pseudoLegalMoves.add(moveSquare)
+        moveSquare = Square(piece.square.rank - 1, piece.square.file + 2)
+        piece.pseudoLegalMoves.add(moveSquare)
+        moveSquare = Square(piece.square.rank + 1, piece.square.file - 2)
+        piece.pseudoLegalMoves.add(moveSquare)
+        moveSquare = Square(piece.square.rank - 1, piece.square.file - 2)
+        piece.pseudoLegalMoves.add(moveSquare)
+
+        piece.pseudoLegalMoves.forEach {
+            if(gameLogic2.isOnBoard(it)){
+                piece.attacks.add(it)
             }
-            if(checkDefendedPieces && gameLogic.isDefending(move, hashMap)){
-                moves.add(move)
+            if(gameLogic2.isLegalMove(it, occupiedSquares, piece, piecesCheckingKing, squaresToBlock)){
+                piece.legalMoves.add(it)
             }
         }
-        return moves
+        piece.pinnedMoves.clear()
     }
 }

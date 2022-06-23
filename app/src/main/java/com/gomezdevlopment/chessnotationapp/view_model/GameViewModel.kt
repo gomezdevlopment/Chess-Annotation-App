@@ -25,7 +25,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     private var hashMap: MutableMap<Square, ChessPiece> = gameRepository.occupiedSquares
     private var previousSquare: MutableState<Square> = gameRepository.previousSquare
     private var selectedPiece: MutableState<ChessPiece> =
-        mutableStateOf(ChessPiece("", "", R.drawable.ic_br_alpha, Square(10, 10), 0))
+        mutableStateOf(ChessPiece("", "", R.drawable.ic_br_alpha, Square(10, 10), 0, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()))
     private var pieceClicked: MutableState<Boolean> = mutableStateOf(false)
     private var promotionDialogShowing: MutableState<Boolean> = mutableStateOf(false)
     var selectedNotationIndex: MutableState<Int> = gameRepository.selectedNotationIndex
@@ -93,6 +93,11 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
                 setPieceClickedState(false)
                 selectedPiece.value = piece
                 if (getPlayerTurn() == getSelectedPiece().value.color) {
+//                    println("Xrays ${piece.xRays}")
+//                    println("Attacks ${piece.attacks}")
+//                    println("legal moves ${piece.legalMoves}")
+//                    println("pinned moves ${piece.pinnedMoves}")
+//                    println("pinned pseudo ${piece.pseudoLegalMoves}")
                     //setPieceClickedState(true)
                     if(isOnline.value){
                         if (getPlayerTurn() == userColor) {
@@ -115,10 +120,10 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         gameRepository.undoMove()
     }
 
-    fun onEvent(event: GameEvent, piece: ChessPiece): MutableList<Square>? {
+    fun onEvent(event: GameEvent, piece: ChessPiece): MutableList<Square> {
         when (event) {
             GameEvent.OnPieceClicked -> {
-                return gameRepository.mapOfPiecesAndTheirLegalMoves[piece]
+                return piece.legalMoves
             }
         }
     }

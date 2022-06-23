@@ -3,70 +3,64 @@ package com.gomezdevlopment.chessnotationapp.model.pieces
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
+import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic2
 
 class King {
     private val gameLogic = GameLogic()
+    private val gameLogic2 = GameLogic2()
 
     fun moves(
         piece: ChessPiece,
-        hashMap: MutableMap<Square, ChessPiece>,
+        occupiedSquares: MutableMap<Square, ChessPiece>,
         squaresToBlock: MutableList<Square>,
         attackedSquares: MutableList<Square>,
         kingCanCastleKingSide: Boolean,
         kingCanCastleQueenSide: Boolean,
-        xRayAttacks: MutableList<Square>,
         kingSquare: Square,
         checksOnKing: MutableList<Square>,
-        piecesCheckingKing: MutableList<Square>,
-        checkDefendedPieces: Boolean
-    ): MutableList<Square> {
-        val listOfMoves = mutableListOf<Square>()
+        piecesCheckingKing: MutableList<Square>
+    ) {
+        gameLogic2.clearMoves(piece)
         var moveSquare = Square(piece.square.rank + 1, piece.square.file + 1)
-        listOfMoves.add(moveSquare)
+        piece.pseudoLegalMoves.add(moveSquare)
         moveSquare = Square(piece.square.rank + 1, piece.square.file - 1)
-        listOfMoves.add(moveSquare)
+        piece.pseudoLegalMoves.add(moveSquare)
         moveSquare = Square(piece.square.rank + 1, piece.square.file)
-        listOfMoves.add(moveSquare)
+        piece.pseudoLegalMoves.add(moveSquare)
         moveSquare = Square(piece.square.rank - 1, piece.square.file)
-        listOfMoves.add(moveSquare)
+        piece.pseudoLegalMoves.add(moveSquare)
         moveSquare = Square(piece.square.rank, piece.square.file + 1)
-        listOfMoves.add(moveSquare)
+        piece.pseudoLegalMoves.add(moveSquare)
         moveSquare = Square(piece.square.rank, piece.square.file - 1)
-        listOfMoves.add(moveSquare)
+        piece.pseudoLegalMoves.add(moveSquare)
         moveSquare = Square(piece.square.rank - 1, piece.square.file - 1)
-        listOfMoves.add(moveSquare)
+        piece.pseudoLegalMoves.add(moveSquare)
         moveSquare = Square(piece.square.rank - 1, piece.square.file + 1)
-        listOfMoves.add(moveSquare)
+        piece.pseudoLegalMoves.add(moveSquare)
 
-        val moves = mutableListOf<Square>()
-        for (move in listOfMoves) {
-            if (!gameLogic.illegalMove(move, hashMap, piece, squaresToBlock, xRayAttacks, kingSquare, piecesCheckingKing) &&
-                !attackedSquares.contains(move)) {
-                if(piecesCheckingKing.isNotEmpty() && checksOnKing.contains(move)){
-                    continue
-                }
-                moves.add(move)
+        piece.pseudoLegalMoves.forEach {
+            if(gameLogic2.isOnBoard(it)){
+                piece.attacks.add(it)
             }
-
-            if(checkDefendedPieces && gameLogic.isDefending(move, hashMap)){
-                moves.add(move)
+            if(gameLogic2.isLegalMove(it, occupiedSquares, piece, piecesCheckingKing, squaresToBlock)
+                && !attackedSquares.contains(it)){
+                piece.legalMoves.add(it)
             }
         }
         
         //King Side Castling
         moveSquare = Square(piece.square.rank, piece.square.file + 2)
         if(kingCanCastleKingSide){
-            if(gameLogic.canKingSideCastle(moveSquare, hashMap, attackedSquares)){
-                moves.add(moveSquare)
+            if(gameLogic.canKingSideCastle(moveSquare, occupiedSquares, attackedSquares)){
+                piece.legalMoves.add(moveSquare)
             }
         }
         //Queen Side Castling
         moveSquare = Square(piece.square.rank, piece.square.file - 2)
         if(kingCanCastleQueenSide){
-            if(gameLogic.canQueenSideCastle(moveSquare, hashMap, attackedSquares)){
-                moves.add(moveSquare)
+            if(gameLogic.canQueenSideCastle(moveSquare, occupiedSquares, attackedSquares)){
+                piece.legalMoves.add(moveSquare)
             }
         }
-        return moves
     }
 }

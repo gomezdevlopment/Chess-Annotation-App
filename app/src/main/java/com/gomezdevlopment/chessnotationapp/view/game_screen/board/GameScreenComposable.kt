@@ -9,6 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontStyle
@@ -23,10 +24,7 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.*
-import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleCapture
-import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleMove
-import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.tealDarker
-import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.textWhite
+import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable
@@ -165,25 +163,25 @@ fun ChessUILogic(height: Dp, viewModel: GameViewModel, navController: NavControl
     val targetFile = remember { mutableStateOf(0) }
     val endOfGame by remember { viewModel.endOfGame }
 
-//    val xRays = remember {
-//        viewModel.xRays()
-//    }
-//
-//    val attackedSquares = remember {
-//        viewModel.getSquaresToBlock()
-//    }
-//
-//    val attacks = remember {
-//        viewModel.getAttacks()
-//    }
+    val xRays = remember {
+        viewModel.xRays()
+    }
 
-//    for(attack in attacks){
-//        Highlight(height = height, square = attack, color = Color.Red, .5f)
-//    }
-//
-//    for(attack in xRays){
-//        Outline(height = height, square = attack, color = Color.Blue)
-//    }
+    val attackedSquares = remember {
+        viewModel.getSquaresToBlock()
+    }
+
+    val attacks = remember {
+        viewModel.getAttacks()
+    }
+
+    for(attack in attacks){
+        Highlight(height = height, square = attack, color = Color.Red, .5f)
+    }
+
+    for(attack in xRays){
+        Outline(height = height, square = attack, color = Color.Blue)
+    }
 
     if (showMoves) {
         val legalMoves = viewModel.onEvent(GameEvent.OnPieceClicked, clickedPiece.value)

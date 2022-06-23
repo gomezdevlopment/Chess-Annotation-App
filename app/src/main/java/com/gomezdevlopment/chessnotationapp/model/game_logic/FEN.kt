@@ -136,7 +136,7 @@ class FEN {
                                     "rook",
                                     R.drawable.ic_br_alpha,
                                     Square(rank, file),
-                                    5
+                                    5, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
                                 )
                             )
                         }
@@ -147,7 +147,7 @@ class FEN {
                                     "knight",
                                     R.drawable.ic_bn_alpha,
                                     Square(rank, file),
-                                    3
+                                    3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
                                 )
                             )
                         }
@@ -158,7 +158,7 @@ class FEN {
                                     "bishop",
                                     R.drawable.ic_bb_alpha,
                                     Square(rank, file),
-                                    3
+                                    3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
                                 )
                             )
                         }
@@ -169,7 +169,7 @@ class FEN {
                                     "queen",
                                     R.drawable.ic_bq_alpha,
                                     Square(rank, file),
-                                    9
+                                    9, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
                                 )
                             )
                         }
@@ -180,7 +180,7 @@ class FEN {
                                     "king",
                                     R.drawable.ic_bk_alpha,
                                     Square(rank, file),
-                                    0
+                                    0, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
                                 )
                             )
                             blackKingSquare.value = Square(rank, file)
@@ -192,7 +192,7 @@ class FEN {
                                     "pawn",
                                     R.drawable.ic_bp_alpha,
                                     Square(rank, file),
-                                    1
+                                    1, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
                                 )
                             )
                         }
@@ -203,7 +203,7 @@ class FEN {
                                     "rook",
                                     R.drawable.ic_wr_alpha,
                                     Square(rank, file),
-                                    5
+                                    5, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
                                 )
                             )
                         }
@@ -214,7 +214,7 @@ class FEN {
                                     "knight",
                                     R.drawable.ic_wn_alpha,
                                     Square(rank, file),
-                                    3
+                                    3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
                                 )
                             )
                         }
@@ -225,7 +225,7 @@ class FEN {
                                     "bishop",
                                     R.drawable.ic_wb_alpha,
                                     Square(rank, file),
-                                    3
+                                    3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
                                 )
                             )
                         }
@@ -236,7 +236,7 @@ class FEN {
                                     "queen",
                                     R.drawable.ic_wq_alpha,
                                     Square(rank, file),
-                                    9
+                                    9, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
                                 )
                             )
                         }
@@ -247,7 +247,7 @@ class FEN {
                                     "king",
                                     R.drawable.ic_wk,
                                     Square(rank, file),
-                                    0
+                                    0, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
                                 )
                             )
                             whiteKingSquare.value = Square(rank, file)
@@ -259,7 +259,7 @@ class FEN {
                                     "pawn",
                                     R.drawable.ic_wp_alpha,
                                     Square(rank, file),
-                                    1
+                                    1, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
                                 )
                             )
                         }
