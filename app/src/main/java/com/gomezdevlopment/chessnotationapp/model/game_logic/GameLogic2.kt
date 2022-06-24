@@ -83,9 +83,7 @@ class GameLogic2() {
         if (squareContainsFriendlyPiece(square, occupiedSquares, piece)) return false
 
         if (piece.pinnedMoves.isNotEmpty()) {
-            println("piece ${piece.piece} pinned")
             if (piece.pinnedMoves.contains(square)) {
-                //if(piecesCheckingKing[0].square == square) return true
                 if(piece.pinnedMoves.contains(square)) return true
                 return false
             }

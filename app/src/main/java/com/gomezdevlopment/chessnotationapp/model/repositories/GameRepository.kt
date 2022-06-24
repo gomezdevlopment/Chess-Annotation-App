@@ -60,7 +60,7 @@ class GameRepository() : ViewModel() {
     var xRayAttacks: MutableList<Square> = mutableListOf()
     var attacks: MutableList<Square> = mutableListOf()
     var pinnedPieces = mutableListOf<ChessPiece>()
-    private var allLegalMoves: MutableList<Square> = mutableListOf()
+    var allLegalMoves: MutableList<Square> = mutableListOf()
     private var whiteCanCastleKingSide: MutableState<Boolean> = mutableStateOf(false)
     private var whiteCanCastleQueenSide: MutableState<Boolean> = mutableStateOf(false)
     private var blackCanCastleKingSide: MutableState<Boolean> = mutableStateOf(false)
@@ -400,7 +400,7 @@ class GameRepository() : ViewModel() {
         for (piece in piecesOnBoard) {
             occupiedSquares[piece.square] = piece
         }
-        checkAllLegalMoves()
+        //checkAllLegalMoves()
 
         //checkAttacks()
     }
@@ -554,7 +554,7 @@ class GameRepository() : ViewModel() {
 
     }
 
-    private fun checkAllLegalMoves() {
+    fun checkAllLegalMoves() {
         allLegalMoves.clear()
         piecesCheckingKing.clear()
         attacks.clear()
@@ -647,6 +647,7 @@ class GameRepository() : ViewModel() {
         )
         checkIfGameOver()
         setPositionFromFen(getGameStateAsFEN())
+        checkAllLegalMoves()
         if (kingInCheck.value) {
             checkSound.value = true
             if (depth == 1) {
@@ -816,23 +817,19 @@ class GameRepository() : ViewModel() {
         startStopClocks()
     }
 
-    fun makeMove(piece: ChessPiece, newSquare: Square, depth: Int) {
+    fun makeMove(piece: ChessPiece, newSquare: Square, depth: Int, promotion: String) {
         val previousPieceSquare = piece.square
+        if(promotion != ""){
+            piece.piece = promotion
+        }
         checkIfCastled(piece, newSquare, depth)
         //Remove Defender
         if (occupiedSquares.containsKey(newSquare)) {
-            if (depth == 1) {
-                captures.value += 1
-            }
             occupiedSquares[newSquare]?.let {
                 capturedPieces.add(it)
             }
             removePiece(newSquare)
         } else if (isEnPassant(piece, newSquare)) {
-            if (depth == 1) {
-                enPassants.value += 1
-                captures.value += 1
-            }
             occupiedSquares[currentSquare.value]?.let {
                 capturedPieces.add(it)
             }
@@ -844,19 +841,13 @@ class GameRepository() : ViewModel() {
         occupiedSquares[newSquare] = piece
         previousSquare.value = previousPieceSquare
         currentSquare.value = newSquare
+
         if (piece.color == "white") {
-            if (piece.piece == "king") {
-                whiteKingSquare.value = newSquare
-            }
             playerTurn.value = "black"
-            //checkAttacks()
         } else {
-            if (piece.piece == "king") {
-                blackKingSquare.value = newSquare
-            }
             playerTurn.value = "white"
-            //checkAttacks()
         }
+
         previousGameStates.add(
             GameState(
                 previousSquare.value,
@@ -865,9 +856,6 @@ class GameRepository() : ViewModel() {
             )
         )
         setPositionFromFen(getGameStateAsFEN())
-        if (kingInCheck.value && depth == 1) {
-            checks.value += 1
-        }
     }
 
     private fun isEnPassant(piece: ChessPiece, square: Square): Boolean {
