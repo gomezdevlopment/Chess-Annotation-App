@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.model.game_logic
 
+import android.os.Build
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
@@ -83,12 +84,8 @@ class GameLogic2() {
         if (squareContainsFriendlyPiece(square, occupiedSquares, piece)) return false
 
         if (piece.pinnedMoves.isNotEmpty()) {
-            if (piece.pinnedMoves.contains(square)) {
-                if(piece.pinnedMoves.contains(square)) return true
-                return false
-            }
+            if (piece.pinnedMoves.contains(square)) return true
             return false
-
         }
 
         if (piecesCheckingKing.isNotEmpty()) {
@@ -126,8 +123,20 @@ class GameLogic2() {
         piece: ChessPiece
     ): Boolean {
         if (occupiedSquares.containsKey(square)) {
+            if(square == Square(0,6)){
+                //println("contains")
+            }
             if (piece.color == occupiedSquares[square]?.color) return true
         }
+//        if(square == Square(0,6)){
+//            println("friendly fire")
+//            println(occupiedSquares.size)
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                occupiedSquares.forEach { square, chessPiece ->
+//                    println("${chessPiece.color} ${chessPiece.piece} $square")
+//                }
+//            }
+//        }
         return false
     }
 
@@ -149,7 +158,7 @@ class GameLogic2() {
         if (abs(previousSquare.rank - currentSquare.rank) == 2) {
             val rank = (previousSquare.rank + currentSquare.rank) / 2
             if (square == Square(rank, currentSquare.file)) {
-                if (occupiedSquares[currentSquare]?.piece == "pawn") {
+                if (occupiedSquares[currentSquare]?.piece == "pawn" && occupiedSquares[currentSquare]?.color != piece.color) {
                     if (!wasPinned) {
                         return true
                     }

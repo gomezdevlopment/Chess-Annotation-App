@@ -4,6 +4,7 @@ import androidx.compose.runtime.MutableState
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
+import com.gomezdevlopment.chessnotationapp.model.pieces.ChessPieces
 
 class FEN {
     fun getGameStateAsFEN(
@@ -115,7 +116,7 @@ class FEN {
         blackCanCastleKingSide: MutableState<Boolean>,
         blackCanCastleQueenSide: MutableState<Boolean>,
         whiteKingSquare: MutableState<Square>,
-        blackKingSquare: MutableState<Square>
+        blackKingSquare: MutableState<Square>,
     ): MutableList<ChessPiece> {
         val pieces = mutableListOf<ChessPiece>()
         val splitFen = fen.split(" ")
@@ -130,138 +131,54 @@ class FEN {
                 } else {
                     when (char) {
                         'r' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "black",
-                                    "rook",
-                                    R.drawable.ic_br_alpha,
-                                    Square(rank, file),
-                                    5, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
-                                )
-                            )
+                            val newPiece = ChessPieces().blackRook(rank, file)
+                            pieces.add(newPiece)
                         }
                         'n' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "black",
-                                    "knight",
-                                    R.drawable.ic_bn_alpha,
-                                    Square(rank, file),
-                                    3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
-                                )
-                            )
+                            val newPiece = ChessPieces().blackKnight(rank, file)
+                            pieces.add(newPiece)
                         }
                         'b' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "black",
-                                    "bishop",
-                                    R.drawable.ic_bb_alpha,
-                                    Square(rank, file),
-                                    3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
-                                )
-                            )
+                            val newPiece = ChessPieces().blackBishop(rank, file)
+                            pieces.add(newPiece)
                         }
                         'q' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "black",
-                                    "queen",
-                                    R.drawable.ic_bq_alpha,
-                                    Square(rank, file),
-                                    9, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
-                                )
-                            )
+                            val newPiece = ChessPieces().blackQueen(rank, file)
+                            pieces.add(newPiece)
                         }
                         'k' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "black",
-                                    "king",
-                                    R.drawable.ic_bk_alpha,
-                                    Square(rank, file),
-                                    0, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
-                                )
-                            )
+                            val newPiece = ChessPieces().blackKing(rank, file)
                             blackKingSquare.value = Square(rank, file)
+                            pieces.add(newPiece)
                         }
                         'p' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "black",
-                                    "pawn",
-                                    R.drawable.ic_bp_alpha,
-                                    Square(rank, file),
-                                    1, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
-                                )
-                            )
+                            val newPiece = ChessPieces().blackPawn(rank, file)
+                            pieces.add(newPiece)
                         }
                         'R' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "white",
-                                    "rook",
-                                    R.drawable.ic_wr_alpha,
-                                    Square(rank, file),
-                                    5, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
-                                )
-                            )
+                            val newPiece = ChessPieces().whiteRook(rank, file)
+                            pieces.add(newPiece)
                         }
                         'N' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "white",
-                                    "knight",
-                                    R.drawable.ic_wn_alpha,
-                                    Square(rank, file),
-                                    3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
-                                )
-                            )
+                            val newPiece = ChessPieces().whiteKnight(rank, file)
+                            pieces.add(newPiece)
                         }
                         'B' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "white",
-                                    "bishop",
-                                    R.drawable.ic_wb_alpha,
-                                    Square(rank, file),
-                                    3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
-                                )
-                            )
+                            val newPiece = ChessPieces().whiteBishop(rank, file)
+                            pieces.add(newPiece)
                         }
                         'Q' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "white",
-                                    "queen",
-                                    R.drawable.ic_wq_alpha,
-                                    Square(rank, file),
-                                    9, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
-                                )
-                            )
+                            val newPiece = ChessPieces().whiteQueen(rank, file)
+                            pieces.add(newPiece)
                         }
                         'K' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "white",
-                                    "king",
-                                    R.drawable.ic_wk,
-                                    Square(rank, file),
-                                    0, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
-                                )
-                            )
+                            val newPiece = ChessPieces().whiteKing(rank, file)
                             whiteKingSquare.value = Square(rank, file)
+                            pieces.add(newPiece)
                         }
                         'P' -> {
-                            pieces.add(
-                                ChessPiece(
-                                    "white",
-                                    "pawn",
-                                    R.drawable.ic_wp_alpha,
-                                    Square(rank, file),
-                                    1, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
-                                )
-                            )
+                            val newPiece = ChessPieces().whitePawn(rank, file)
+                            pieces.add(newPiece)
                         }
                     }
                     file++

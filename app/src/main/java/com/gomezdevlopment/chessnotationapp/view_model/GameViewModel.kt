@@ -117,7 +117,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     fun undoMove() {
-        gameRepository.undoMove()
+        //gameRepository.undoMove()
     }
 
     fun onEvent(event: GameEvent, piece: ChessPiece): MutableList<Square> {

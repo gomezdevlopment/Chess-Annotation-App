@@ -7,9 +7,9 @@ data class Square(
      val file: Int,
 )
 
-data class Move(
-    val square: Square,
-    val promotion: String
-)
+//data class Move(
+//    val square: Square,
+//    val promotion: String
+//)
 
 

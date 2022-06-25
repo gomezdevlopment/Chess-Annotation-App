@@ -94,6 +94,11 @@ class Pawn {
                 piece.legalMoves.add(move)
             }
         }
+//        if(piece.square == (Square(3, 5))){
+//            println("Was Pinned: $wasPinned")
+//            println("Pinned Moves: ${piece.pinnedMoves.size}")
+//            println("Legal Moves: ${piece.legalMoves}")
+//        }
         piece.pinnedMoves.clear()
     }
 

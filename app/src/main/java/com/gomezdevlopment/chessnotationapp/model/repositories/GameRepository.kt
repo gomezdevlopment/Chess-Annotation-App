@@ -2,6 +2,7 @@ package com.gomezdevlopment.chessnotationapp.model.repositories
 
 import android.os.CountDownTimer
 import androidx.compose.runtime.*
+import androidx.core.os.persistableBundleOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gomezdevlopment.chessnotationapp.R
@@ -122,8 +123,9 @@ class GameRepository() : ViewModel() {
     init {
         //initialPosition()
         //testPositionKiwipete()
-        //testPosition3()
-        testPosition4()
+        testPosition3()
+        checkAllLegalMoves()
+        //testPosition4()
     }
 
     fun resetGame(time: Long, isOnline: Boolean) {
@@ -154,6 +156,7 @@ class GameRepository() : ViewModel() {
         openDrawOfferedDialog.value = false
         capturedPieces.clear()
         initialPosition()
+        checkAllLegalMoves()
         if (isOnline) {
             snapshotListener()
         } else {
@@ -371,7 +374,7 @@ class GameRepository() : ViewModel() {
         }
     }
 
-    private fun getGameStateAsFEN(): String {
+    fun getGameStateAsFEN(): String {
         return FEN().getGameStateAsFEN(
             occupiedSquares,
             playerTurn,
@@ -383,8 +386,8 @@ class GameRepository() : ViewModel() {
     }
 
     fun setPositionFromFen(fen: String) {
-        occupiedSquares.clear()
-        piecesOnBoard.clear()
+//        occupiedSquares.clear()
+//        piecesOnBoard.clear()
         val piecesOnBoardFromFENPosition = FEN().parseFEN(
             fen,
             playerTurn,
@@ -393,16 +396,67 @@ class GameRepository() : ViewModel() {
             blackCanCastleKingSide,
             blackCanCastleQueenSide,
             whiteKingSquare,
-            blackKingSquare
+            blackKingSquare,
         )
+        val names = mutableListOf<Map<Square, String>>()
+        val piecesOnBoardTemp = mutableListOf<ChessPiece>()
+        piecesOnBoardTemp.addAll(piecesOnBoard)
 
-        piecesOnBoard.addAll(piecesOnBoardFromFENPosition)
-        for (piece in piecesOnBoard) {
-            occupiedSquares[piece.square] = piece
+        piecesOnBoard.forEachIndexed() { index, piece ->
+            names.add(mapOf(piece.square to piece.color))
         }
-        //checkAllLegalMoves()
 
-        //checkAttacks()
+        val fenMap = mutableListOf<Map<Square, String>>()
+        piecesOnBoardFromFENPosition.forEach {
+            fenMap.add(mapOf(it.square to it.color))
+        }
+
+        piecesOnBoardFromFENPosition.forEach { piece ->
+            if (!names.contains(mapOf(piece.square to piece.color))) {
+                piecesOnBoard.add(piece)
+            }
+        }
+
+        piecesOnBoardTemp.forEach() { piece ->
+            if (!fenMap.contains(mapOf(piece.square to piece.color))) {
+
+                piecesOnBoard.remove(piece)
+            }
+        }
+
+        occupiedSquares.clear()
+
+        piecesOnBoard.forEach {
+            occupiedSquares[it.square] = it
+        }
+
+    }
+
+    fun setPreviousPosition(state: State) {
+        piecesOnBoard[state.index].square = state.square
+        println(state.square)
+        //state.piece.square = state.square
+        if (state.capture) {
+            piecesOnBoard.add(capturedPieces.last())
+            capturedPieces.removeLast()
+        }
+        playerTurn.value = state.playerTurn
+        whiteCanCastleKingSide.value = state.whiteCanCastleKingSide
+        whiteCanCastleQueenSide.value = state.whiteCanCastleQueenSide
+        blackCanCastleKingSide.value = state.blackCanCastleKingSide
+        blackCanCastleQueenSide.value = state.blackCanCastleQueenSide
+        whiteKingSquare.value = state.whiteKingSquare
+        blackKingSquare.value = state.blackKingSquare
+        currentSquare.value = state.currentSquare
+        previousSquare.value = state.previousSquare
+        occupiedSquares.clear()
+        piecesOnBoard.forEach {
+            occupiedSquares[it.square] = it
+        }
+//        if(state.square == Square(0,6)){
+//            println(state.piece.square)
+//            println(occupiedSquares[Square(0,6)])
+//        }
     }
 
     private fun addInitialGameState() {
@@ -418,26 +472,36 @@ class GameRepository() : ViewModel() {
 
 
     fun testPositionKiwipete() {
+        piecesOnBoard.clear()
+        occupiedSquares.clear()
         setPositionFromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ")
         addInitialGameState()
     }
 
     fun testPosition3() {
+        piecesOnBoard.clear()
+        occupiedSquares.clear()
         setPositionFromFen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -")
         addInitialGameState()
     }
 
     fun testPosition4() {
+        piecesOnBoard.clear()
+        occupiedSquares.clear()
         setPositionFromFen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq -")
         addInitialGameState()
     }
 
     fun initialPosition() {
+        piecesOnBoard.clear()
+        occupiedSquares.clear()
         setPositionFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ")
         addInitialGameState()
     }
 
     fun promotionPosition() {
+        piecesOnBoard.clear()
+        occupiedSquares.clear()
         setPositionFromFen("2r5/KP6/8/8/8/8/6pk/8 w - - 0 1")
         addInitialGameState()
     }
@@ -524,34 +588,29 @@ class GameRepository() : ViewModel() {
         }
     }
 
-    fun castleKingSide(): Boolean {
+    fun castleKingSide(): MutableState<Boolean> {
         if (playerTurn.value == "white") {
-            return whiteCanCastleKingSide.value
+            return whiteCanCastleKingSide
         }
-        return blackCanCastleKingSide.value
+        return blackCanCastleKingSide
     }
 
-    fun castleQueenSide(): Boolean {
+    fun castleQueenSide(): MutableState<Boolean> {
         if (playerTurn.value == "white") {
-            return whiteCanCastleQueenSide.value
+            return whiteCanCastleQueenSide
         }
-        return blackCanCastleQueenSide.value
+        return blackCanCastleQueenSide
     }
 
     fun undoMove() {
-        if (previousGameStates.size > 1) {
-            previousGameStates.removeAt(previousGameStates.size - 1)
-            setPositionFromFen(previousGameStates[previousGameStates.size - 1].fenPosition)
-            currentSquare.value = previousGameStates[previousGameStates.size - 1].currentSquare
-            previousSquare.value = previousGameStates[previousGameStates.size - 1].previousSquare
-        }
+        setPreviousPosition(states.last())
+        states.removeLast()
     }
 
     fun setGameState(index: Int) {
         setPositionFromFen(previousGameStates[index].fenPosition)
         currentSquare.value = previousGameStates[index].currentSquare
         previousSquare.value = previousGameStates[index].previousSquare
-
     }
 
     fun checkAllLegalMoves() {
@@ -677,7 +736,7 @@ class GameRepository() : ViewModel() {
     ): String {
         //Castling
         if (piece.piece == "king") {
-            if (castleKingSide()) {
+            if (castleKingSide().value) {
                 if (newSquare.file == piece.square.file + 2) {
                     val rook: ChessPiece =
                         occupiedSquares[Square(newSquare.rank, newSquare.file + 1)]!!
@@ -691,7 +750,7 @@ class GameRepository() : ViewModel() {
                     return ("0-0")
                 }
             }
-            if (castleQueenSide()) {
+            if (castleQueenSide().value) {
                 if (newSquare.file == piece.square.file - 2) {
                     val rook: ChessPiece =
                         occupiedSquares[Square(newSquare.rank, newSquare.file - 2)]!!
@@ -817,25 +876,62 @@ class GameRepository() : ViewModel() {
         startStopClocks()
     }
 
-    fun makeMove(piece: ChessPiece, newSquare: Square, depth: Int, promotion: String) {
+    fun makeMove(pieceCopy: ChessPiece, newSquare: Square, depth: Int, promotion: String) {
+        var piece = pieceCopy
+        if (occupiedSquares.containsKey(pieceCopy.square)) {
+            piece = occupiedSquares[pieceCopy.square]!!
+        }
         val previousPieceSquare = piece.square
-        if(promotion != ""){
+
+        if (promotion != "") {
             piece.piece = promotion
         }
-        checkIfCastled(piece, newSquare, depth)
+
+        var pieceCaptured = false
         //Remove Defender
         if (occupiedSquares.containsKey(newSquare)) {
             occupiedSquares[newSquare]?.let {
                 capturedPieces.add(it)
+                println("capture $it")
+                pieceCaptured = true
             }
             removePiece(newSquare)
         } else if (isEnPassant(piece, newSquare)) {
             occupiedSquares[currentSquare.value]?.let {
                 capturedPieces.add(it)
+                println("capture")
+                println("en passant")
+                pieceCaptured = true
             }
             removePiece(currentSquare.value)
         }
 
+
+        val index = piecesOnBoard.indexOf(piece)
+        states.add(
+            State(
+                previousPieceSquare, pieceCaptured, index, playerTurn.value,
+                whiteCanCastleKingSide.value,
+                whiteCanCastleQueenSide.value,
+                blackCanCastleKingSide.value,
+                blackCanCastleQueenSide.value,
+                whiteKingSquare.value,
+                blackKingSquare.value,
+                previousSquare.value,
+                currentSquare.value,
+                piece
+            )
+        )
+
+//        previousGameStates.add(
+//            GameState(
+//                previousSquare.value,
+//                currentSquare.value,
+//                getGameStateAsFEN()
+//            )
+//        )
+
+        checkIfCastled(piece, newSquare, depth)
         occupiedSquares.remove(previousPieceSquare)
         changePieceSquare(piece, newSquare)
         occupiedSquares[newSquare] = piece
@@ -843,20 +939,37 @@ class GameRepository() : ViewModel() {
         currentSquare.value = newSquare
 
         if (piece.color == "white") {
+            if (piece.piece == "king") {
+                whiteKingSquare.value = newSquare
+            }
             playerTurn.value = "black"
         } else {
+            if (piece.piece == "king") {
+                blackKingSquare.value = newSquare
+            }
             playerTurn.value = "white"
         }
-
-        previousGameStates.add(
-            GameState(
-                previousSquare.value,
-                currentSquare.value,
-                getGameStateAsFEN()
-            )
-        )
-        setPositionFromFen(getGameStateAsFEN())
+        //setPreviousPosition(getGameStateAsFEN(), newSquare, pieceCaptured, index)
+        //setPositionFromFen(getGameStateAsFEN())
     }
+
+    val states: MutableList<State> = mutableListOf()
+
+    data class State(
+        val square: Square,
+        val capture: Boolean,
+        val index: Int,
+        val playerTurn: String,
+        val whiteCanCastleKingSide: Boolean,
+        val whiteCanCastleQueenSide: Boolean,
+        val blackCanCastleKingSide: Boolean,
+        val blackCanCastleQueenSide: Boolean,
+        val whiteKingSquare: Square,
+        val blackKingSquare: Square,
+        val previousSquare: Square,
+        val currentSquare: Square,
+        val piece: ChessPiece
+    )
 
     private fun isEnPassant(piece: ChessPiece, square: Square): Boolean {
         //If pawn moves to an empty diagonal square it should be en passant
@@ -948,8 +1061,8 @@ class GameRepository() : ViewModel() {
             piece,
             occupiedSquares,
             attacks,
-            castleKingSide(),
-            castleQueenSide(),
+            castleKingSide().value,
+            castleQueenSide().value,
             kingInCheck,
             kingSquare,
             piecesCheckingKing,

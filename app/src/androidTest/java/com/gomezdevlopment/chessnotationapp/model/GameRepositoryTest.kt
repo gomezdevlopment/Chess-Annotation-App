@@ -14,6 +14,7 @@ class GameRepositoryTest {
     private val gameRepository: GameRepository = GameRepository()
 
     private fun analyzePositions(depth: Int): Int {
+        //println(gameRepository.piecesOnBoard.size)
         gameRepository.checkAllLegalMoves()
         val legalMoves = mutableListOf<Square>()
         legalMoves.addAll(gameRepository.allLegalMoves)
@@ -29,7 +30,6 @@ class GameRepositoryTest {
                     if (piece.color == playerTurn) {
                         piece.legalMoves.forEach { square ->
                             if (square.rank == 7 || square.rank == 0) {
-                                println(square)
                                 promotions += 3
                             }
                         }
@@ -39,21 +39,69 @@ class GameRepositoryTest {
             return (legalMoves.size + promotions)
         }
 
+        for (piece in pieces) {
+            gameRepository.checkAllLegalMoves()
+            val moves = mutableListOf<Square>()
+            moves.addAll(piece.legalMoves)
+            if (piece.color == playerTurn) {
+                println("${piece.piece} : Legal Move Count - ${moves.size}")
+                for (legalMove in moves) {
+                    if (piece.piece == "pawn" && (legalMove.rank == 7 || legalMove.rank == 0)) {
+                        for (promotion in listOf("queen", "rook", "bishop", "knight")) {
+                            gameRepository.makeMove(piece, legalMove, depth, promotion)
+                            numberOfMoves += analyzePositions(depth - 1)
+                            gameRepository.undoMove()
+                        }
+                    } else {
+                        gameRepository.makeMove(piece, legalMove, depth, "")
+                        numberOfMoves += analyzePositions(depth - 1)
+                        gameRepository.undoMove()
+                    }
+                }
+            }
+        }
+        return numberOfMoves
+    }
+
+    private fun analyzePositionsV2(depth: Int): Int {
+        gameRepository.checkAllLegalMoves()
+        val legalMoves = mutableListOf<Square>()
+        legalMoves.addAll(gameRepository.allLegalMoves)
+        var numberOfMoves = 0
+        val pieces = mutableListOf<ChessPiece>()
+        pieces.addAll(gameRepository.piecesOnBoard)
+        val playerTurn = gameRepository.playerTurn.value
+
+        if (depth == 1) {
+            var promotions = 0
+//            pieces.forEach { piece ->
+//                if (piece.piece == "pawn") {
+//                    if (piece.color == playerTurn) {
+//                        piece.legalMoves.forEach { square ->
+//                            if (square.rank == 7 || square.rank == 0) {
+//                                promotions += 3
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+            return (gameRepository.allLegalMoves.size)
+        }
+
 
         for (piece in pieces) {
             if (piece.color == playerTurn) {
                 val originalPieceSquare = piece.square
                 val originalLegalMoves = mutableListOf<Square>()
                 originalLegalMoves.addAll(piece.legalMoves)
-
+                println("${piece.piece} : Legal Move Count - ${originalLegalMoves.size}")
                 for (legalMove in originalLegalMoves) {
                     if (piece.piece == "pawn" && (legalMove.rank == 7 || legalMove.rank == 0)) {
                         for (promotion in listOf("queen", "rook", "bishop", "knight")) {
                             gameRepository.makeMove(piece, legalMove, depth, promotion)
                             numberOfMoves += analyzePositions(depth - 1)
                             gameRepository.undoMove()
-                            piece.piece = "pawn"
-                            piece.square = originalPieceSquare
+
                         }
                     } else {
                         gameRepository.makeMove(piece, legalMove, depth, "")
@@ -103,13 +151,6 @@ class GameRepositoryTest {
         gameRepository.initialPosition()
         val numberOfPositions = analyzePositions(2)
         println(numberOfPositions)
-        println("Number of Pieces on Board: ${gameRepository.piecesOnBoard.size}")
-        println("Number of Occupied Squares on Board: ${gameRepository.occupiedSquares.size}")
-        println("Number of Captures: ${gameRepository.captures}")
-        println("Number of Checks: ${gameRepository.checks}")
-        println("Number of Castles: ${gameRepository.castles}")
-        println("Number of EnPassants: ${gameRepository.enPassants}")
-        println("Number of Promotions: ${gameRepository.promotions}")
         assert(numberOfPositions == 400)
     }
 
@@ -166,6 +207,11 @@ class GameRepositoryTest {
     fun testPosition3Depth2() {
         gameRepository.testPosition3()
         val numberOfPositions = analyzePositions(2)
+        println("Number of Pieces on Board: ${gameRepository.piecesOnBoard.size}")
+        gameRepository.piecesOnBoard.forEach {
+            println(it)
+        }
+        println("Number of Occupied Squares on Board: ${gameRepository.occupiedSquares.size}")
         println(numberOfPositions)
         assert(numberOfPositions == 191)
     }

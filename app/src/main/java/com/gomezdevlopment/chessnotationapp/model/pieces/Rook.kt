@@ -27,6 +27,7 @@ class Rook {
         GameLogic2().clearMoves(piece)
         val listOfMoves = mutableListOf<Square>()
 
+        //println(occupiedSquares[Square(0, 6)])
         fun addMoves() {
             val gameLogic = GameLogic2()
             val moves = mutableListOf<Square>()
