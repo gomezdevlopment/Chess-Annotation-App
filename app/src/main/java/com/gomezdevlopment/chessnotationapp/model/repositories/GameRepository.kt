@@ -23,29 +23,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-//data class CurrentGameState(
-//    var piecesOnBoard: List<ChessPiece>,
-//    var capturedPieces: List<ChessPiece>,
-//    var occupiedSquares: Map<Square, ChessPiece>,
-//    var previousSquare: Square,
-//    var currentSquare: Square,
-//    var playerTurn: String,
-//    var whiteKingSquare: Square,
-//    var blackKingSquare: Square,
-//    var xRayAttacks: List<Square>,
-//    var attacks: List<Square>,
-//    var allLegalMoves: List<Square>,
-//    var whiteCanCastleKingSide: Boolean,
-//    var whiteCanCastleQueenSide: Boolean,
-//    var blackCanCastleKingSide: Boolean,
-//    var blackCanCastleQueenSide: Boolean,
-//    var kingInCheck: Boolean,
-//    var piecesCheckingKing: List<Square>,
-//    val pinnedPieces: List<ChessPiece>,
-//    val pieceMoved: ChessPiece?,
-//    val pieceCaptured: ChessPiece?
-//)
-
 class GameRepository() : ViewModel() {
     var piecesOnBoard: MutableList<ChessPiece> = mutableStateListOf()
     var capturedPieces: MutableList<ChessPiece> = mutableStateListOf()
@@ -119,13 +96,14 @@ class GameRepository() : ViewModel() {
     var selectedNotationIndex: MutableState<Int> = mutableStateOf(0)
     val openDrawOfferedDialog = mutableStateOf(false)
 
+    val pinnedPiecesFromPreviousTurns = mutableListOf<List<ChessPiece>>(listOf())
 
     init {
         //initialPosition()
         //testPositionKiwipete()
-        testPosition3()
+        //testPosition3()
+        testPosition4()
         checkAllLegalMoves()
-        //testPosition4()
     }
 
     fun resetGame(time: Long, isOnline: Boolean) {
@@ -262,111 +240,23 @@ class GameRepository() : ViewModel() {
         when (playerTurn.value) {
             "black" -> {
                 if (previousMoveString.contains("queen"))
-                    piece = ChessPiece(
-                        "black",
-                        "queen",
-                        R.drawable.ic_bq_alpha,
-                        newSquare,
-                        9,
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf()
-                    )
+                    piece = ChessPieces().blackQueen(newSquare.rank, newSquare.file)
                 if (previousMoveString.contains("rook"))
-                    piece = ChessPiece(
-                        "black",
-                        "rook",
-                        R.drawable.ic_br_alpha,
-                        newSquare,
-                        5,
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf()
-                    )
+                    piece = ChessPieces().blackRook(newSquare.rank, newSquare.file)
                 if (previousMoveString.contains("bishop"))
-                    piece = ChessPiece(
-                        "black",
-                        "bishop",
-                        R.drawable.ic_bb_alpha,
-                        newSquare,
-                        3,
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf()
-                    )
+                    piece = ChessPieces().blackBishop(newSquare.rank, newSquare.file)
                 if (previousMoveString.contains("knight"))
-                    piece = ChessPiece(
-                        "black",
-                        "knight",
-                        R.drawable.ic_bn_alpha,
-                        newSquare,
-                        3,
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf()
-                    )
+                    piece = ChessPieces().blackKnight(newSquare.rank, newSquare.file)
             }
             "white" -> {
                 if (previousMoveString.contains("queen"))
-                    piece = ChessPiece(
-                        "white",
-                        "queen",
-                        R.drawable.ic_wq_alpha,
-                        newSquare,
-                        9,
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf()
-                    )
+                    piece = ChessPieces().whiteQueen(newSquare.rank, newSquare.file)
                 if (previousMoveString.contains("rook"))
-                    piece = ChessPiece(
-                        "white",
-                        "rook",
-                        R.drawable.ic_wr_alpha,
-                        newSquare,
-                        5,
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf()
-                    )
+                    piece = ChessPieces().whiteRook(newSquare.rank, newSquare.file)
                 if (previousMoveString.contains("bishop"))
-                    piece = ChessPiece(
-                        "white",
-                        "bishop",
-                        R.drawable.ic_wb_alpha,
-                        newSquare,
-                        3,
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf()
-                    )
+                    piece = ChessPieces().whiteBishop(newSquare.rank, newSquare.file)
                 if (previousMoveString.contains("knight"))
-                    piece = ChessPiece(
-                        "white",
-                        "knight",
-                        R.drawable.ic_wn_alpha,
-                        newSquare,
-                        3,
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf(),
-                        mutableListOf()
-                    )
+                    piece = ChessPieces().whiteKnight(newSquare.rank, newSquare.file)
             }
         }
         if (piece != null) {
@@ -386,8 +276,9 @@ class GameRepository() : ViewModel() {
     }
 
     fun setPositionFromFen(fen: String) {
-//        occupiedSquares.clear()
-//        piecesOnBoard.clear()
+        occupiedSquares.clear()
+        piecesOnBoard.clear()
+        //println(fen)
         val piecesOnBoardFromFENPosition = FEN().parseFEN(
             fen,
             playerTurn,
@@ -398,48 +289,88 @@ class GameRepository() : ViewModel() {
             whiteKingSquare,
             blackKingSquare,
         )
-        val names = mutableListOf<Map<Square, String>>()
-        val piecesOnBoardTemp = mutableListOf<ChessPiece>()
-        piecesOnBoardTemp.addAll(piecesOnBoard)
+//        val names = mutableListOf<Map<Square, String>>()
+//        val piecesOnBoardTemp = mutableListOf<ChessPiece>()
+//        piecesOnBoardTemp.addAll(piecesOnBoard)
+//
+//        piecesOnBoard.forEachIndexed() { index, piece ->
+//            names.add(mapOf(piece.square to piece.color))
+//        }
+//
+//        val fenMap = mutableListOf<Map<Square, String>>()
+//        piecesOnBoardFromFENPosition.forEach {
+//            fenMap.add(mapOf(it.square to it.color))
+//        }
+//
+//        piecesOnBoardFromFENPosition.forEach { piece ->
+//            if (!names.contains(mapOf(piece.square to piece.color))) {
+//                piecesOnBoard.add(piece)
+//            }
+//        }
+//
+//        piecesOnBoardTemp.forEach() { piece ->
+//            if (!fenMap.contains(mapOf(piece.square to piece.color))) {
+//
+//                piecesOnBoard.remove(piece)
+//            }
+//        }
 
-        piecesOnBoard.forEachIndexed() { index, piece ->
-            names.add(mapOf(piece.square to piece.color))
-        }
+        //occupiedSquares.clear()
 
-        val fenMap = mutableListOf<Map<Square, String>>()
-        piecesOnBoardFromFENPosition.forEach {
-            fenMap.add(mapOf(it.square to it.color))
-        }
-
-        piecesOnBoardFromFENPosition.forEach { piece ->
-            if (!names.contains(mapOf(piece.square to piece.color))) {
-                piecesOnBoard.add(piece)
-            }
-        }
-
-        piecesOnBoardTemp.forEach() { piece ->
-            if (!fenMap.contains(mapOf(piece.square to piece.color))) {
-
-                piecesOnBoard.remove(piece)
-            }
-        }
-
-        occupiedSquares.clear()
-
+        piecesOnBoard.addAll(piecesOnBoardFromFENPosition)
         piecesOnBoard.forEach {
             occupiedSquares[it.square] = it
         }
-
     }
 
     fun setPreviousPosition(state: State) {
-        piecesOnBoard[state.index].square = state.square
-        println(state.square)
-        //state.piece.square = state.square
+        //piecesOnBoard[state.index].square = state.square
+        state.piece.square = state.square
         if (state.capture) {
             piecesOnBoard.add(capturedPieces.last())
             capturedPieces.removeLast()
         }
+
+        if(state.whiteKingSquare == Square(0, 4)){
+            if(currentSquare.value == Square(0,6)){
+                val rook = occupiedSquares[Square(0,5)]
+                if (rook != null) {
+                    occupiedSquares.remove(rook.square)
+                    rook.square = Square(0,7)
+                    occupiedSquares[rook.square] = rook
+                }
+            }
+
+            if(currentSquare.value == Square(0,2)){
+                val rook = occupiedSquares[Square(0,3)]
+                if (rook != null) {
+                    occupiedSquares.remove(rook.square)
+                    rook.square = Square(0,0)
+                    occupiedSquares[rook.square] = rook
+                }
+            }
+        }
+
+        if(state.blackKingSquare == Square(7, 4)){
+            if(currentSquare.value == Square(7,6)){
+                val rook = occupiedSquares[Square(7,5)]
+                if (rook != null) {
+                    occupiedSquares.remove(rook.square)
+                    rook.square = Square(7,7)
+                    occupiedSquares[rook.square] = rook
+                }
+            }
+
+            if(currentSquare.value == Square(7,2)){
+                val rook = occupiedSquares[Square(7,3)]
+                if (rook != null) {
+                    occupiedSquares.remove(rook.square)
+                    rook.square = Square(7,0)
+                    occupiedSquares[rook.square] = rook
+                }
+            }
+        }
+
         playerTurn.value = state.playerTurn
         whiteCanCastleKingSide.value = state.whiteCanCastleKingSide
         whiteCanCastleQueenSide.value = state.whiteCanCastleQueenSide
@@ -453,10 +384,6 @@ class GameRepository() : ViewModel() {
         piecesOnBoard.forEach {
             occupiedSquares[it.square] = it
         }
-//        if(state.square == Square(0,6)){
-//            println(state.piece.square)
-//            println(occupiedSquares[Square(0,6)])
-//        }
     }
 
     private fun addInitialGameState() {
@@ -603,6 +530,12 @@ class GameRepository() : ViewModel() {
     }
 
     fun undoMove() {
+//        previousGameStates.removeLast()
+//        setPositionFromFen(previousGameStates.last().fenPosition)
+//        currentSquare.value = previousGameStates.last().currentSquare
+//        previousSquare.value = previousGameStates.last().previousSquare
+//        pinnedPiecesFromPreviousTurns.removeLast()
+//        println(pinnedPiecesFromPreviousTurns)
         setPreviousPosition(states.last())
         states.removeLast()
     }
@@ -614,6 +547,7 @@ class GameRepository() : ViewModel() {
     }
 
     fun checkAllLegalMoves() {
+        pinnedPiecesFromPreviousTurns.add(pinnedPieces.toList())
         allLegalMoves.clear()
         piecesCheckingKing.clear()
         attacks.clear()
@@ -633,6 +567,7 @@ class GameRepository() : ViewModel() {
                 }
             }
         }
+
 
         setXRayAttacks(xRayAttacks, false)
         kingInCheck.value = piecesCheckingKing.isNotEmpty()
@@ -738,8 +673,7 @@ class GameRepository() : ViewModel() {
         if (piece.piece == "king") {
             if (castleKingSide().value) {
                 if (newSquare.file == piece.square.file + 2) {
-                    val rook: ChessPiece =
-                        occupiedSquares[Square(newSquare.rank, newSquare.file + 1)]!!
+                    val rook: ChessPiece = occupiedSquares[Square(newSquare.rank, newSquare.file + 1)]!!
                     occupiedSquares.remove(Square(newSquare.rank, newSquare.file + 1))
                     changePieceSquare(rook, Square(newSquare.rank, newSquare.file - 1))
                     occupiedSquares[rook.square] = rook
@@ -892,15 +826,15 @@ class GameRepository() : ViewModel() {
         if (occupiedSquares.containsKey(newSquare)) {
             occupiedSquares[newSquare]?.let {
                 capturedPieces.add(it)
-                println("capture $it")
+                //println("capture")
                 pieceCaptured = true
             }
             removePiece(newSquare)
         } else if (isEnPassant(piece, newSquare)) {
             occupiedSquares[currentSquare.value]?.let {
                 capturedPieces.add(it)
-                println("capture")
-                println("en passant")
+                //println("capture")
+                //println("en passant")
                 pieceCaptured = true
             }
             removePiece(currentSquare.value)
@@ -923,13 +857,13 @@ class GameRepository() : ViewModel() {
             )
         )
 
-//        previousGameStates.add(
-//            GameState(
-//                previousSquare.value,
-//                currentSquare.value,
-//                getGameStateAsFEN()
-//            )
-//        )
+        previousGameStates.add(
+            GameState(
+                previousSquare.value,
+                currentSquare.value,
+                getGameStateAsFEN()
+            )
+        )
 
         checkIfCastled(piece, newSquare, depth)
         occupiedSquares.remove(previousPieceSquare)
@@ -949,8 +883,11 @@ class GameRepository() : ViewModel() {
             }
             playerTurn.value = "white"
         }
+
+
         //setPreviousPosition(getGameStateAsFEN(), newSquare, pieceCaptured, index)
         //setPositionFromFen(getGameStateAsFEN())
+        //checkAllLegalMoves()
     }
 
     val states: MutableList<State> = mutableListOf()
@@ -1068,7 +1005,8 @@ class GameRepository() : ViewModel() {
             piecesCheckingKing,
             previousSquare.value,
             currentSquare.value,
-            pinnedPieces
+            pinnedPieces,
+            pinnedPiecesFromPreviousTurns.last()
         ).moves()
     }
 

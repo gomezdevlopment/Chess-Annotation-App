@@ -51,10 +51,10 @@ class ChessPieces {
     fun blackBishop(rank:Int, file: Int): ChessPiece {
         return ChessPiece(
             "black",
-            "rook",
-            R.drawable.ic_br_alpha,
+            "bishop",
+            R.drawable.ic_bb_alpha,
             Square(rank, file),
-            5, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
+            3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
         )
     }
 

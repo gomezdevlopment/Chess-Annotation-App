@@ -16,12 +16,21 @@ class Pawn {
         previousSquare: Square,
         currentSquare: Square,
         piecesCheckingKing: MutableList<ChessPiece>,
-        pinnedPieces: MutableList<ChessPiece>
+        pinnedPieces: MutableList<ChessPiece>,
+        pinnedPiecesPreviousTurn: List<ChessPiece>
     ) {
-        val pinnedMovesCopy = mutableListOf<Square>()
-        pinnedMovesCopy.addAll(piece.pinnedMoves)
-        val wasPinned = pinnedMovesCopy.isNotEmpty()
 
+        var wasPinned = pinnedPiecesPreviousTurn.contains(piece)
+
+        pinnedPieces.forEach {
+            if(it.piece == piece.piece){
+                if(it.color == piece.color){
+                    if(it.square == piece.square){
+                        wasPinned = true
+                    }
+                }
+            }
+        }
         if (!pinnedPieces.contains(piece)) {
             piece.pinnedMoves.clear()
         }
@@ -92,6 +101,9 @@ class Pawn {
             }
             if (gameLogic2.isEnPassant(previousSquare, currentSquare, move, occupiedSquares, piece, wasPinned)) {
                 piece.legalMoves.add(move)
+                println("enpassant")
+                //println("pinned value: $wasPinned")
+                //println(piece)
             }
         }
 //        if(piece.square == (Square(3, 5))){

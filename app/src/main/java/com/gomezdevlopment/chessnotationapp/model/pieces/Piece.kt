@@ -15,7 +15,8 @@ class Piece(
     private val piecesCheckingKing: MutableList<ChessPiece>,
     private val previousSquare: Square,
     private val currentSquare: Square,
-    private val pinnedPieces: MutableList<ChessPiece>
+    private val pinnedPieces: MutableList<ChessPiece>,
+    private val pinnedPiecesPreviousTurn: List<ChessPiece>
 ) {
     fun moves(): MutableList<Square> {
         val listOfMoves = mutableListOf<Square>()
@@ -38,7 +39,8 @@ class Piece(
             previousSquare,
             currentSquare,
             piecesCheckingKing,
-            pinnedPieces
+            pinnedPieces,
+            pinnedPiecesPreviousTurn
         )
         return piece.legalMoves
     }

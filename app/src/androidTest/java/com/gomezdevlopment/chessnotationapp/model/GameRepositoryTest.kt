@@ -14,13 +14,12 @@ class GameRepositoryTest {
     private val gameRepository: GameRepository = GameRepository()
 
     private fun analyzePositions(depth: Int): Int {
-        //println(gameRepository.piecesOnBoard.size)
         gameRepository.checkAllLegalMoves()
-        val legalMoves = mutableListOf<Square>()
-        legalMoves.addAll(gameRepository.allLegalMoves)
+        val legalMoves = gameRepository.allLegalMoves.toList()
+        //println(legalMoves)
+        //println("Legal Move Count: ${legalMoves.size}")
         var numberOfMoves = 0
-        val pieces = mutableListOf<ChessPiece>()
-        pieces.addAll(gameRepository.piecesOnBoard)
+        val pieces = gameRepository.piecesOnBoard.toList()
         val playerTurn = gameRepository.playerTurn.value
 
         if (depth == 1) {
@@ -44,8 +43,8 @@ class GameRepositoryTest {
             val moves = mutableListOf<Square>()
             moves.addAll(piece.legalMoves)
             if (piece.color == playerTurn) {
-                println("${piece.piece} : Legal Move Count - ${moves.size}")
                 for (legalMove in moves) {
+                    //println("${piece.piece} : Move - $legalMove")
                     if (piece.piece == "pawn" && (legalMove.rank == 7 || legalMove.rank == 0)) {
                         for (promotion in listOf("queen", "rook", "bishop", "knight")) {
                             gameRepository.makeMove(piece, legalMove, depth, promotion)
@@ -58,59 +57,6 @@ class GameRepositoryTest {
                         gameRepository.undoMove()
                     }
                 }
-            }
-        }
-        return numberOfMoves
-    }
-
-    private fun analyzePositionsV2(depth: Int): Int {
-        gameRepository.checkAllLegalMoves()
-        val legalMoves = mutableListOf<Square>()
-        legalMoves.addAll(gameRepository.allLegalMoves)
-        var numberOfMoves = 0
-        val pieces = mutableListOf<ChessPiece>()
-        pieces.addAll(gameRepository.piecesOnBoard)
-        val playerTurn = gameRepository.playerTurn.value
-
-        if (depth == 1) {
-            var promotions = 0
-//            pieces.forEach { piece ->
-//                if (piece.piece == "pawn") {
-//                    if (piece.color == playerTurn) {
-//                        piece.legalMoves.forEach { square ->
-//                            if (square.rank == 7 || square.rank == 0) {
-//                                promotions += 3
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-            return (gameRepository.allLegalMoves.size)
-        }
-
-
-        for (piece in pieces) {
-            if (piece.color == playerTurn) {
-                val originalPieceSquare = piece.square
-                val originalLegalMoves = mutableListOf<Square>()
-                originalLegalMoves.addAll(piece.legalMoves)
-                println("${piece.piece} : Legal Move Count - ${originalLegalMoves.size}")
-                for (legalMove in originalLegalMoves) {
-                    if (piece.piece == "pawn" && (legalMove.rank == 7 || legalMove.rank == 0)) {
-                        for (promotion in listOf("queen", "rook", "bishop", "knight")) {
-                            gameRepository.makeMove(piece, legalMove, depth, promotion)
-                            numberOfMoves += analyzePositions(depth - 1)
-                            gameRepository.undoMove()
-
-                        }
-                    } else {
-                        gameRepository.makeMove(piece, legalMove, depth, "")
-                        numberOfMoves += analyzePositions(depth - 1)
-                        gameRepository.undoMove()
-                        piece.square = originalPieceSquare
-                    }
-                }
-                piece.legalMoves = originalLegalMoves
             }
         }
         return numberOfMoves
