@@ -12,6 +12,7 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
 import com.gomezdevlopment.chessnotationapp.model.game_logic.Clock
+import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPiece
 import com.gomezdevlopment.chessnotationapp.model.repositories.GameRepository
 import com.gomezdevlopment.chessnotationapp.model.utils.FirestoreGameInteraction
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
@@ -150,22 +151,9 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         return hashMap
     }
 
-    fun changePiecePosition(newSquare: Square, piece: ChessPiece) {
+    fun changePiecePosition(newSquare: Square, piece: ChessPiece, promotionPiece: PromotionPiece?) {
         viewModelScope.launch {
-            gameRepository.changePiecePosition(newSquare, piece, 0)
-        }
-    }
-
-    fun promotion(newSquare: Square, promotionSelection: ChessPiece) {
-        viewModelScope.launch {
-            gameRepository.promotion(newSquare, promotionSelection, 0)
-            selectedNotationIndex.value += 1
-        }
-    }
-
-    fun movePiece(newSquare: Square, piece: ChessPiece) {
-        viewModelScope.launch {
-            gameRepository.movePiece(newSquare, piece, 0)
+            gameRepository.changePiecePosition(newSquare, piece, promotionPiece)
         }
     }
 

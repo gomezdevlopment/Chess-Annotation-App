@@ -181,28 +181,23 @@ fun ChessUILogic(height: Dp, viewModel: GameViewModel, navController: NavControl
 
     if (showMoves) {
         val legalMoves = viewModel.onEvent(GameEvent.OnPieceClicked, clickedPiece.value)
-        if (legalMoves != null) {
-            for (move in legalMoves) {
-                if (hashMap.containsKey(move)) {
-                    PossibleCapture(height, move, targetRank, targetFile, isMoveSelected)
-                } else {
-                    PossibleMove(height, move, targetRank, targetFile, isMoveSelected)
-                }
+        for (move in legalMoves) {
+            if (hashMap.containsKey(move)) {
+                PossibleCapture(height, move, targetRank, targetFile, isMoveSelected)
+            } else {
+                PossibleMove(height, move, targetRank, targetFile, isMoveSelected)
             }
         }
     }
 
     if (isMoveSelected.value) {
         if (clickedPiece.value.piece == "pawn" && (targetRank.value == 7 || targetRank.value == 0)) {
-            viewModel.movePiece(
-                Square(targetRank.value, targetFile.value),
-                clickedPiece.value
-            )
             promotionSelectionShowing.value = true
         } else {
             viewModel.changePiecePosition(
                 Square(targetRank.value, targetFile.value),
-                clickedPiece.value
+                clickedPiece.value,
+                null
             )
         }
         viewModel.isPieceClicked().value = false

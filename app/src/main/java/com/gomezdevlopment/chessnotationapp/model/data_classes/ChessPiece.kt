@@ -3,9 +3,9 @@ package com.gomezdevlopment.chessnotationapp.model.data_classes
 data class ChessPiece(
     val color: String,
     var piece: String,
-    val pieceDrawable: Int,
+    var pieceDrawable: Int,
     var square: Square,
-    val value: Int,
+    var value: Int,
     val pseudoLegalMoves: MutableList<Square>,
     val attacks: MutableList<Square>,
     val xRays: MutableList<Square>,

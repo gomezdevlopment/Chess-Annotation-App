@@ -18,6 +18,7 @@ import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
+import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPieces
 import com.gomezdevlopment.chessnotationapp.model.utils.Utils
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
@@ -31,26 +32,14 @@ fun Promotion(
     file: Int,
     viewModel: GameViewModel
 ) {
-    val pieces = mutableListOf<ChessPiece>()
-    val blackPieceImages = listOf(
-        ChessPiece("black", "queen", R.drawable.ic_bq_alpha, Square(rank, file), 9, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
-        ChessPiece("black", "rook", R.drawable.ic_br_alpha, Square(rank, file), 5, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
-        ChessPiece("black", "bishop", R.drawable.ic_bb_alpha, Square(rank, file), 3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
-        ChessPiece("black", "knight", R.drawable.ic_bn_alpha, Square(rank, file), 3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf())
-    )
-
-    val whitePieceImages = listOf(
-        ChessPiece("white", "queen", R.drawable.ic_wq_alpha, Square(rank, file), 9, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
-        ChessPiece("white", "rook", R.drawable.ic_wr_alpha, Square(rank, file), 5, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
-        ChessPiece("white", "bishop", R.drawable.ic_wb_alpha, Square(rank, file), 3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()),
-        ChessPiece("white", "knight", R.drawable.ic_wn_alpha, Square(rank, file), 3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf())
-    )
-
-    if (chessPiece.color == "white") {
-        pieces.addAll(whitePieceImages)
-    } else {
-        pieces.addAll(blackPieceImages)
+    var pieces = PromotionPieces().whitePieces
+    println(pieces)
+    if (chessPiece.color == "black") {
+        pieces = PromotionPieces().blackPieces
     }
+
+    println(pieces)
+    val list = listOf("queen", "rook", "bishop", "knight")
 
     val offsetX = Utils().offsetX(width.value, file).dp
     var offsetY = Utils().offsetY(width.value, rank).dp
@@ -80,9 +69,13 @@ fun Promotion(
             shape = RoundedCornerShape(10.dp)
         ) {
             Column(Modifier.fillMaxWidth()) {
-                pieces.forEach { selectedPiece ->
+                list.forEach() {
+                    var drawable = pieces[it]?.pieceDrawable
+                    if(drawable == null){
+                        drawable = com.google.android.material.R.drawable.mtrl_ic_error
+                    }
                     Image(
-                        imageVector = ImageVector.vectorResource(selectedPiece.pieceDrawable),
+                        imageVector = ImageVector.vectorResource(drawable),
                         contentDescription = "Chess Piece",
                         modifier = Modifier
                             .fillMaxWidth()
@@ -90,7 +83,7 @@ fun Promotion(
                             .padding(5.dp)
                             .clickable {
                                 promotionSelectionShowing.value = false
-                                viewModel.promotion(Square(rank, file), selectedPiece)
+                                viewModel.changePiecePosition(Square(rank, file), chessPiece, pieces[it])
                             }
                     )
                 }
