@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp.view.game_screen.utils
+package com.gomezdevlopment.chessnotationapp.view
 
 import androidx.compose.ui.graphics.Color
 
@@ -12,3 +12,4 @@ val blue = Color(0xFF5D84E7)
 val pink = Color(0xFFFF5DC3)
 val textWhite = Color(0xFFDFDFDF)
 val cardWhite = Color(0xFFFCFCFC)
+val navBarWhite = Color(0xFFF8F8F8)

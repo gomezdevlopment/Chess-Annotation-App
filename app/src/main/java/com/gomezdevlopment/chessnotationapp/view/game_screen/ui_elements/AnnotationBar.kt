@@ -2,10 +2,7 @@ package com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -24,8 +21,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.gomezdevlopment.chessnotationapp.R
-import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.orange
-import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.teal
+import com.gomezdevlopment.chessnotationapp.view.orange
+import com.gomezdevlopment.chessnotationapp.view.teal
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable

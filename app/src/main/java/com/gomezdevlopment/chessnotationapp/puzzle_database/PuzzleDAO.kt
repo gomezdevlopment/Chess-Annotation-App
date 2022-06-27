@@ -6,7 +6,7 @@ import androidx.room.Query
 @Dao
 interface PuzzleDAO {
 
-    @Query ("SELECT * FROM puzzle ORDER BY rating")
+    @Query("SELECT * FROM puzzle ORDER BY rating")
     fun getPuzzles(): List<Puzzle>
 
 }

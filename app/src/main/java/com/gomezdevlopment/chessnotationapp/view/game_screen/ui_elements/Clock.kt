@@ -12,8 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.tealDarker
-import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
+import com.gomezdevlopment.chessnotationapp.view.tealDarker
 import java.util.concurrent.TimeUnit
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.unit.Dp

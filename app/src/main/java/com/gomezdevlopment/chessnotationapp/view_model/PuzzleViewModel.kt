@@ -13,6 +13,4 @@ class PuzzleViewModel @Inject constructor(private val roomRepository: RoomReposi
     fun getPuzzles(): List<Puzzle>{
         return puzzles
     }
-
-
 }

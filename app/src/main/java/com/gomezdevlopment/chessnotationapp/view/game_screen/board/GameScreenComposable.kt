@@ -12,7 +12,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -20,11 +19,12 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.GameEvent
-import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
+import com.gomezdevlopment.chessnotationapp.view.tealDarker
+import com.gomezdevlopment.chessnotationapp.view.textWhite
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable

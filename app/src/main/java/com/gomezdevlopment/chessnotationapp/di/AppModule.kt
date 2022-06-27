@@ -1,6 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.di
 
 import android.content.Context
+import androidx.room.Room
 import com.gomezdevlopment.chessnotationapp.puzzle_database.PuzzleDAO
 import com.gomezdevlopment.chessnotationapp.puzzle_database.PuzzleDatabase
 import dagger.Module
@@ -15,13 +16,13 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun getPuzzleDb(context: Context): PuzzleDatabase{
-        return PuzzleDatabase.getPuzzleDatabase(context)
-    }
+    fun providePuzzleDb(context: Context) = Room.databaseBuilder(
+        context,
+        PuzzleDatabase::class.java,
+        "puzzle_database"
+    ).createFromAsset("database/puzzles.db").build()
 
     @Singleton
     @Provides
-    fun getPuzzleDao(puzzleDb: PuzzleDatabase): PuzzleDAO{
-        return puzzleDb.getDAO()
-    }
+    fun providePuzzleDao(puzzleDb: PuzzleDatabase) = puzzleDb.puzzleDAO()
 }

@@ -16,7 +16,10 @@ import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.utils.Utils
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
+import com.gomezdevlopment.chessnotationapp.view.blue
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
+import com.gomezdevlopment.chessnotationapp.view.orange
+import com.gomezdevlopment.chessnotationapp.view.yellow
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable

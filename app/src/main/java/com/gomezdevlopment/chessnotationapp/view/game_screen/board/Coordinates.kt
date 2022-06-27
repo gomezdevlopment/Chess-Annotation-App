@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.tealDarker
+import com.gomezdevlopment.chessnotationapp.view.tealDarker
 
 @Composable()
 fun Coordinates(size: Dp) {
