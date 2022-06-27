@@ -1,23 +1,18 @@
 package com.gomezdevlopment.chessnotationapp.view_model
 
 import android.app.Application
-import android.os.CountDownTimer
 import androidx.compose.runtime.*
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.*
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
-import com.gomezdevlopment.chessnotationapp.model.game_logic.Clock
 import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPiece
 import com.gomezdevlopment.chessnotationapp.model.repositories.GameRepository
-import com.gomezdevlopment.chessnotationapp.model.utils.FirestoreGameInteraction
+import com.gomezdevlopment.chessnotationapp.model.firestore_game_interaction.FirestoreGameInteraction
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
-import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.formatTime
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 

@@ -1,14 +1,14 @@
-package com.gomezdevlopment.chessnotationapp.model.utils
+package com.gomezdevlopment.chessnotationapp.model.firestore_game_interaction
 
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.google.firebase.firestore.FieldValue
 
 class FirestoreGameInteraction {
-    fun writePromotion(playerTurn: String, string: String, promotionSelection: ChessPiece){
+    fun writePromotion(playerTurn: String, string: String, promotionSelection: String){
         if (MainActivity.gameDocumentReference != null) {
             if (playerTurn == MainActivity.userColor) {
-                MainActivity.gameDocumentReference?.update("previousMove", "$string${promotionSelection.piece}")
+                MainActivity.gameDocumentReference?.update("previousMove", "$string$promotionSelection")
                     ?.addOnFailureListener { e ->
                         println(e)
                     }

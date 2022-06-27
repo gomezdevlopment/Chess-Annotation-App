@@ -2,25 +2,19 @@ package com.gomezdevlopment.chessnotationapp.model.repositories
 
 import android.os.CountDownTimer
 import androidx.compose.runtime.*
-import androidx.core.os.persistableBundleOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
 import com.gomezdevlopment.chessnotationapp.model.data_classes.OnlineGame
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.*
 import com.gomezdevlopment.chessnotationapp.model.pieces.*
-import com.gomezdevlopment.chessnotationapp.model.utils.FirestoreGameInteraction
+import com.gomezdevlopment.chessnotationapp.model.firestore_game_interaction.FirestoreGameInteraction
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.gameDocumentReference
-import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.formatTime
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.ktx.toObject
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class GameRepository() : ViewModel() {
@@ -168,7 +162,6 @@ class GameRepository() : ViewModel() {
                     if (piece != null && piece.color != userColor) {
                         if (piece.piece == "pawn" && (square.rank == 0 || square.rank == 7)) {
                             changePiecePosition(square, piece, getPromotionSelectionFromDocument(previousMoveString))
-                            getPromotionSelectionFromDocument(previousMoveString)
                         } else {
                             changePiecePosition(square, piece, null)
                         }
@@ -278,7 +271,6 @@ class GameRepository() : ViewModel() {
     fun setPositionFromFen(fen: String) {
         occupiedSquares.clear()
         piecesOnBoard.clear()
-        //println(fen)
         val piecesOnBoardFromFENPosition = FEN().parseFEN(
             fen,
             playerTurn,
@@ -289,33 +281,6 @@ class GameRepository() : ViewModel() {
             whiteKingSquare,
             blackKingSquare,
         )
-//        val names = mutableListOf<Map<Square, String>>()
-//        val piecesOnBoardTemp = mutableListOf<ChessPiece>()
-//        piecesOnBoardTemp.addAll(piecesOnBoard)
-//
-//        piecesOnBoard.forEachIndexed() { index, piece ->
-//            names.add(mapOf(piece.square to piece.color))
-//        }
-//
-//        val fenMap = mutableListOf<Map<Square, String>>()
-//        piecesOnBoardFromFENPosition.forEach {
-//            fenMap.add(mapOf(it.square to it.color))
-//        }
-//
-//        piecesOnBoardFromFENPosition.forEach { piece ->
-//            if (!names.contains(mapOf(piece.square to piece.color))) {
-//                piecesOnBoard.add(piece)
-//            }
-//        }
-//
-//        piecesOnBoardTemp.forEach() { piece ->
-//            if (!fenMap.contains(mapOf(piece.square to piece.color))) {
-//
-//                piecesOnBoard.remove(piece)
-//            }
-//        }
-
-        //occupiedSquares.clear()
 
         piecesOnBoard.addAll(piecesOnBoardFromFENPosition)
         piecesOnBoard.forEach {
@@ -399,37 +364,22 @@ class GameRepository() : ViewModel() {
 
 
     fun testPositionKiwipete() {
-        piecesOnBoard.clear()
-        occupiedSquares.clear()
         setPositionFromFen("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq - ")
         addInitialGameState()
     }
 
     fun testPosition3() {
-        piecesOnBoard.clear()
-        occupiedSquares.clear()
         setPositionFromFen("8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -")
         addInitialGameState()
     }
 
     fun testPosition4() {
-        piecesOnBoard.clear()
-        occupiedSquares.clear()
         setPositionFromFen("r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq -")
         addInitialGameState()
     }
 
     fun initialPosition() {
-        piecesOnBoard.clear()
-        occupiedSquares.clear()
         setPositionFromFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1 ")
-        addInitialGameState()
-    }
-
-    fun promotionPosition() {
-        piecesOnBoard.clear()
-        occupiedSquares.clear()
-        setPositionFromFen("2r5/KP6/8/8/8/8/6pk/8 w - - 0 1")
         addInitialGameState()
     }
 
@@ -603,15 +553,19 @@ class GameRepository() : ViewModel() {
         return "${piece.square.rank}${piece.square.file}${square.rank}${square.file}"
     }
 
-    private fun convertPromotionToString(previousSquare: Square, square: Square): String {
-        return "${previousSquare.rank}${previousSquare.file}${square.rank}${square.file}"
-    }
+//    private fun convertPromotionToString(previousSquare: Square, square: Square): String {
+//        return "${previousSquare.rank}${previousSquare.file}${square.rank}${square.file}"
+//    }
 
     fun changePiecePosition(newSquare: Square, piece: ChessPiece, promotion: PromotionPiece?) {
         val string = convertMoveToStringOfRanksAndFiles(piece, newSquare)
         val turn: String = playerTurn.value
         viewModelScope.launch {
-            FirestoreGameInteraction().writeMove(turn, string)
+            if (promotion != null) {
+                FirestoreGameInteraction().writePromotion(turn, string, promotion.piece)
+            }else{
+                FirestoreGameInteraction().writeMove(turn, string)
+            }
         }
         val previousPieceSquare = piece.square
         val notation = Notation(currentNotation, newSquare)
