@@ -3,12 +3,11 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
     id 'kotlin-kapt'
-    id 'kotlin-android-extensions'
     id 'dagger.hilt.android.plugin'
 }
 
 android {
-    compileSdk 31
+    compileSdk 32
 
     packagingOptions {
         exclude 'META-INF/*'
@@ -17,7 +16,7 @@ android {
     defaultConfig {
         applicationId "com.gomezdevlopment.chessnotationapp"
         minSdk 21
-        targetSdk 31
+        targetSdk 32
         versionCode 1
         versionName "1.0"
 
