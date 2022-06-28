@@ -6,20 +6,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.SoundFX
-import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
-import com.gomezdevlopment.chessnotationapp.view_model.HomeViewModel
-import com.gomezdevlopment.chessnotationapp.view_model.MatchmakingViewModel
-import com.gomezdevlopment.chessnotationapp.view_model.SignOutViewModel
+import com.gomezdevlopment.chessnotationapp.view_model.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeFragment : Fragment() {
 
     private lateinit var homeViewModel: HomeViewModel
+    private lateinit var puzzleViewModel: PuzzleViewModel
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
         homeViewModel.init()
+        puzzleViewModel = ViewModelProvider(this).get(PuzzleViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -32,7 +34,7 @@ class HomeFragment : Fragment() {
             val matchmakingViewModel = MatchmakingViewModel()
             val signOutViewModel = SignOutViewModel(requireActivity().application)
             setContent {
-                Navigation(viewModel, matchmakingViewModel, signOutViewModel)
+                Navigation(viewModel, matchmakingViewModel, signOutViewModel, puzzleViewModel)
                 SoundFX(viewModel = viewModel)
             }
         }

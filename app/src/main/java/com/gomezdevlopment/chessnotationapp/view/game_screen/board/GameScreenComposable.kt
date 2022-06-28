@@ -19,6 +19,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.GameEvent
+import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.*
@@ -69,7 +70,16 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                         .aspectRatio(1f),
                 ) {
                     ChessBoard(chessBoardVector = chessBoardVector)
-                    Pieces(viewModel = viewModel, height = maxWidth / 8)
+                    Pieces(
+                        height = maxWidth / 8,
+                        pieces = viewModel.piecesOnBoard,
+                        playerTurn = viewModel.getPlayerTurn(),
+                        userColor = userColor,
+                        selectedPiece= viewModel.getSelectedPiece(),
+                        pieceClicked = viewModel.isPieceClicked(),
+                        currentSquare = viewModel.getCurrentSquare().value,
+                        previousSquare = viewModel.getPreviousSquare().value,
+                    )
                     Coordinates(size = maxWidth / 8)
                     ChessUILogic(height = maxWidth / 8, viewModel = viewModel, navController)
                 }

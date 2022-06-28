@@ -8,15 +8,16 @@ import com.gomezdevlopment.chessnotationapp.databinding.ActivityMainBinding
 import com.gomezdevlopment.chessnotationapp.model.data_classes.User
 import com.gomezdevlopment.chessnotationapp.view_model.HomeViewModel
 import com.google.firebase.firestore.DocumentReference
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
     companion object{
         var user: User? = null
-        lateinit var userColor: String
+        var userColor: String = "both"
         var gameDocumentReference: DocumentReference? = null
         var userDocumentReference: DocumentReference? = null
     }

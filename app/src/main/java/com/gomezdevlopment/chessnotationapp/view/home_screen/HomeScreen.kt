@@ -1,18 +1,11 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -21,17 +14,18 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.gomezdevlopment.chessnotationapp.R
+import com.gomezdevlopment.chessnotationapp.puzzle_database.RoomRepository
 import com.gomezdevlopment.chessnotationapp.view.*
-import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.GameScreen
-import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.PlayScreen
-import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.PuzzleScreen
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.play_component.PlayScreen
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component.PuzzleScreen
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.Settings
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.UserScreen
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.MatchmakingViewModel
+import com.gomezdevlopment.chessnotationapp.view_model.PuzzleViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.SignOutViewModel
+import javax.inject.Inject
 
 @Composable
 fun MatchSearch(
@@ -108,11 +102,12 @@ fun NavigationFromMatchSearch(
 fun Navigation(
     gameViewModel: GameViewModel,
     matchmakingViewModel: MatchmakingViewModel,
-    signOutViewModel: SignOutViewModel
+    signOutViewModel: SignOutViewModel,
+    puzzleViewModel: PuzzleViewModel
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "home") {
-        composable("home") { Home(navController, matchmakingViewModel, gameViewModel) }
+        composable("home") { Home(navController, matchmakingViewModel, gameViewModel, puzzleViewModel) }
         composable("game") { GameScreen(gameViewModel, navController) }
         composable("settings") { Settings(signOutViewModel, navController) }
         composable("matchSearch") {
@@ -130,11 +125,12 @@ fun HomeBottomNavigation(
     navController: NavHostController,
     playNavController: NavController,
     matchmakingViewModel: MatchmakingViewModel,
-    gameViewModel: GameViewModel
+    gameViewModel: GameViewModel,
+    puzzleViewModel: PuzzleViewModel
 ) {
     NavHost(navController = navController, startDestination = "play") {
         composable("play") { PlayScreen(playNavController, matchmakingViewModel, gameViewModel) }
-        composable("puzzles") { PuzzleScreen()}
+        composable("puzzles") { PuzzleScreen(puzzleViewModel) }
         composable("user") { UserScreen()}
     }
 }
@@ -143,7 +139,8 @@ fun HomeBottomNavigation(
 fun Home(
     navController: NavController,
     matchmakingViewModel: MatchmakingViewModel,
-    gameViewModel: GameViewModel
+    gameViewModel: GameViewModel,
+    puzzleViewModel: PuzzleViewModel
 ) {
     val bottomNavBarController = rememberNavController()
 
@@ -152,7 +149,8 @@ fun Home(
             navController = bottomNavBarController,
             playNavController = navController,
             matchmakingViewModel = matchmakingViewModel,
-            gameViewModel = gameViewModel
+            gameViewModel = gameViewModel,
+            puzzleViewModel = puzzleViewModel
         )
     }
 
