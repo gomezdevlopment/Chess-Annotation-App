@@ -81,10 +81,10 @@ class GameRepository() : ViewModel(), GameSetup {
     private var fiftyMoveCount = mutableStateOf(0)
 
     //Sound FX Booleans
-    var pieceSound: MutableState<Boolean> = mutableStateOf(false)
-    var checkSound: MutableState<Boolean> = mutableStateOf(false)
-    var captureSound: MutableState<Boolean> = mutableStateOf(false)
-    var castlingSound: MutableState<Boolean> = mutableStateOf(false)
+    override var pieceSound: MutableState<Boolean> = mutableStateOf(false)
+    override var checkSound: MutableState<Boolean> = mutableStateOf(false)
+    override var captureSound: MutableState<Boolean> = mutableStateOf(false)
+    override var castlingSound: MutableState<Boolean> = mutableStateOf(false)
     var gameEndSound: MutableState<Boolean> = mutableStateOf(false)
 
 

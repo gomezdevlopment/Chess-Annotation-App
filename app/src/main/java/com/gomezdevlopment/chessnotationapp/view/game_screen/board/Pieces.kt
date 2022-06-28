@@ -1,5 +1,8 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen.board
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateOffsetAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.aspectRatio
@@ -179,11 +182,11 @@ fun Pieces(
             val offsetX = Utils().offsetX(height.value, square.file)
             val offsetY = Utils().offsetY(height.value, square.rank)
             val offset = Offset(offsetX, offsetY)
-            //val animatedOffset by animateOffsetAsState(targetValue = offset, tween(100, easing = LinearEasing))
+            val animatedOffset by animateOffsetAsState(targetValue = offset, tween(200, easing = LinearEasing))
             Piece(
                 piece = piece,
                 height = height,
-                offset = offset,
+                offset = animatedOffset,
                 playerTurn = playerTurn,
                 userColor = userColor,
                 selectedPiece = selectedPiece,

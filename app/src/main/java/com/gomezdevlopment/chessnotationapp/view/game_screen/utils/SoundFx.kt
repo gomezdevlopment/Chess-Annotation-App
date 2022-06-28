@@ -45,6 +45,4 @@ fun SoundFX(viewModel: GameViewModel) {
             viewModel.playSoundPool("end")
         }
     }
-
-
 }

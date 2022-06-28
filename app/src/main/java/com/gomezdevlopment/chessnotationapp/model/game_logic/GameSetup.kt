@@ -33,12 +33,11 @@ interface GameSetup {
     var annotations: MutableList<String>
     var currentNotation: StringBuilder
 
-//    //Sound FX Booleans
-//    var pieceSound: MutableState<Boolean> = mutableStateOf(false)
-//    var checkSound: MutableState<Boolean> = mutableStateOf(false)
-//    var captureSound: MutableState<Boolean> = mutableStateOf(false)
-//    var castlingSound: MutableState<Boolean> = mutableStateOf(false)
-//    var gameEndSound: MutableState<Boolean> = mutableStateOf(false)
+    //Sound FX Booleans
+    var pieceSound: MutableState<Boolean>
+    var checkSound: MutableState<Boolean>
+    var captureSound: MutableState<Boolean>
+    var castlingSound: MutableState<Boolean>
 
     var selectedNotationIndex: MutableState<Int>
     val openDrawOfferedDialog: MutableState<Boolean>
@@ -312,6 +311,18 @@ interface GameSetup {
             )
         )
         checkAllLegalMoves()
+
+        if (kingInCheck.value) {
+            checkSound.value = true
+        } else {
+            if (castled.value) {
+                castlingSound.value = true
+            } else if (capture.value) {
+                captureSound.value = true
+            } else {
+                pieceSound.value = true
+            }
+        }
     }
 
     private fun isEnPassant(piece: ChessPiece, square: Square): Boolean {

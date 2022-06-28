@@ -22,7 +22,7 @@ object AppModule {
     fun providePuzzleDb(context: Application) = Room.databaseBuilder(
         context,
         PuzzleDatabase::class.java,
-        "puzzle_database"
+        "puzzles"
     ).createFromAsset("database/puzzles.db").build()
 
     @Singleton
