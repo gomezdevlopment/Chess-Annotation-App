@@ -2,10 +2,18 @@ package com.gomezdevlopment.chessnotationapp.model.repositories
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
+import com.gomezdevlopment.chessnotationapp.model.firestore_game_interaction.FirestoreGameInteraction
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameSetup
+import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPiece
+import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPieces
+import com.gomezdevlopment.chessnotationapp.view.MainActivity
+import com.gomezdevlopment.chessnotationapp.view.game_screen.board.Pieces
+import kotlinx.coroutines.launch
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
@@ -40,7 +48,7 @@ class PuzzleRepository() : ViewModel(), GameSetup {
     override var captureSound: MutableState<Boolean> = mutableStateOf(false)
     override var castlingSound: MutableState<Boolean> = mutableStateOf(false)
 
-    val playerRating = mutableStateOf(600)
+    val playerRating: MutableState<Int> = mutableStateOf(600)
     private val k = 20
     var correct = mutableStateOf(false)
     var endOfPuzzle = mutableStateOf(false)
@@ -49,35 +57,92 @@ class PuzzleRepository() : ViewModel(), GameSetup {
 
     val userColor: MutableState<String> = mutableStateOf("white")
 
+    val correctPiece: MutableState<ChessPiece?> = mutableStateOf(null)
+    val correctSquare: MutableState<Square?> = mutableStateOf(null)
+    val correctPromotionChar: MutableState<Char?> = mutableStateOf(null)
+
+    val message = mutableStateOf("Incorrect")
+    val image = mutableStateOf(R.drawable.ic_incorrect)
+
     fun makeComputerMove(move: String) {
         val pieceToMove: ChessPiece? = occupiedSquares[convertMoveToSquare(move, 0, 1)]
         val square: Square = convertMoveToSquare(move, 2, 3)
-
-        println(move)
-        println(square)
         if (pieceToMove != null) {
-            changePiecePosition(square, pieceToMove, null)
+            var promotion: PromotionPiece? = null
+            if(move.length == 5){
+                when(playerTurn.value){
+                    "white" -> {
+                        when(move.last()){
+                            'q' -> promotion = PromotionPieces().whitePieces["queen"]
+                            'r' -> promotion = PromotionPieces().whitePieces["rook"]
+                            'b' -> promotion = PromotionPieces().whitePieces["bishop"]
+                            'n' -> promotion = PromotionPieces().whitePieces["knight"]
+                        }
+                    }
+                    "black" -> {
+                        when(move.last()) {
+                            'q' -> promotion = PromotionPieces().blackPieces["queen"]
+                            'r' -> promotion = PromotionPieces().blackPieces["rook"]
+                            'b' -> promotion = PromotionPieces().blackPieces["bishop"]
+                            'n' -> promotion = PromotionPieces().blackPieces["knight"]
+                        }
+                    }
+                }
+            }
+            changePiecePosition(square, pieceToMove, promotion)
             moveIndex.value += 1
-            println(moveIndex.value)
-        }else{
-            println("null piece")
         }
     }
 
-    fun checkIfMoveIsCorrect(square: Square, piece: ChessPiece, correctMove: String, puzzleRating: Float) {
+    fun setCorrectMove(correctMove: String){
         val squareFromMove = convertMoveToSquare(correctMove, 0, 1)
-        println("square from move: $squareFromMove")
-        val correctPiece: ChessPiece? = occupiedSquares[squareFromMove]
-        val correctSquare: Square = convertMoveToSquare(correctMove, 2, 3)
+        val piece: ChessPiece? = occupiedSquares[squareFromMove]
+        val square: Square = convertMoveToSquare(correctMove, 2, 3)
+        correctPiece.value = piece
+        correctSquare.value = square
+        if(correctMove.length == 5){
+            correctPromotionChar.value = correctMove.last()
+        }
+    }
 
-        if (piece == correctPiece && square == correctSquare) {
-            correct.value = true
-            playerRating.value = Elo().eloRating(playerRating.value.toFloat(), puzzleRating, k, correct.value)
+    fun checkIfMoveIsCorrect(square: Square, piece: ChessPiece, promotion: PromotionPiece?) {
+        if (piece == correctPiece.value && square == correctSquare.value) {
+            if(promotion != null){
+                val promotionChar = when(promotion.piece){
+                    "queen" -> 'q'
+                    "rook" -> 'r'
+                    "bishop" -> 'b'
+                    "knight" -> "n"
+                    else -> '0'
+                }
+                if(promotionChar == correctPromotionChar.value){
+                    message.value = "Correct!"
+                    image.value = R.drawable.ic_correct
+                    correct.value = true
+                }else{
+                    message.value = "Incorrect"
+                    image.value = R.drawable.ic_incorrect
+                    correct.value = false
+                    endOfPuzzle.value = true
+                }
+            }else{
+                message.value = "Correct!"
+                image.value = R.drawable.ic_correct
+                correct.value = true
+            }
         } else {
+            message.value = "Incorrect"
+            image.value = R.drawable.ic_incorrect
             correct.value = false
             endOfPuzzle.value = true
-            playerRating.value = Elo().eloRating(playerRating.value.toFloat(), puzzleRating, k, correct.value)
         }
+    }
+
+    fun updatePlayerRating(puzzleRating: Float){
+        playerRating.value = Elo().eloRating(playerRating.value.toFloat(), puzzleRating, k, correct.value)
+//        viewModelScope.launch {
+//            FirestoreGameInteraction().writePuzzleRating(playerRating.value)
+//        }
     }
 
 

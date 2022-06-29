@@ -1,8 +1,13 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
+import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
@@ -11,7 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,49 +27,58 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.GameEvent
+import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
+import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPieces
 import com.gomezdevlopment.chessnotationapp.model.utils.Utils
-import com.gomezdevlopment.chessnotationapp.view.cardWhite
+import com.gomezdevlopment.chessnotationapp.view.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.ChessBoard
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.ChessUILogic
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.Coordinates
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.Pieces
-import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.EndOfGameCard
-import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.Promotion
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.Highlight
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.Outline
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleCapture
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleMove
-import com.gomezdevlopment.chessnotationapp.view.teal
-import com.gomezdevlopment.chessnotationapp.view.tealDarker
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.PuzzleViewModel
 
 @Composable
 fun PuzzleScreen(viewModel: PuzzleViewModel) {
+    if(viewModel.showNoMorePuzzlesCard.value){
+        AllPuzzlesCompletedCard(header = "Congratulations!", message = "You completed all Puzzles!")
+    }
+
     val chessBoardVector: ImageVector =
         ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
 
     Column(
         Modifier
-            .fillMaxSize()
             .background(cardWhite),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val ratingString = "Your Rating: ${viewModel.playerRating.value}"
-        Text(
-            ratingString,
-            fontSize = 14.sp,
-            modifier = Modifier.padding(20.dp),
-            color = Color.Black
-        )
-        Text(
-            viewModel.puzzleRating.value,
-            fontSize = 20.sp,
-            modifier = Modifier.padding(20.dp),
-            color = tealDarker
-        )
+        BoxWithConstraints(
+            Modifier
+                .weight(1f)
+        ) {
+            Column() {
+                Text(
+                    ratingString,
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(20.dp),
+                    color = Color.Black
+                )
+                Text(
+                    viewModel.puzzleRating.value,
+                    fontSize = 20.sp,
+                    modifier = Modifier.padding(20.dp),
+                    color = tealDarker
+                )
+            }
+        }
+
         BoxWithConstraints(
             modifier = Modifier
                 .fillMaxWidth()
@@ -81,33 +98,123 @@ fun PuzzleScreen(viewModel: PuzzleViewModel) {
             Coordinates(size = maxWidth / 8)
             PuzzleUILogic(height = maxWidth / 8, viewModel = viewModel)
 
-            if(viewModel.endOfPuzzle.value){
-                if(viewModel.correct.value){
-                    OutlineBoard(height = maxWidth, color = Color.Green)
-                }else{
-                    OutlineBoard(height = maxWidth, color = Color.Red)
+//            if (viewModel.endOfPuzzle.value) {
+//                if (viewModel.correct.value) {
+//                    OutlineBoard(height = maxWidth, color = Color.Green)
+//                } else {
+//                    OutlineBoard(height = maxWidth, color = Color.Red)
+//                }
+//
+//            }
+        }
+        BoxWithConstraints(
+            Modifier
+                .weight(1f)
+        ) {
+            if (!viewModel.endOfPuzzle.value) {
+                HintButton(viewModel = viewModel)
+            }
+            Column(Modifier.height(maxHeight), verticalArrangement = Arrangement.Bottom) {
+                if (viewModel.endOfPuzzle.value) {
+                    EndOfPuzzleCard(viewModel)
                 }
-
+                //Hacky Way to account for the height of the nav bar
+                Spacer(modifier = Modifier.height(60.dp))
             }
         }
-        TextButton(
-            onClick = {
-                viewModel.puzzleIndex += 1
-                viewModel.setPuzzle()
-            },
-            Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
+    }
+}
+
+@Composable
+fun EndOfPuzzleCard(viewModel: PuzzleViewModel) {
+    val message by viewModel.message
+    val image by viewModel.image
+    println(viewModel.message.value)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(5.dp)
+    ) {
+        Card(
+            backgroundColor = cardWhite,
+            elevation = 10.dp,
+            shape = RoundedCornerShape(5.dp),
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Text(
-                text = "Next Puzzle",
-                fontSize = 20.sp,
-                color = tealDarker,
-                modifier = Modifier.padding(20.dp)
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(horizontalAlignment = Alignment.Start) {
+
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Image(
+                            imageVector = ImageVector.vectorResource(id = image),
+                            contentDescription = message,
+                            modifier = Modifier.padding(10.dp)
+                        )
+                        Text(message, modifier = Modifier.padding(10.dp))
+                    }
+                }
+                Column(horizontalAlignment = Alignment.End, modifier = Modifier.weight(1f)) {
+                    Row() {
+                        if (viewModel.endOfPuzzle.value) {
+                            if (!viewModel.correct.value) {
+                                TextButton(onClick = {
+                                    viewModel.setPuzzle()
+                                }) {
+                                    Text(
+                                        text = "Try Again",
+                                        fontSize = 14.sp,
+                                        color = tealDarker,
+                                        modifier = Modifier.padding(10.dp)
+                                    )
+                                }
+                            }
+                        }
+                        TextButton(onClick = {
+                            viewModel.puzzleIndex += 1
+                            viewModel.setPuzzle()
+                        }) {
+                            Text(
+                                text = "Next",
+                                fontSize = 14.sp,
+                                color = tealDarker,
+                                modifier = Modifier.padding(10.dp)
+                            )
+                        }
+                    }
+
+                }
+            }
         }
     }
+}
 
+@Composable
+fun HintButton(viewModel: PuzzleViewModel) {
+    TextButton(
+        onClick = { viewModel.hint.value = true },
+        Modifier
+            .fillMaxWidth()
+            .padding(20.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                imageVector = ImageVector.vectorResource(id = R.drawable.ic_hint),
+                contentDescription = "Hint",
+                tint = tealDarker
+            )
+            Text(
+                text = "Hint",
+                fontSize = 20.sp,
+                color = tealDarker,
+                modifier = Modifier.padding(10.dp)
+            )
+        }
+
+    }
 }
 
 @Composable
@@ -145,17 +252,29 @@ private fun PuzzleUILogic(height: Dp, viewModel: PuzzleViewModel) {
         isMoveSelected.value = false
     }
 
+    if (viewModel.hint.value) {
+        val correctPiece = viewModel.correctPiece.value
+        if (correctPiece != null) {
+            Highlight(
+                height = height,
+                square = correctPiece.square,
+                color = pink,
+                transparency = .8f
+            )
+        }
+
+    }
     SoundFX(viewModel = viewModel)
-//    if (promotionSelectionShowing.value) {
-//        Promotion(
-//            height,
-//            clickedPiece.value,
-//            promotionSelectionShowing,
-//            targetRank.value,
-//            targetFile.value,
-//            viewModel
-//        )
-//    }
+    if (promotionSelectionShowing.value) {
+        PuzzlePromotion(
+            height,
+            clickedPiece.value,
+            promotionSelectionShowing,
+            targetRank.value,
+            targetFile.value,
+            viewModel
+        )
+    }
 }
 
 @Composable
@@ -210,6 +329,129 @@ private fun SoundFX(viewModel: PuzzleViewModel) {
         LaunchedEffect(0) {
             castlingSound.value = false
             viewModel.playSoundPool("castle")
+        }
+    }
+}
+
+@Composable
+fun PuzzlePromotion(
+    width: Dp,
+    chessPiece: ChessPiece,
+    promotionSelectionShowing: MutableState<Boolean>,
+    rank: Int,
+    file: Int,
+    viewModel: PuzzleViewModel
+) {
+    var pieces = PromotionPieces().whitePieces
+    println(pieces)
+    if (chessPiece.color == "black") {
+        pieces = PromotionPieces().blackPieces
+    }
+
+    println(pieces)
+    val list = listOf("queen", "rook", "bishop", "knight")
+
+    val offsetX = Utils().offsetX(width.value, file).dp
+    var offsetY = Utils().offsetY(width.value, rank).dp
+
+    if (rank == 0 && MainActivity.userColor == "white") {
+        offsetY = width * 4
+    }
+
+    if(rank == 7 && MainActivity.userColor == "black"){
+        offsetY = width * 4
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .background(colorResource(id = R.color.transparentBlack))
+            .zIndex(4f)
+    )
+    {
+        Card(
+            modifier = Modifier
+                .width(width)
+                .height((width * 4))
+                .absoluteOffset(offsetX, offsetY),
+            elevation = 5.dp,
+            shape = RoundedCornerShape(10.dp)
+        ) {
+            Column(Modifier.fillMaxWidth()) {
+                list.forEach() {
+                    var drawable = pieces[it]?.pieceDrawable
+                    if(drawable == null){
+                        drawable = com.google.android.material.R.drawable.mtrl_ic_error
+                    }
+                    Image(
+                        imageVector = ImageVector.vectorResource(drawable),
+                        contentDescription = "Chess Piece",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .aspectRatio(1f)
+                            .padding(5.dp)
+                            .clickable {
+                                promotionSelectionShowing.value = false
+                                viewModel.changePiecePosition(
+                                    Square(rank, file),
+                                    chessPiece,
+                                    pieces[it]
+                                )
+                            }
+                    )
+                }
+            }
+        }
+
+    }
+}
+
+@Composable
+fun AllPuzzlesCompletedCard(
+    header: String,
+    message: String
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .background(colorResource(id = R.color.transparentBlack))
+            .zIndex(4f)
+            .padding(50.dp)
+    )
+    {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(50.dp),
+            elevation = 10.dp,
+            shape = RoundedCornerShape(20.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Column(
+                    Modifier
+                        .fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Spacer(modifier = Modifier.height(50.dp))
+                    Text(
+                        text = header,
+                        textAlign = TextAlign.Center,
+                        fontSize = 24.sp,
+                        modifier = Modifier.absolutePadding(10.dp)
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Text(text = message, textAlign = TextAlign.Center, fontSize = 14.sp)
+                    Spacer(modifier = Modifier.height(50.dp))
+                }
+                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    TextButton(onClick = {  }) {
+                        Text("Close", color = tealDarker)
+                    }
+                    Spacer(modifier = Modifier.height(20.dp))
+                }
+            }
         }
     }
 }

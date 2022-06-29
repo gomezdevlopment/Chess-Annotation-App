@@ -122,7 +122,8 @@ class AuthenticationRepository(private val application: Application) {
             "username" to "Player",
             "wins" to 0,
             "losses" to 0,
-            "draws" to 0
+            "draws" to 0,
+            "puzzleRating" to 600
         )
     }
 

@@ -12,6 +12,8 @@ import com.gomezdevlopment.chessnotationapp.view.textWhite
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.*
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.NavComponent
@@ -28,7 +30,7 @@ fun BottomNavBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    BottomNavigation(backgroundColor = navBarWhite) {
+    BottomNavigation(backgroundColor = navBarWhite, modifier = Modifier.height(60.dp)) {
         listOfNavComponents.forEach { component ->
             AddItem(component, currentDestination, navController)
         }

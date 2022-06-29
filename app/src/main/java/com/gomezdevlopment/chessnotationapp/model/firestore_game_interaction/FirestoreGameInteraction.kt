@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.model.firestore_game_interaction
 
+import android.media.Rating
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.google.firebase.firestore.FieldValue
@@ -85,6 +86,12 @@ class FirestoreGameInteraction {
     fun incrementDraws(){
         if (MainActivity.userDocumentReference != null) {
             MainActivity.userDocumentReference?.update("draws", FieldValue.increment(1))
+        }
+    }
+
+    fun writePuzzleRating(rating: Int){
+        if (MainActivity.userDocumentReference != null) {
+            MainActivity.userDocumentReference?.update("puzzleRating", rating)
         }
     }
 

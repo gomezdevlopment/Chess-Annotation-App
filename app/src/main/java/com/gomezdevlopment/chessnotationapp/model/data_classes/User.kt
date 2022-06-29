@@ -7,5 +7,6 @@ data class User(
     val username: String = "",
     val wins: Int = 0,
     val losses: Int = 0,
-    val draws: Int = 0
+    val draws: Int = 0,
+    val puzzleRating: Int = 600
 )
