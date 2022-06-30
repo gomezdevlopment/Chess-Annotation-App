@@ -47,6 +47,7 @@ class PuzzleRepository() : ViewModel(), GameSetup {
     override var checkSound: MutableState<Boolean> = mutableStateOf(false)
     override var captureSound: MutableState<Boolean> = mutableStateOf(false)
     override var castlingSound: MutableState<Boolean> = mutableStateOf(false)
+    override var kingSquare: MutableState<Square> = mutableStateOf(blackKingSquare.value)
 
     val playerRating: MutableState<Int> = mutableStateOf(600)
     private val k = 20
@@ -140,6 +141,9 @@ class PuzzleRepository() : ViewModel(), GameSetup {
 
     fun updatePlayerRating(puzzleRating: Float){
         playerRating.value = Elo().eloRating(playerRating.value.toFloat(), puzzleRating, k, correct.value)
+        if(MainActivity.user != null){
+            MainActivity.user!!.puzzleRating = playerRating.value
+        }
 //        viewModelScope.launch {
 //            FirestoreGameInteraction().writePuzzleRating(playerRating.value)
 //        }

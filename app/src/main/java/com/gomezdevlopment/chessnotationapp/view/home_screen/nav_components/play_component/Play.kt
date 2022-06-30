@@ -35,7 +35,7 @@ fun PlayScreen(
         arrayListOf(R.drawable.ic_rapid, R.drawable.ic_blitz, R.drawable.ic_bullet)
     Column() {
         Column(Modifier.weight(1f)) {
-            Spacer(modifier = Modifier.height(100.dp))
+            Spacer(modifier = Modifier.height(30.dp))
             Text(
                 text = "Select Game Mode",
                 modifier = Modifier.padding(10.dp),

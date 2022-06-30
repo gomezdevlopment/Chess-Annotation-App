@@ -50,7 +50,7 @@ fun PuzzleScreen(viewModel: PuzzleViewModel) {
     }
 
     val chessBoardVector: ImageVector =
-        ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
+        ImageVector.vectorResource(id = R.drawable.ic_ches_board_grey)
 
     Column(
         Modifier
@@ -92,19 +92,20 @@ fun PuzzleScreen(viewModel: PuzzleViewModel) {
                 userColor = viewModel.userColor.value,
                 selectedPiece = viewModel.selectedPiece,
                 pieceClicked = viewModel.pieceClicked,
+                kingInCheck = viewModel.kingInCheck.value,
                 currentSquare = viewModel.getCurrentSquare().value,
                 previousSquare = viewModel.getPreviousSquare().value,
+                kingSquare = viewModel.kingSquare,
             )
             Coordinates(size = maxWidth / 8)
             PuzzleUILogic(height = maxWidth / 8, viewModel = viewModel)
 
 //            if (viewModel.endOfPuzzle.value) {
 //                if (viewModel.correct.value) {
-//                    OutlineBoard(height = maxWidth, color = Color.Green)
+//                    OutlineBoard(height = maxWidth, color = greenCorrect)
 //                } else {
-//                    OutlineBoard(height = maxWidth, color = Color.Red)
+//                    OutlineBoard(height = maxWidth, color = redIncorrect)
 //                }
-//
 //            }
         }
         BoxWithConstraints(

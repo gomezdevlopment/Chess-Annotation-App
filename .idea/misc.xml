@@ -4,6 +4,9 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/batmi/Desktop/ChessNotationApp/app/src/main/res/drawable/chess_splash_image.xml" value="0.1565" />
+        <entry key="..\:/Users/batmi/Desktop/ChessNotationApp/app/src/main/res/drawable/ic_ches_board_grey.xml" value="0.227" />
+        <entry key="..\:/Users/batmi/Desktop/ChessNotationApp/app/src/main/res/drawable/ic_ches_board_purple_pearl.xml" value="0.227" />
+        <entry key="..\:/Users/batmi/Desktop/ChessNotationApp/app/src/main/res/drawable/ic_chess_board_wood.xml" value="0.2665" />
         <entry key="..\:/Users/batmi/Desktop/ChessNotationApp/app/src/main/res/drawable/ic_chessbackground.xml" value="0.1" />
         <entry key="..\:/Users/batmi/Desktop/ChessNotationApp/app/src/main/res/drawable/ic_chessboard.xml" value="0.2685" />
         <entry key="..\:/Users/batmi/Desktop/ChessNotationApp/app/src/main/res/drawable/ic_user_icon.xml" value="0.1" />

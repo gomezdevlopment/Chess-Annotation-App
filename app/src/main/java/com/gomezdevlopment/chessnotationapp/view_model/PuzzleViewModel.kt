@@ -5,6 +5,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
@@ -33,6 +34,8 @@ class PuzzleViewModel @Inject constructor(
     val endOfPuzzle = puzzleRepository.endOfPuzzle
     val puzzleRating: MutableState<String> = mutableStateOf("")
     val pieceClicked: MutableState<Boolean> = mutableStateOf(false)
+    val kingInCheck = puzzleRepository.kingInCheck
+    var kingSquare = puzzleRepository.kingSquare
     val occupiedSquares = puzzleRepository.occupiedSquares
     val userColor = puzzleRepository.userColor
     val piecesOnBoard: List<ChessPiece> = puzzleRepository.piecesOnBoard
@@ -85,11 +88,12 @@ class PuzzleViewModel @Inject constructor(
     }
 
     private fun makeFirstMove(){
-        CoroutineScope(Dispatchers.IO).launch {
-            delay(1000)
-            puzzleRepository.makeComputerMove(correctMoveOrder[moveIndex])
-            puzzleRepository.setCorrectMove(correctMoveOrder[moveIndex])
-        }
+        puzzleRepository.makeComputerMove(correctMoveOrder[moveIndex])
+        puzzleRepository.setCorrectMove(correctMoveOrder[moveIndex])
+//        CoroutineScope(Dispatchers.IO).launch {
+//            delay(1000)
+//
+//        }
 
     }
 
@@ -107,10 +111,13 @@ class PuzzleViewModel @Inject constructor(
             puzzleRepository.endOfPuzzle.value = true
             puzzleRepository.updatePlayerRating(currentPuzzle.rating.toFloat())
         }else{
-            CoroutineScope(Dispatchers.IO).launch {
-                delay(1000)
-                puzzleRepository.makeComputerMove(correctMoveOrder[moveIndex])
-            }
+//            CoroutineScope(Dispatchers.IO).launch {
+//                delay(500)
+//                viewModelScope.launch {
+//                    puzzleRepository.makeComputerMove(correctMoveOrder[moveIndex])
+//                }
+//            }
+            puzzleRepository.makeComputerMove(correctMoveOrder[moveIndex])
         }
     }
 

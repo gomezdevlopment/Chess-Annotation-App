@@ -6,6 +6,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.databinding.ActivityMainBinding
 import com.gomezdevlopment.chessnotationapp.model.data_classes.User
+import com.gomezdevlopment.chessnotationapp.model.firestore_game_interaction.FirestoreGameInteraction
 import com.gomezdevlopment.chessnotationapp.view_model.HomeViewModel
 import com.google.firebase.firestore.DocumentReference
 import dagger.hilt.android.AndroidEntryPoint
@@ -30,13 +31,5 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-    }
-
-    override fun onDestroy() {
-        gameDocumentReference?.delete()?.addOnFailureListener {
-            println("fail to delete")
-        }
-        super.onDestroy()
-
     }
 }

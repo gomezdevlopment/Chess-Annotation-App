@@ -43,6 +43,7 @@ class GameRepository() : ViewModel(), GameSetup {
     override var selectedNotationIndex: MutableState<Int> = mutableStateOf(0)
     override val openDrawOfferedDialog = mutableStateOf(false)
     override val pinnedPiecesFromPreviousTurns = mutableListOf<List<ChessPiece>>(listOf())
+    override var kingSquare: MutableState<Square> = mutableStateOf(blackKingSquare.value)
 
     var initialTime = mutableStateOf(300000L)
     var whiteTimer = mutableStateOf(initialTime.value)
@@ -463,11 +464,13 @@ class GameRepository() : ViewModel(), GameSetup {
         if (piece.color == "white") {
             if (piece.piece == "king") {
                 whiteKingSquare.value = newSquare
+                kingSquare.value = whiteKingSquare.value
             }
             playerTurn.value = "black"
         } else {
             if (piece.piece == "king") {
                 blackKingSquare.value = newSquare
+                kingSquare.value = blackKingSquare.value
             }
             playerTurn.value = "white"
         }

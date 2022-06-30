@@ -25,6 +25,7 @@ import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
 import com.gomezdevlopment.chessnotationapp.view.orange
 import com.gomezdevlopment.chessnotationapp.view.yellow
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
+import kotlinx.coroutines.delay
 
 //@Composable
 //fun Piece(
@@ -114,9 +115,7 @@ fun Piece(
     userColor: String,
     selectedPiece: MutableState<ChessPiece>,
     pieceClicked: MutableState<Boolean>,
-    currentSquare: Square,
-
-) {
+    ) {
     val imageVector = ImageVector.vectorResource(piece.pieceDrawable)
 
     key(piece) {
@@ -132,17 +131,6 @@ fun Piece(
             ) else Modifier.notClickable(height, offset))
         )
     }
-
-    if (piece == selectedPiece.value && piece.color == playerTurn && piece.color == userColor) {
-        Highlight(height = height, square = piece.square, color = blue, transparency = 1f)
-    }
-//    if (viewModel.kingInCheck() && piece.square == viewModel.kingSquare()) {
-//        Highlight(height = height, square = piece.square, orange, 1f)
-//    }
-    if (piece.square == currentSquare) {
-        Highlight(height = height, square = piece.square, yellow, .9f)
-    }
-
 }
 
 fun Modifier.notClickable(height: Dp, offset: Offset) =
@@ -173,8 +161,10 @@ fun Pieces(
     userColor: String,
     pieceClicked: MutableState<Boolean>,
     selectedPiece: MutableState<ChessPiece>,
+    kingInCheck: Boolean,
     currentSquare: Square,
     previousSquare: Square,
+    kingSquare: MutableState<Square>
 ) {
     pieces.forEach() { piece ->
         key(piece) {
@@ -182,7 +172,10 @@ fun Pieces(
             val offsetX = Utils().offsetX(height.value, square.file)
             val offsetY = Utils().offsetY(height.value, square.rank)
             val offset = Offset(offsetX, offsetY)
-            val animatedOffset by animateOffsetAsState(targetValue = offset, tween(200, easing = LinearEasing))
+            val animatedOffset by animateOffsetAsState(
+                targetValue = offset,
+                tween(150, easing = LinearEasing),
+            )
             Piece(
                 piece = piece,
                 height = height,
@@ -191,11 +184,28 @@ fun Pieces(
                 userColor = userColor,
                 selectedPiece = selectedPiece,
                 pieceClicked = pieceClicked,
-                currentSquare = currentSquare,
             )
         }
     }
     if (previousSquare.rank != 10) {
         Highlight(height = height, square = previousSquare, color = yellow, .9f)
     }
+
+    if(currentSquare.rank != 10){
+        Highlight(height = height, square = currentSquare, yellow, .9f)
+    }
+
+    if (pieceClicked.value && selectedPiece.value.color == userColor) {
+        Highlight(
+            height = height,
+            square = selectedPiece.value.square,
+            color = blue,
+            transparency = 1f
+        )
+    }
+
+    if (kingInCheck) {
+        Highlight(height = height, square = kingSquare.value, orange, 1f)
+    }
+
 }

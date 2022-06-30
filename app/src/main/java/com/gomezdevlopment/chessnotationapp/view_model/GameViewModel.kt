@@ -42,6 +42,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     val whiteProgress: StateFlow<Float> = gameRepository.whiteProgress
     val blackTime: StateFlow<String> = gameRepository.blackTime
     val blackProgress: StateFlow<Float> = gameRepository.blackProgress
+    val kingSquare: MutableState<Square> = gameRepository.kingSquare
 
     private val soundPlayer: SoundPlayer = SoundPlayer(app)
 
@@ -164,9 +165,9 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         return gameRepository.playerTurn.value
     }
 
-    fun kingSquare(): Square {
-        return gameRepository.kingSquare().value
-    }
+//    fun kingSquare(): MutableState<Square> {
+//        return gameRepository.kingSquare()
+//    }
 
     fun kingInCheck(): Boolean {
         return gameRepository.kingInCheck.value

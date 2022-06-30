@@ -32,6 +32,7 @@ interface GameSetup {
     var previousGameStates: MutableList<GameState>
     var annotations: MutableList<String>
     var currentNotation: StringBuilder
+    var kingSquare: MutableState<Square>
 
     //Sound FX Booleans
     var pieceSound: MutableState<Boolean>
@@ -61,6 +62,12 @@ interface GameSetup {
         piecesOnBoard.forEach {
             occupiedSquares[it.square] = it
         }
+        if(playerTurn.value == "white"){
+            kingSquare.value = whiteKingSquare.value
+        }else{
+            kingSquare.value = blackKingSquare.value
+        }
+
         checkAllLegalMoves()
     }
 
@@ -86,12 +93,18 @@ interface GameSetup {
         )
     }
 
-    fun kingSquare(): MutableState<Square> {
-        if (playerTurn.value == "white") {
-            return whiteKingSquare
-        }
-        return blackKingSquare
-    }
+//    fun kingSquare(): MutableState<Square> {
+//        if (playerTurn.value == "white") {
+//            println("returning white")
+//            println(whiteKingSquare)
+//            println(blackKingSquare)
+//            return whiteKingSquare
+//        }
+//        println("returning black")
+//        println(blackKingSquare)
+//        println(whiteKingSquare)
+//        return blackKingSquare
+//    }
 
     fun getEnemyKingSquare(): Square {
         if (playerTurn.value == "white") {
@@ -139,9 +152,9 @@ interface GameSetup {
         piecesOnBoard.forEach { piece ->
             kingInCheck.value = false
             if (piece.color != playerTurn.value) {
-                checkLegalMoves(piece, kingSquare().value)
+                checkLegalMoves(piece, kingSquare.value)
                 attacks.addAll(piece.attacks)
-                if (piece.legalMoves.contains(kingSquare().value)) {
+                if (piece.legalMoves.contains(kingSquare.value)) {
                     if (piece.piece == "pawn" || piece.piece == "knight") {
                         piecesCheckingKing.add(piece)
                     }
@@ -297,11 +310,13 @@ interface GameSetup {
                 whiteKingSquare.value = newSquare
             }
             playerTurn.value = "black"
+            kingSquare.value = blackKingSquare.value
         } else {
             if (piece.piece == "king") {
                 blackKingSquare.value = newSquare
             }
             playerTurn.value = "white"
+            kingSquare.value = whiteKingSquare.value
         }
         previousGameStates.add(
             GameState(

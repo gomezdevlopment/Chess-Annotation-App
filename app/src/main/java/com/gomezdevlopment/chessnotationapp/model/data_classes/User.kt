@@ -8,5 +8,5 @@ data class User(
     val wins: Int = 0,
     val losses: Int = 0,
     val draws: Int = 0,
-    val puzzleRating: Int = 600
+    var puzzleRating: Int = 600
 )

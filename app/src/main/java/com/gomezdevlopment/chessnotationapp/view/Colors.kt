@@ -13,3 +13,6 @@ val pink = Color(0xFFFF5DC3)
 val textWhite = Color(0xFFDFDFDF)
 val cardWhite = Color(0xFFFCFCFC)
 val navBarWhite = Color(0xFFF8F8F8)
+
+val greenCorrect = Color(0xFF4CE63B)
+val redIncorrect = Color(0xFFE63B3B)
