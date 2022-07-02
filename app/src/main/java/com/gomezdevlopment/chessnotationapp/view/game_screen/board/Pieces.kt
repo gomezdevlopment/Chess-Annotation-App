@@ -23,6 +23,7 @@ import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColo
 import com.gomezdevlopment.chessnotationapp.view.blue
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
 import com.gomezdevlopment.chessnotationapp.view.orange
+import com.gomezdevlopment.chessnotationapp.view.redIncorrect
 import com.gomezdevlopment.chessnotationapp.view.yellow
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import kotlinx.coroutines.delay
@@ -188,24 +189,28 @@ fun Pieces(
         }
     }
     if (previousSquare.rank != 10) {
-        Highlight(height = height, square = previousSquare, color = yellow, .9f)
+        Outline(height = height, square = previousSquare, color = yellow)
+        //Highlight(height = height, square = previousSquare, color = yellow, .9f)
     }
 
     if(currentSquare.rank != 10){
-        Highlight(height = height, square = currentSquare, yellow, .9f)
+        Outline(height = height, square = currentSquare, color = yellow)
+        //Highlight(height = height, square = currentSquare, yellow, .9f)
     }
 
     if (pieceClicked.value && selectedPiece.value.color == userColor) {
-        Highlight(
-            height = height,
-            square = selectedPiece.value.square,
-            color = blue,
-            transparency = 1f
-        )
+        Outline(height = height, square = selectedPiece.value.square, color = blue)
+//        Highlight(
+//            height = height,
+//            square = selectedPiece.value.square,
+//            color = blue,
+//            transparency = 1f
+//        )
     }
 
     if (kingInCheck) {
-        Highlight(height = height, square = kingSquare.value, orange, 1f)
+        Outline(height = height, square = kingSquare.value, color = redIncorrect)
+        //Highlight(height = height, square = kingSquare.value, orange, 1f)
     }
 
 }

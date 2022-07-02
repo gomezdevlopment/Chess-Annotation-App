@@ -41,7 +41,6 @@ fun PlayScreen(
                 modifier = Modifier.padding(10.dp),
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.h5,
-                color = tealDarker
             )
 
             LazyRow() {
@@ -142,7 +141,7 @@ fun GameSelectionCard(drawableID: Int, title: String, onClick: () -> Unit) {
             .width(200.dp)
             .wrapContentHeight()
             .padding(10.dp),
-        backgroundColor = cardWhite,
+        backgroundColor = MaterialTheme.colors.surface,
         shape = RoundedCornerShape(10.dp),
         elevation = 5.dp,
     )
@@ -159,7 +158,7 @@ fun GameSelectionCard(drawableID: Int, title: String, onClick: () -> Unit) {
                     title,
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.h4,
-                    color = tealDarker,
+                    color = MaterialTheme.colors.onSurface,
                     modifier = Modifier.padding(20.dp)
                 )
             }

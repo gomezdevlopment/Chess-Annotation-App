@@ -6,10 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,8 +50,6 @@ fun PuzzleScreen(viewModel: PuzzleViewModel) {
         ImageVector.vectorResource(id = R.drawable.ic_ches_board_grey)
 
     Column(
-        Modifier
-            .background(cardWhite),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -63,18 +58,18 @@ fun PuzzleScreen(viewModel: PuzzleViewModel) {
             Modifier
                 .weight(1f)
         ) {
-            Column() {
+            Column(verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     ratingString,
                     fontSize = 14.sp,
                     modifier = Modifier.padding(20.dp),
-                    color = Color.Black
+
                 )
                 Text(
                     viewModel.puzzleRating.value,
                     fontSize = 20.sp,
                     modifier = Modifier.padding(20.dp),
-                    color = tealDarker
                 )
             }
         }
@@ -137,7 +132,7 @@ fun EndOfPuzzleCard(viewModel: PuzzleViewModel) {
             .padding(5.dp)
     ) {
         Card(
-            backgroundColor = cardWhite,
+            backgroundColor = MaterialTheme.colors.surface,
             elevation = 10.dp,
             shape = RoundedCornerShape(5.dp),
             modifier = Modifier.fillMaxWidth()
@@ -168,7 +163,7 @@ fun EndOfPuzzleCard(viewModel: PuzzleViewModel) {
                                     Text(
                                         text = "Try Again",
                                         fontSize = 14.sp,
-                                        color = tealDarker,
+                                        color = MaterialTheme.colors.onSurface,
                                         modifier = Modifier.padding(10.dp)
                                     )
                                 }
@@ -181,7 +176,7 @@ fun EndOfPuzzleCard(viewModel: PuzzleViewModel) {
                             Text(
                                 text = "Next",
                                 fontSize = 14.sp,
-                                color = tealDarker,
+                                color = MaterialTheme.colors.onSurface,
                                 modifier = Modifier.padding(10.dp)
                             )
                         }
@@ -205,13 +200,13 @@ fun HintButton(viewModel: PuzzleViewModel) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_hint),
                 contentDescription = "Hint",
-                tint = tealDarker
+                tint = MaterialTheme.colors.onBackground
             )
             Text(
                 text = "Hint",
                 fontSize = 20.sp,
-                color = tealDarker,
-                modifier = Modifier.padding(10.dp)
+                modifier = Modifier.padding(10.dp),
+                color = MaterialTheme.colors.onBackground
             )
         }
 
@@ -256,12 +251,13 @@ private fun PuzzleUILogic(height: Dp, viewModel: PuzzleViewModel) {
     if (viewModel.hint.value) {
         val correctPiece = viewModel.correctPiece.value
         if (correctPiece != null) {
-            Highlight(
-                height = height,
-                square = correctPiece.square,
-                color = pink,
-                transparency = .8f
-            )
+            Outline(height, correctPiece.square, pink)
+//            Highlight(
+//                height = height,
+//                square = correctPiece.square,
+//                color = pink,
+//                transparency = .8f
+//            )
         }
 
     }

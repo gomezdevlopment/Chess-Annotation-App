@@ -5,9 +5,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import com.gomezdevlopment.chessnotationapp.view.AppTheme
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.SoundFX
 import com.gomezdevlopment.chessnotationapp.view_model.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,9 +36,12 @@ class HomeFragment : Fragment() {
             val viewModel = GameViewModel(requireActivity().application)
             val matchmakingViewModel = MatchmakingViewModel()
             val signOutViewModel = SignOutViewModel(requireActivity().application)
+            val userViewModel = UserViewModel()
             setContent {
-                Navigation(viewModel, matchmakingViewModel, signOutViewModel, puzzleViewModel)
-                SoundFX(viewModel = viewModel)
+                AppTheme(darkTheme = isSystemInDarkTheme()) {
+                    Navigation(viewModel, matchmakingViewModel, signOutViewModel, puzzleViewModel, userViewModel)
+                    SoundFX(viewModel = viewModel)
+                }
             }
         }
     }

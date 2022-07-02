@@ -1,7 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -9,9 +9,6 @@ import androidx.compose.ui.res.vectorResource
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.gomezdevlopment.chessnotationapp.view.tealDarker
 import com.gomezdevlopment.chessnotationapp.view.textWhite
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.*
@@ -30,7 +27,7 @@ fun BottomNavBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
 
-    BottomNavigation(backgroundColor = navBarWhite, modifier = Modifier.height(60.dp)) {
+    BottomNavigation(backgroundColor = MaterialTheme.colors.surface, modifier = Modifier.height(60.dp)) {
         listOfNavComponents.forEach { component ->
             AddItem(component, currentDestination, navController)
         }

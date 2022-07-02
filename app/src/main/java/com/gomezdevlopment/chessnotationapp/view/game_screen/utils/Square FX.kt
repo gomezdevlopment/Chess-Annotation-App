@@ -113,7 +113,7 @@ fun Outline(
             .height(height)
             .aspectRatio(1f)
             .absoluteOffset(offsetX.dp, offsetY.dp)
-            .padding(1.dp)
+            .padding(3.dp)
             .zIndex(2f)
 
     ) {
@@ -121,7 +121,7 @@ fun Outline(
             color = color,
             size = size,
             alpha = 1f,
-            style = Stroke(size.width * .05f)
+            style = Stroke(size.width * .075f)
         )
     }
 }

@@ -102,6 +102,7 @@ class PuzzleViewModel @Inject constructor(
     fun getPreviousSquare() = puzzleRepository.previousSquare
 
     fun changePiecePosition(square: Square, piece: ChessPiece, promotion: PromotionPiece?) {
+        hint.value = false
         puzzleRepository.setCorrectMove(correctMoveOrder[moveIndex])
         puzzleRepository.checkIfMoveIsCorrect(square, piece, promotion)
         puzzleRepository.changePiecePosition(square, piece, promotion)

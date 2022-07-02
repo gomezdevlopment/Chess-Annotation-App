@@ -14,18 +14,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.gomezdevlopment.chessnotationapp.puzzle_database.RoomRepository
 import com.gomezdevlopment.chessnotationapp.view.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.GameScreen
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.play_component.PlayScreen
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component.PuzzleScreen
-import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.Settings
-import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.UserScreen
-import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
-import com.gomezdevlopment.chessnotationapp.view_model.MatchmakingViewModel
-import com.gomezdevlopment.chessnotationapp.view_model.PuzzleViewModel
-import com.gomezdevlopment.chessnotationapp.view_model.SignOutViewModel
-import javax.inject.Inject
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.more_component.Settings
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.more_component.UserScreen
+import com.gomezdevlopment.chessnotationapp.view_model.*
 
 @Composable
 fun MatchSearch(
@@ -103,11 +98,12 @@ fun Navigation(
     gameViewModel: GameViewModel,
     matchmakingViewModel: MatchmakingViewModel,
     signOutViewModel: SignOutViewModel,
-    puzzleViewModel: PuzzleViewModel
+    puzzleViewModel: PuzzleViewModel,
+    userViewModel: UserViewModel
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "home") {
-        composable("home") { Home(navController, matchmakingViewModel, gameViewModel, puzzleViewModel) }
+        composable("home") { Home(navController, matchmakingViewModel, gameViewModel, puzzleViewModel, userViewModel) }
         composable("game") { GameScreen(gameViewModel, navController) }
         composable("settings") { Settings(signOutViewModel, navController) }
         composable("matchSearch") {
@@ -126,12 +122,13 @@ fun HomeBottomNavigation(
     playNavController: NavController,
     matchmakingViewModel: MatchmakingViewModel,
     gameViewModel: GameViewModel,
-    puzzleViewModel: PuzzleViewModel
+    puzzleViewModel: PuzzleViewModel,
+    userViewModel: UserViewModel
 ) {
     NavHost(navController = navController, startDestination = "play") {
         composable("play") { PlayScreen(playNavController, matchmakingViewModel, gameViewModel) }
         composable("puzzles") { PuzzleScreen(puzzleViewModel) }
-        composable("user") { UserScreen()}
+        composable("user") { UserScreen(userViewModel) }
     }
 }
 
@@ -140,7 +137,8 @@ fun Home(
     navController: NavController,
     matchmakingViewModel: MatchmakingViewModel,
     gameViewModel: GameViewModel,
-    puzzleViewModel: PuzzleViewModel
+    puzzleViewModel: PuzzleViewModel,
+    userViewModel: UserViewModel
 ) {
     val bottomNavBarController = rememberNavController()
 
@@ -150,7 +148,8 @@ fun Home(
             playNavController = navController,
             matchmakingViewModel = matchmakingViewModel,
             gameViewModel = gameViewModel,
-            puzzleViewModel = puzzleViewModel
+            puzzleViewModel = puzzleViewModel,
+            userViewModel = userViewModel
         )
     }
 

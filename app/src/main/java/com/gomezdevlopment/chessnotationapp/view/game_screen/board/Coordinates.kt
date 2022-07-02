@@ -14,8 +14,8 @@ import com.gomezdevlopment.chessnotationapp.view.tealDarker
 
 @Composable()
 fun Coordinates(size: Dp) {
-    Ranks(size = size, darkColor = tealDarker, lightColor = Color.White)
-    Files(size = size, darkColor = tealDarker, lightColor = Color.White)
+    Ranks(size = size, darkColor = Color.Black, lightColor = Color.White)
+    Files(size = size, darkColor = Color.Black, lightColor = Color.White)
 }
 
 @Composable
