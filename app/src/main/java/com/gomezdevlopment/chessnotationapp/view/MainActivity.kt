@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.databinding.ActivityMainBinding
+import com.gomezdevlopment.chessnotationapp.model.data_classes.OnlineGame
 import com.gomezdevlopment.chessnotationapp.model.data_classes.User
 import com.gomezdevlopment.chessnotationapp.model.firestore_game_interaction.FirestoreGameInteraction
 import com.gomezdevlopment.chessnotationapp.view_model.HomeViewModel
@@ -21,6 +22,7 @@ class MainActivity : AppCompatActivity() {
         var userColor: String = "both"
         var gameDocumentReference: DocumentReference? = null
         var userDocumentReference: DocumentReference? = null
+        var game: OnlineGame? = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

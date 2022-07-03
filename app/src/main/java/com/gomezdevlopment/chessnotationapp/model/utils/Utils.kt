@@ -19,4 +19,20 @@ class Utils {
         }
         return offsetY
     }
+
+    fun offsetX(size: Float, file: Int, color: String): Float {
+        var offsetX = (size * (file).toFloat())
+        if(color == "black"){
+            offsetX = (size * (7-file).toFloat())
+        }
+        return offsetX
+    }
+
+    fun offsetY(size: Float, rank: Int, color: String): Float {
+        var offsetY = (size * (7 - rank).toFloat())
+        if(color == "black"){
+            offsetY = (size * (rank).toFloat())
+        }
+        return offsetY
+    }
 }

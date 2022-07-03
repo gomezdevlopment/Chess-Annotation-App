@@ -38,12 +38,12 @@ fun PlayScreen(
             Spacer(modifier = Modifier.height(30.dp))
             Text(
                 text = "Select Game Mode",
-                modifier = Modifier.padding(10.dp),
+                modifier = Modifier.padding(20.dp),
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.h5,
             )
 
-            LazyRow() {
+            LazyRow(Modifier.padding(10.dp, 10.dp)) {
                 itemsIndexed(gameModes) { index, mode ->
                     GameSelectionCard(drawableID = gameModeImageIDs[index], title = mode) {
                         matchmakingViewModel.joinGame(timeControls[index])
@@ -80,8 +80,8 @@ fun VSPlayerCard(navController: NavController, viewModel: GameViewModel) {
                         navController.navigate("game")
                     },
                 backgroundColor = tealDarker,
-                shape = RoundedCornerShape(10.dp),
-                elevation = 5.dp,
+                shape = RoundedCornerShape(3.dp),
+                elevation = 3.dp,
             )
             {
                 Column(
@@ -142,8 +142,8 @@ fun GameSelectionCard(drawableID: Int, title: String, onClick: () -> Unit) {
             .wrapContentHeight()
             .padding(10.dp),
         backgroundColor = MaterialTheme.colors.surface,
-        shape = RoundedCornerShape(10.dp),
-        elevation = 5.dp,
+        shape = RoundedCornerShape(3.dp),
+        elevation = 3.dp,
     )
     {
         Column(

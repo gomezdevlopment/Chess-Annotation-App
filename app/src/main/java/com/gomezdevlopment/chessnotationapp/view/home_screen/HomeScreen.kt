@@ -105,7 +105,7 @@ fun Navigation(
     NavHost(navController = navController, startDestination = "home") {
         composable("home") { Home(navController, matchmakingViewModel, gameViewModel, puzzleViewModel, userViewModel) }
         composable("game") { GameScreen(gameViewModel, navController) }
-        composable("settings") { Settings(signOutViewModel, navController) }
+        //composable("settings") { Settings(signOutViewModel, navController) }
         composable("matchSearch") {
             MatchSearch(
                 gameViewModel,

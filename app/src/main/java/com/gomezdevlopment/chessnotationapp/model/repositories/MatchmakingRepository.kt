@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.gomezdevlopment.chessnotationapp.model.data_classes.OnlineGame
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.game
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.gameDocumentReference
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.google.firebase.firestore.DocumentReference
@@ -37,7 +38,7 @@ class MatchmakingRepository : ViewModel() {
                     createGame(timeControl, MainActivity.user?.username.toString())
                 } else {
                     val docRef = db.collection(gamePoolCollection).document(gamePool.documents[0].id)
-                    val game = gamePool.documents[0].toObject(OnlineGame::class.java)
+                    game = gamePool.documents[0].toObject(OnlineGame::class.java)
                     gameDocumentReference = docRef
                     docRef.update("joinable", false)
                     if (game?.blackPlayer == "") {
@@ -111,7 +112,7 @@ class MatchmakingRepository : ViewModel() {
 
     private fun waitForMatch(docRef: DocumentReference, opponentColor: String){
         matchSearch = docRef.addSnapshotListener { value, error ->
-            val game = value?.toObject(OnlineGame::class.java)
+            game = value?.toObject(OnlineGame::class.java)
             gameDocumentReference = docRef
             if(opponentColor == "whitePlayer"){
                 if(game?.whitePlayer != ""){

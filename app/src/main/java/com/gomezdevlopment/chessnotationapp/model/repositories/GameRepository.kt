@@ -11,11 +11,16 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.*
 import com.gomezdevlopment.chessnotationapp.model.pieces.*
 import com.gomezdevlopment.chessnotationapp.model.firestore_game_interaction.FirestoreGameInteraction
+import com.gomezdevlopment.chessnotationapp.view.MainActivity
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.game
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.gameDocumentReference
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.formatTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.util.*
 
 class GameRepository() : ViewModel(), GameSetup {
     override var piecesOnBoard: MutableList<ChessPiece> = mutableStateListOf()
@@ -91,10 +96,10 @@ class GameRepository() : ViewModel(), GameSetup {
 
 
     init {
-        //initialPosition()
+        initialPosition()
         //testPositionKiwipete()
         //testPosition3()
-        testPosition4()
+        //testPosition4()
         checkAllLegalMoves()
     }
 
@@ -169,7 +174,52 @@ class GameRepository() : ViewModel(), GameSetup {
         }
     }
 
+    private fun createMapOfGame(result: String): Map<String, String>{
+        val game = mutableMapOf<String, String>()
+        val gameNotationString = StringBuilder("")
+        annotations.forEach {
+            gameNotationString.append("$it ")
+        }
+        game["notations"] = gameNotationString.toString()
+
+        previousGameStates.forEachIndexed { index, gameState ->
+            game[index.toString()] = gameState.fenPosition
+        }
+
+        game["result"] = result
+
+        var opponentName = MainActivity.game?.whitePlayer
+        if(userColor == "white"){
+            opponentName =  MainActivity.game?.blackPlayer
+        }
+
+        if(opponentName != null){
+            game["opponent"] = opponentName
+        }
+
+        return game
+    }
+
+    private fun writeWinToFirestore(){
+        FirestoreGameInteraction().incrementWins()
+        val game = createMapOfGame("win")
+        FirestoreGameInteraction().writeGame(game)
+    }
+
+    private fun writeLossToFirestore(){
+        FirestoreGameInteraction().incrementLosses()
+        val game = createMapOfGame("loss")
+        FirestoreGameInteraction().writeGame(game)
+    }
+
+    private fun writeDrawToFirestore(){
+        FirestoreGameInteraction().incrementDraws()
+        val game = createMapOfGame("draw")
+        FirestoreGameInteraction().writeGame(game)
+    }
+
     private fun setEndOfGameValues(result: String, message: String) {
+        //FirestoreGameInteraction().writeGame()
         endOfGameResult.value = result
         endOfGameMessage.value = message
         endOfGame.value = true
@@ -179,7 +229,7 @@ class GameRepository() : ViewModel(), GameSetup {
 
     private fun drawAccepted() {
         setEndOfGameValues("Draw", "by Agreement")
-        FirestoreGameInteraction().incrementDraws()
+        writeDrawToFirestore()
     }
 
     private fun resignation(playerColor: String?) {
@@ -187,19 +237,19 @@ class GameRepository() : ViewModel(), GameSetup {
             when (playerColor) {
                 "white" -> {
                     if (userColor == "white") {
-                        FirestoreGameInteraction().incrementLosses()
+                        writeLossToFirestore()
                     }
                     if (userColor == "black") {
-                        FirestoreGameInteraction().incrementWins()
+                        writeWinToFirestore()
                     }
                     setEndOfGameValues("Black Wins!", "by Resignation")
                 }
                 "black" -> {
                     if (userColor == "black") {
-                        FirestoreGameInteraction().incrementLosses()
+                        writeLossToFirestore()
                     }
                     if (userColor == "white") {
-                        FirestoreGameInteraction().incrementWins()
+                        writeWinToFirestore()
                     }
                     setEndOfGameValues("White Wins!", "by Resignation")
                 }
@@ -626,31 +676,31 @@ class GameRepository() : ViewModel(), GameSetup {
                 winner = "Black"
             }
             if (userColor == playerTurn.value) {
-                FirestoreGameInteraction().incrementLosses()
+                writeLossToFirestore()
             }
             if (userColor != playerTurn.value) {
-                FirestoreGameInteraction().incrementWins()
+                writeWinToFirestore()
             }
             setEndOfGameValues("Checkmate", "$winner Wins!")
         }
 
         if (insufficientMaterial.value) {
-            FirestoreGameInteraction().incrementDraws()
+            writeDrawToFirestore()
             setEndOfGameValues("Draw", "by Insufficient Material")
         }
 
         if (stalemate.value) {
-            FirestoreGameInteraction().incrementDraws()
+            writeDrawToFirestore()
             setEndOfGameValues("Draw", "by Stalemate")
         }
 
         if (threeFoldRepetition.value) {
-            FirestoreGameInteraction().incrementDraws()
+            writeDrawToFirestore()
             setEndOfGameValues("Draw", "by Threefold Repetition")
         }
 
         if (fiftyMoveRule.value) {
-            FirestoreGameInteraction().incrementDraws()
+            writeDrawToFirestore()
             setEndOfGameValues("Draw", "by The Fifty Move Rule")
         }
     }
@@ -668,15 +718,15 @@ class GameRepository() : ViewModel(), GameSetup {
                 winner.lowercase()
             )
         ) {
-            FirestoreGameInteraction().incrementDraws()
+            writeDrawToFirestore()
             endOfGameResult.value = "Draw"
             endOfGameMessage.value = "by Time Out vs Insufficient Material"
         } else {
             if (userColor == playerTurn.value) {
-                FirestoreGameInteraction().incrementLosses()
+                writeLossToFirestore()
             }
             if (userColor != playerTurn.value) {
-                FirestoreGameInteraction().incrementWins()
+                writeWinToFirestore()
             }
         }
         endOfGame.value = true
