@@ -144,9 +144,9 @@ class PuzzleRepository() : ViewModel(), GameSetup {
         if(MainActivity.user != null){
             MainActivity.user!!.puzzleRating = playerRating.value
         }
-//        viewModelScope.launch {
-//            FirestoreGameInteraction().writePuzzleRating(playerRating.value)
-//        }
+        viewModelScope.launch {
+            FirestoreGameInteraction().writePuzzleRating(playerRating.value)
+        }
     }
 
 

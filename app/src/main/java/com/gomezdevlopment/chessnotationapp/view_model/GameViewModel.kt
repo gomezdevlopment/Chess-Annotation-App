@@ -12,6 +12,7 @@ import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
 import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPiece
 import com.gomezdevlopment.chessnotationapp.model.repositories.GameRepository
 import com.gomezdevlopment.chessnotationapp.model.firestore_game_interaction.FirestoreGameInteraction
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.game
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -45,6 +46,8 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
     val kingSquare: MutableState<Square> = gameRepository.kingSquare
 
     private val soundPlayer: SoundPlayer = SoundPlayer(app)
+
+    val previousGameStates = gameRepository.previousGameStates
 
     fun createNewGame(time: Long, isOnline: Boolean) {
         viewModelScope.launch {
@@ -205,6 +208,7 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
         soundPlayer.playSoundPool(soundName)
     }
 
+    val notations = gameRepository.annotations
     fun getAnnotations(): MutableList<String> {
         return gameRepository.annotations
     }

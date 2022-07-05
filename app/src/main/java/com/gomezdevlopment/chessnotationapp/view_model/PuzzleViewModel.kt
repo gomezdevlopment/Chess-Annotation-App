@@ -83,7 +83,6 @@ class PuzzleViewModel @Inject constructor(
             makeFirstMove()
         }else{
             showNoMorePuzzlesCard.value = true
-            println("No More Puzzles")
         }
     }
 
@@ -122,7 +121,21 @@ class PuzzleViewModel @Inject constructor(
         }
     }
 
-    init {
+//    init {
+//        CoroutineScope(Dispatchers.IO).launch {
+//            val userPuzzleRating = MainActivity.user?.puzzleRating
+//            if(userPuzzleRating != null){
+//                puzzleRepository.playerRating.value = userPuzzleRating
+//            }
+//            puzzles = roomRepository.getPuzzles(puzzleRepository.playerRating.value).shuffled()
+//            if(puzzles.isNotEmpty()){
+//                println(puzzles)
+//                setPuzzle()
+//            }
+//        }
+//    }
+
+    fun initializePuzzles(){
         CoroutineScope(Dispatchers.IO).launch {
             val userPuzzleRating = MainActivity.user?.puzzleRating
             if(userPuzzleRating != null){
@@ -130,7 +143,6 @@ class PuzzleViewModel @Inject constructor(
             }
             puzzles = roomRepository.getPuzzles(puzzleRepository.playerRating.value).shuffled()
             if(puzzles.isNotEmpty()){
-                println(puzzles)
                 setPuzzle()
             }
         }

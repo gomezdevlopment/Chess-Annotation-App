@@ -33,12 +33,10 @@ fun Promotion(
     viewModel: GameViewModel
 ) {
     var pieces = PromotionPieces().whitePieces
-    println(pieces)
     if (chessPiece.color == "black") {
         pieces = PromotionPieces().blackPieces
     }
 
-    println(pieces)
     val list = listOf("queen", "rook", "bishop", "knight")
 
     val offsetX = Utils().offsetX(width.value, file).dp

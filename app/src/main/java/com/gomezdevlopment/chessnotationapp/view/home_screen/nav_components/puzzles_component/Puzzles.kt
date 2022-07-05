@@ -125,7 +125,6 @@ fun PuzzleScreen(viewModel: PuzzleViewModel) {
 fun EndOfPuzzleCard(viewModel: PuzzleViewModel) {
     val message by viewModel.message
     val image by viewModel.image
-    println(viewModel.message.value)
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -340,12 +339,10 @@ fun PuzzlePromotion(
     viewModel: PuzzleViewModel
 ) {
     var pieces = PromotionPieces().whitePieces
-    println(pieces)
     if (chessPiece.color == "black") {
         pieces = PromotionPieces().blackPieces
     }
 
-    println(pieces)
     val list = listOf("queen", "rook", "bishop", "knight")
 
     val offsetX = Utils().offsetX(width.value, file).dp

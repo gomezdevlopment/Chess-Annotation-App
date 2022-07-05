@@ -16,6 +16,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gomezdevlopment.chessnotationapp.view.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.GameScreen
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.more_component.GameReview
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.play_component.PlayScreen
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component.PuzzleScreen
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.more_component.Settings
@@ -105,6 +106,7 @@ fun Navigation(
     NavHost(navController = navController, startDestination = "home") {
         composable("home") { Home(navController, matchmakingViewModel, gameViewModel, puzzleViewModel, userViewModel) }
         composable("game") { GameScreen(gameViewModel, navController) }
+        composable("gameReview") { GameReview(gameViewModel, navController) }
         //composable("settings") { Settings(signOutViewModel, navController) }
         composable("matchSearch") {
             MatchSearch(
@@ -127,8 +129,13 @@ fun HomeBottomNavigation(
 ) {
     NavHost(navController = navController, startDestination = "play") {
         composable("play") { PlayScreen(playNavController, matchmakingViewModel, gameViewModel) }
-        composable("puzzles") { PuzzleScreen(puzzleViewModel) }
-        composable("user") { UserScreen(userViewModel) }
+        composable("puzzles") {
+            LaunchedEffect(key1 = true){
+                puzzleViewModel.initializePuzzles()
+            }
+            PuzzleScreen(puzzleViewModel)
+        }
+        composable("user") { UserScreen(userViewModel, playNavController, gameViewModel) }
     }
 }
 

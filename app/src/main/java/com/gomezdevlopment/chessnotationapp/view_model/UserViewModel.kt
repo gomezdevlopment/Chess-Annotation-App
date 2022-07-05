@@ -4,32 +4,24 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
+import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.FEN
 import com.gomezdevlopment.chessnotationapp.model.pieces.ChessPieces
+import com.gomezdevlopment.chessnotationapp.view.MainActivity
 
 class UserViewModel: ViewModel() {
     var destination = mutableStateOf("Games")
-    var games = mutableListOf<Map<String, String>>(
-        mapOf(
-        "result" to "Loss",
-        "opponent" to "Sai"),
-        mapOf(
-            "result" to "Draw",
-            "opponent" to "Hikaru"),
-        mapOf(
-            "result" to "Win",
-            "opponent" to "Fuku"),
-        mapOf(
-            "result" to "Win",
-            "opponent" to "Akira"),
-        )
-
-    var finalBoardState = "rnb1kbnr/pppp1ppp/8/4p3/6Pq/5P2/PPPPP2P/RNBQKBNR w KQkq "
+    var userGames = mutableListOf<Map<String, String>>()
     var color = "white"
 
-    fun setBoard(){
-       val pieces = parseFEN(finalBoardState)
+    fun initializeGamesList(){
+        if(userGames.isEmpty()){
+            MainActivity.user?.games?.forEachIndexed() { index, game ->
+                userGames.add(index, game)
+            }
+            userGames.reverse()
+        }
     }
 
     fun parseFEN(

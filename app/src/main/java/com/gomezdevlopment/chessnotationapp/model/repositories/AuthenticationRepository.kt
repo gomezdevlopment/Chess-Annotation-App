@@ -51,8 +51,6 @@ class AuthenticationRepository(private val application: Application) {
                     val userDocumentToObject = it.documents[0].toObject(User::class.java)
                     if (userDocumentToObject != null) {
                         user = userDocumentToObject
-                    } else {
-                        println("userDocument is null")
                     }
                 }
             }

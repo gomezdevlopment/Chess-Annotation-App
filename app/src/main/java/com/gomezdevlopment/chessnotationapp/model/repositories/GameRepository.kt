@@ -189,32 +189,36 @@ class GameRepository() : ViewModel(), GameSetup {
         game["result"] = result
 
         var opponentName = MainActivity.game?.whitePlayer
+        var color = "black"
         if(userColor == "white"){
             opponentName =  MainActivity.game?.blackPlayer
+            color = "white"
         }
 
         if(opponentName != null){
             game["opponent"] = opponentName
         }
 
+        game["color"] = color
+
         return game
     }
 
-    private fun writeWinToFirestore(){
+    private fun writeWinToFirestore(result: String){
         FirestoreGameInteraction().incrementWins()
-        val game = createMapOfGame("win")
+        val game = createMapOfGame(result)
         FirestoreGameInteraction().writeGame(game)
     }
 
-    private fun writeLossToFirestore(){
+    private fun writeLossToFirestore(result: String){
         FirestoreGameInteraction().incrementLosses()
-        val game = createMapOfGame("loss")
+        val game = createMapOfGame(result)
         FirestoreGameInteraction().writeGame(game)
     }
 
-    private fun writeDrawToFirestore(){
+    private fun writeDrawToFirestore(result: String){
         FirestoreGameInteraction().incrementDraws()
-        val game = createMapOfGame("draw")
+        val game = createMapOfGame(result)
         FirestoreGameInteraction().writeGame(game)
     }
 
@@ -229,7 +233,7 @@ class GameRepository() : ViewModel(), GameSetup {
 
     private fun drawAccepted() {
         setEndOfGameValues("Draw", "by Agreement")
-        writeDrawToFirestore()
+        writeDrawToFirestore("Draw by Agreement")
     }
 
     private fun resignation(playerColor: String?) {
@@ -237,19 +241,19 @@ class GameRepository() : ViewModel(), GameSetup {
             when (playerColor) {
                 "white" -> {
                     if (userColor == "white") {
-                        writeLossToFirestore()
+                        writeLossToFirestore("Loss by resignation")
                     }
                     if (userColor == "black") {
-                        writeWinToFirestore()
+                        writeWinToFirestore("Win by resignation")
                     }
                     setEndOfGameValues("Black Wins!", "by Resignation")
                 }
                 "black" -> {
                     if (userColor == "black") {
-                        writeLossToFirestore()
+                        writeLossToFirestore("Loss by resignation")
                     }
                     if (userColor == "white") {
-                        writeWinToFirestore()
+                        writeWinToFirestore("Win by resignation")
                     }
                     setEndOfGameValues("White Wins!", "by Resignation")
                 }
@@ -533,7 +537,7 @@ class GameRepository() : ViewModel(), GameSetup {
         )
         checkAllLegalMoves()
         //checkAttacks()
-        checkIfGameOver()
+        checkIfGameOver(notation)
         if (!gameEndSound.value) {
             if (kingInCheck.value) {
                 checkSound.value = true
@@ -547,10 +551,12 @@ class GameRepository() : ViewModel(), GameSetup {
                 }
             }
         }
-        notation.checkmateOrCheck(checkmate.value, kingInCheck.value)
-        annotations.add(currentNotation.toString())
-        currentNotation.clear()
-        selectedNotationIndex.value += 1
+        if(!endOfGame.value){
+            notation.checkmateOrCheck(checkmate.value, kingInCheck.value)
+            annotations.add(currentNotation.toString())
+            currentNotation.clear()
+            selectedNotationIndex.value += 1
+        }
         startStopClocks()
     }
 
@@ -662,7 +668,7 @@ class GameRepository() : ViewModel(), GameSetup {
         return false
     }
 
-    private fun checkIfGameOver() {
+    private fun checkIfGameOver(notation: Notation) {
         val endOfGameConditions = EndOfGameConditions(gameEndSound)
         endOfGameConditions.checkCheckmate(allLegalMoves, kingInCheck.value, checkmate)
         endOfGameConditions.checkStalemate(allLegalMoves, kingInCheck.value, stalemate)
@@ -670,37 +676,48 @@ class GameRepository() : ViewModel(), GameSetup {
         endOfGameConditions.checkThreefoldRepetition(previousGameStates, threeFoldRepetition)
         endOfGameConditions.checkFiftyMoveCount(allLegalMoves, fiftyMoveCount.value, fiftyMoveRule)
 
+        fun setNotations(){
+            notation.checkmateOrCheck(checkmate.value, kingInCheck.value)
+            annotations.add(currentNotation.toString())
+            currentNotation.clear()
+            selectedNotationIndex.value += 1
+        }
+
         if (checkmate.value) {
+            setNotations()
             var winner = "White"
             if (playerTurn.value == "white") {
                 winner = "Black"
             }
             if (userColor == playerTurn.value) {
-                writeLossToFirestore()
+                writeLossToFirestore("Loss by Checkmate")
             }
             if (userColor != playerTurn.value) {
-                writeWinToFirestore()
+                writeWinToFirestore("Win by Checkmate")
             }
             setEndOfGameValues("Checkmate", "$winner Wins!")
         }
-
         if (insufficientMaterial.value) {
-            writeDrawToFirestore()
+            setNotations()
+            writeDrawToFirestore("Draw by Insufficient Material")
             setEndOfGameValues("Draw", "by Insufficient Material")
         }
 
         if (stalemate.value) {
-            writeDrawToFirestore()
+            setNotations()
+            writeDrawToFirestore("Draw by Stalemate")
             setEndOfGameValues("Draw", "by Stalemate")
         }
 
         if (threeFoldRepetition.value) {
-            writeDrawToFirestore()
+            setNotations()
+            writeDrawToFirestore("Draw by Threefold Repetition")
             setEndOfGameValues("Draw", "by Threefold Repetition")
         }
 
         if (fiftyMoveRule.value) {
-            writeDrawToFirestore()
+            setNotations()
+            writeDrawToFirestore("Draw by The Fifty Move Rule")
             setEndOfGameValues("Draw", "by The Fifty Move Rule")
         }
     }
@@ -718,15 +735,15 @@ class GameRepository() : ViewModel(), GameSetup {
                 winner.lowercase()
             )
         ) {
-            writeDrawToFirestore()
+            writeDrawToFirestore("Draw by Time Out vs Insufficient Material")
             endOfGameResult.value = "Draw"
             endOfGameMessage.value = "by Time Out vs Insufficient Material"
         } else {
             if (userColor == playerTurn.value) {
-                writeLossToFirestore()
+                writeLossToFirestore("Loss by Timeout")
             }
             if (userColor != playerTurn.value) {
-                writeWinToFirestore()
+                writeWinToFirestore("Win by Timeout")
             }
         }
         endOfGame.value = true

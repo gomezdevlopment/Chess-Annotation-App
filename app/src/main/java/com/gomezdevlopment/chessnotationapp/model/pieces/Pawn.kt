@@ -101,7 +101,6 @@ class Pawn {
             }
             if (gameLogic2.isEnPassant(previousSquare, currentSquare, move, occupiedSquares, piece, wasPinned)) {
                 piece.legalMoves.add(move)
-                println("enpassant")
                 //println("pinned value: $wasPinned")
                 //println(piece)
             }

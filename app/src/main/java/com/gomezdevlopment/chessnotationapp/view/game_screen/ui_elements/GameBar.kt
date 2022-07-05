@@ -8,119 +8,108 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.view.tealDarker
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable
-fun GameBar(viewModel: GameViewModel){
-        Row(Modifier.wrapContentHeight(), verticalAlignment = Alignment.Bottom) {
-//            Column(
-//                Modifier
-//                    .weight(1f)
-//                    .clickable {
-//                        navController.navigate("home")
-//                        viewModel.isOnline.value = true
-//                        //viewModel.resetGame()
-//                    }) {
-//
-//                val home: ImageVector =
-//                    ImageVector.vectorResource(id = R.drawable.ic_home)
-//                Icon(
-//                    imageVector = home,
-//                    contentDescription = "Go to Home Screen",
-//                    tint = tealDarker,
-//                    modifier = Modifier
-//                        .height(50.dp)
-//                        .padding(10.dp)
-//                        .aspectRatio(1f)
-//                        .align(Alignment.CenterHorizontally)
-//                )
-//            }
-
-            Column(
-                Modifier
-                    .weight(1f)
-                    .clickable {
-                        viewModel.openResignDialog.value = true
-                    }) {
-
-                val resign: ImageVector =
-                    ImageVector.vectorResource(id = R.drawable.ic_resign)
-                Icon(
-                    imageVector = resign,
-                    contentDescription = "Resign",
-                    tint = tealDarker,
-                    modifier = Modifier
-                        .height(50.dp)
-                        .padding(15.dp)
-                        .aspectRatio(1f)
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
-
-            Column(
-                Modifier
-                    .weight(1f)
-                    .clickable {
-                        viewModel.openDrawOfferDialog.value = true
-                    }) {
-
-                val home: ImageVector =
-                    ImageVector.vectorResource(id = R.drawable.ic_draw_offer)
-                Icon(
-                    imageVector = home,
-                    contentDescription = "Offer Draw",
-                    tint = tealDarker,
-                    modifier = Modifier
-                        .height(50.dp)
-                        .padding(5.dp)
-                        .aspectRatio(1f)
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
-
-            Column(
-                Modifier
-                    .weight(1f)
-                    .clickable {
-                        viewModel.previousNotation()
-                        //viewModel.undoMove()
-                    }
-            ) {
-                val leftArrow: ImageVector =
-                    ImageVector.vectorResource(id = R.drawable.ic_round_arrow_left)
-                Icon(
-                    imageVector = leftArrow,
-                    contentDescription = "Previous Move",
-                    tint = tealDarker,
-                    modifier = Modifier
-                        .height(50.dp)
-                        .padding(10.dp)
-                        .aspectRatio(1f)
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
-
-            Column(
-                Modifier
-                    .weight(1f)
-                    .clickable {
-                        viewModel.nextNotation()
-                    }) {
-                val rightArrow: ImageVector =
-                    ImageVector.vectorResource(id = R.drawable.ic_round_arrow_right)
-                Icon(
-                    imageVector = rightArrow,
-                    contentDescription = "Next Move",
-                    tint = tealDarker,
-                    modifier = Modifier
-                        .height(50.dp)
-                        .padding(10.dp)
-                        .aspectRatio(1f)
-                        .align(Alignment.CenterHorizontally)
-                )
-            }
+fun GameBar(viewModel: GameViewModel) {
+    Row(Modifier.wrapContentHeight(), verticalAlignment = Alignment.Bottom) {
+        GameBarItem(
+            modifier = Modifier.weight(1f),
+            drawableResource = R.drawable.ic_resign,
+            contDescr = "Resign",
+            padding = 15.dp
+        ) {
+            viewModel.openResignDialog.value = true
         }
+        GameBarItem(
+            modifier = Modifier.weight(1f),
+            drawableResource = R.drawable.ic_draw_offer,
+            contDescr = "Offer Draw",
+            padding = 5.dp
+        ) {
+            viewModel.openDrawOfferDialog.value = true
+        }
+
+        GameBarItem(
+            modifier = Modifier.weight(1f),
+            drawableResource = R.drawable.ic_round_arrow_left,
+            contDescr = "Previous Move",
+            padding = 10.dp
+        ) {
+            viewModel.previousNotation()
+        }
+        GameBarItem(
+            modifier = Modifier.weight(1f),
+            drawableResource = R.drawable.ic_round_arrow_right,
+            contDescr = "Next Move",
+            padding = 10.dp
+        ) {
+            viewModel.nextNotation()
+        }
+    }
+}
+
+@Composable
+fun ReviewGameBar(viewModel: GameViewModel, navController: NavController) {
+    Row(Modifier.wrapContentHeight(), verticalAlignment = Alignment.Bottom) {
+
+        GameBarItem(
+            modifier = Modifier.weight(1f),
+            drawableResource = R.drawable.ic_home,
+            contDescr = "Go Home",
+            padding = 10.dp
+        ) {
+            navController.popBackStack()
+            //navController.navigate("home")
+        }
+        GameBarItem(
+            modifier = Modifier.weight(1f),
+            drawableResource = R.drawable.ic_round_arrow_left,
+            contDescr = "Previous Move",
+            padding = 10.dp
+        ) {
+            viewModel.previousNotation()
+        }
+        GameBarItem(
+            modifier = Modifier.weight(1f),
+            drawableResource = R.drawable.ic_round_arrow_right,
+            contDescr = "Next Move",
+            padding = 10.dp
+        ) {
+            viewModel.nextNotation()
+        }
+    }
+}
+
+@Composable
+fun GameBarItem(
+    modifier: Modifier,
+    drawableResource: Int,
+    contDescr: String,
+    padding: Dp,
+    onClick: () -> Unit
+) {
+    val icon: ImageVector =
+        ImageVector.vectorResource(id = drawableResource)
+    Column(
+        modifier
+            .clickable {
+                onClick()
+            }) {
+        Icon(
+            imageVector = icon,
+            contentDescription = contDescr,
+            tint = tealDarker,
+            modifier = Modifier
+                .height(50.dp)
+                .padding(padding)
+                .aspectRatio(1f)
+                .align(Alignment.CenterHorizontally)
+        )
+    }
 }

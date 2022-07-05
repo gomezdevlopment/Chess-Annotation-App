@@ -9,18 +9,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,21 +24,23 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.R
+import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
+import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.utils.Utils
 import com.gomezdevlopment.chessnotationapp.view.*
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.*
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
-import com.gomezdevlopment.chessnotationapp.view_model.MatchmakingViewModel
-import com.gomezdevlopment.chessnotationapp.view_model.SignOutViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
 
 @Composable
-fun UserScreen(userViewModel: UserViewModel) {
+fun UserScreen(userViewModel: UserViewModel, navController: NavController, gameViewModel: GameViewModel) {
     Column(Modifier.fillMaxSize()) {
         User()
         UserNavbar(userViewModel)
         when (userViewModel.destination.value) {
-            "Games" -> Games(userViewModel)
+            "Games" -> Games(userViewModel, navController, gameViewModel)
             "Friends" -> Friends()
             "Settings" -> Settings()
         }
@@ -130,11 +128,34 @@ fun Preview() {
 }
 
 @Composable
-fun Games(viewModel: UserViewModel) {
-    val games = viewModel.games
+fun Games(viewModel: UserViewModel, navController: NavController, gameViewModel: GameViewModel) {
+    viewModel.initializeGamesList()
+    val games = viewModel.userGames
     LazyColumn(){
         itemsIndexed(games) { index, game ->
-            GamesCard(game["result"], game["opponent"], viewModel)
+            val color = game["color"]
+            if(color != null){
+                userColor = color
+            }
+            GamesCard(game["result"], game["opponent"], viewModel, index){
+                val annotations = mutableListOf<String>()
+                for(i in 0..game.size-4){
+                    val fen = game[i.toString()]
+                    if(fen != null){
+                        annotations.add(i, fen)
+                    }
+                }
+                gameViewModel.previousGameStates.clear()
+                annotations.forEach {
+                    gameViewModel.previousGameStates.add(GameState(Square(10,10), Square(10,10), it))
+                }
+                val notations = game["notations"]?.split(" ")?.filter { it.isNotBlank() }
+                gameViewModel.notations.clear()
+                if (notations != null) {
+                    gameViewModel.notations.addAll(notations)
+                }
+                navController.navigate("gameReview")
+            }
         }
     }
 }
@@ -154,8 +175,8 @@ fun ChessBoard() {
 }
 
 @Composable
-fun GamesCardBoardState(viewModel: UserViewModel){
-    val color = viewModel.color
+fun GamesCardBoardState(viewModel: UserViewModel, index: Int){
+    val color = userColor
     BoxWithConstraints(
         modifier = Modifier
             .width(100.dp)
@@ -163,32 +184,37 @@ fun GamesCardBoardState(viewModel: UserViewModel){
     ) {
         val size = (100.dp/8).value
         ChessBoard()
-        viewModel.parseFEN(viewModel.finalBoardState).forEach {
-            key(it){
-                val square = it.square
-                val offsetX = Utils().offsetX(size, square.file, color)
-                val offsetY = Utils().offsetY(size, square.rank, color)
-                val offset = Offset(offsetX, offsetY)
-                val imageVector = ImageVector.vectorResource(id = it.pieceDrawable)
-                Image(
-                    imageVector = imageVector,
-                    contentDescription = "Chess Piece",
-                    modifier = Modifier.notClickable(size.dp, offset)
-                )
+        val game = viewModel.userGames[index]
+        val finalPosition = game[(game.size - 5).toString()]
+        if(finalPosition != null){
+            viewModel.parseFEN(finalPosition).forEach {
+                key(it){
+                    val square = it.square
+                    val offsetX = Utils().offsetX(size, square.file, color)
+                    val offsetY = Utils().offsetY(size, square.rank, color)
+                    val offset = Offset(offsetX, offsetY)
+                    val imageVector = ImageVector.vectorResource(id = it.pieceDrawable)
+                    Image(
+                        imageVector = imageVector,
+                        contentDescription = "Chess Piece",
+                        modifier = Modifier.notClickable(size.dp, offset)
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-fun GamesCard(result: String?, opponent: String?, viewModel: UserViewModel){
+fun GamesCard(result: String?, opponent: String?, viewModel: UserViewModel, index: Int, onClick: () -> Unit){
     Card(
         Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .padding(20.dp, 5.dp)) {
+            .padding(20.dp, 5.dp)
+            .clickable { onClick() }) {
         Row(){
-            GamesCardBoardState(viewModel = viewModel)
+            GamesCardBoardState(viewModel = viewModel, index)
             Column() {
                 result?.let { Text(it, Modifier.padding(5.dp, 2.dp), fontWeight = FontWeight.SemiBold) }
                 opponent?.let { Text("opponent: $it", Modifier.padding(5.dp, 2.dp)) }
@@ -221,13 +247,16 @@ fun User() {
         )
         Column() {
             Text(
-                "Username",
+                user?.username ?: "Username",
                 Modifier.padding(10.dp, 5.dp),
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
                 color = textWhite
             )
-            Text("10 Wins/5 Losses/2 Draws", Modifier.padding(10.dp, 5.dp), color = textWhite)
+            val wins = user?.wins
+            val losses = user?.losses
+            val draws = user?.draws
+            Text("$wins Wins/$losses Losses/$draws Draws", Modifier.padding(10.dp, 5.dp), color = textWhite)
         }
     }
 }
