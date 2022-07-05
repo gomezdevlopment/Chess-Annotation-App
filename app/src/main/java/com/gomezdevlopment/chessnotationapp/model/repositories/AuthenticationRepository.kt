@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.navigation.Navigation
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.User
+import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userDocumentReference
@@ -117,15 +118,14 @@ class AuthenticationRepository(private val application: Application) {
             "email" to email,
             "password" to password,
             "games" to arrayListOf<String>(),
-            "username" to "Player",
+            "username" to createUsername(),
             "wins" to 0,
             "losses" to 0,
             "draws" to 0,
-            "puzzleRating" to 600
-        )
+            "puzzleRating" to 600,)
     }
 
-    private fun createUsername() {
+    private fun createUsername(): String {
         var username = "Player${getRandomString()}"
 
         fun checkIfUsernameIsUnique(name: String) {
@@ -137,14 +137,14 @@ class AuthenticationRepository(private val application: Application) {
                         username = "Player${getRandomString()}"
                         checkIfUsernameIsUnique(username)
                     } else {
-                        userDocumentReference?.update("username", username)?.addOnCompleteListener {
-
-                        }
+//                        userDocumentReference?.update("username", username)?.addOnCompleteListener {
+//
+//                        }
                     }
                 }
         }
-
         checkIfUsernameIsUnique(username)
+        return username
     }
 
     private fun getRandomString(): String {
@@ -154,11 +154,32 @@ class AuthenticationRepository(private val application: Application) {
             .joinToString("")
     }
 
+    private fun createFriendsDocument(username: String): HashMap<String, Serializable> {
+        return hashMapOf(
+            "user" to username,
+            "friends" to arrayListOf<String>())
+    }
+
     private fun addFirestoreDocument(user: HashMap<String, Serializable>) {
+        val username = user["username"].toString()
+        db.collection("friends")
+            .whereEqualTo("user", user["username"])
+            .get()
+            .addOnSuccessListener { query ->
+                if(query.isEmpty){
+                    db.collection("friends").add(createFriendsDocument(username)).addOnFailureListener {
+                        println("failed to add doc")
+                    }
+                }
+            }
+            .addOnFailureListener {
+
+            }
         db.collection("users")
             .add(user)
             .addOnFailureListener { e ->
                 Toast.makeText(application, e.toString(), Toast.LENGTH_LONG).show()
             }
+
     }
 }

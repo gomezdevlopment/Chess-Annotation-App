@@ -2,13 +2,10 @@ package com.gomezdevlopment.chessnotationapp.view
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.databinding.ActivityMainBinding
 import com.gomezdevlopment.chessnotationapp.model.data_classes.OnlineGame
 import com.gomezdevlopment.chessnotationapp.model.data_classes.User
-import com.gomezdevlopment.chessnotationapp.model.firestore_game_interaction.FirestoreGameInteraction
-import com.gomezdevlopment.chessnotationapp.view_model.HomeViewModel
 import com.google.firebase.firestore.DocumentReference
 import dagger.hilt.android.AndroidEntryPoint
 

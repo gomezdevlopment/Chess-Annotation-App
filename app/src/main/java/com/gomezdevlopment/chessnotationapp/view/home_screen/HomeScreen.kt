@@ -16,11 +16,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gomezdevlopment.chessnotationapp.view.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.GameScreen
-import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.more_component.GameReview
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.GameReview
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.play_component.PlayScreen
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component.PuzzleScreen
-import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.more_component.Settings
-import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.more_component.UserScreen
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.UserScreen
 import com.gomezdevlopment.chessnotationapp.view_model.*
 
 @Composable

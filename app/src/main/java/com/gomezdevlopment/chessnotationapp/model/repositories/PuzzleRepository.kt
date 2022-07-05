@@ -7,12 +7,11 @@ import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
-import com.gomezdevlopment.chessnotationapp.model.firestore_game_interaction.FirestoreGameInteraction
+import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameSetup
 import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPiece
 import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPieces
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
-import com.gomezdevlopment.chessnotationapp.view.game_screen.board.Pieces
 import kotlinx.coroutines.launch
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -145,7 +144,7 @@ class PuzzleRepository() : ViewModel(), GameSetup {
             MainActivity.user!!.puzzleRating = playerRating.value
         }
         viewModelScope.launch {
-            FirestoreGameInteraction().writePuzzleRating(playerRating.value)
+            FirestoreInteraction().writePuzzleRating(playerRating.value)
         }
     }
 

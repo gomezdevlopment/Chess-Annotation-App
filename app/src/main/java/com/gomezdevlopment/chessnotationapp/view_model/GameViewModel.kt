@@ -11,8 +11,7 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
 import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPiece
 import com.gomezdevlopment.chessnotationapp.model.repositories.GameRepository
-import com.gomezdevlopment.chessnotationapp.model.firestore_game_interaction.FirestoreGameInteraction
-import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.game
+import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -130,19 +129,19 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     fun drawOffer(value: String){
         viewModelScope.launch {
-            FirestoreGameInteraction().writeDrawOffer(getPlayerTurn(), value)
+            FirestoreInteraction().writeDrawOffer(getPlayerTurn(), value)
         }
     }
 
     fun rematchOffer(value: String){
         viewModelScope.launch {
-            FirestoreGameInteraction().writeRematchOffer(getPlayerTurn(), value)
+            FirestoreInteraction().writeRematchOffer(getPlayerTurn(), value)
         }
     }
 
     fun resign(){
         viewModelScope.launch {
-            FirestoreGameInteraction().writeResignation(userColor)
+            FirestoreInteraction().writeResignation(userColor)
         }
     }
 

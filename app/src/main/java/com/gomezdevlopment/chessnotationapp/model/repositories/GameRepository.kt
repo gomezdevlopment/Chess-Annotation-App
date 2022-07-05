@@ -10,17 +10,13 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.OnlineGame
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.*
 import com.gomezdevlopment.chessnotationapp.model.pieces.*
-import com.gomezdevlopment.chessnotationapp.model.firestore_game_interaction.FirestoreGameInteraction
+import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
-import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.game
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.gameDocumentReference
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.formatTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.util.*
 
 class GameRepository() : ViewModel(), GameSetup {
     override var piecesOnBoard: MutableList<ChessPiece> = mutableStateListOf()
@@ -205,21 +201,21 @@ class GameRepository() : ViewModel(), GameSetup {
     }
 
     private fun writeWinToFirestore(result: String){
-        FirestoreGameInteraction().incrementWins()
+        FirestoreInteraction().incrementWins()
         val game = createMapOfGame(result)
-        FirestoreGameInteraction().writeGame(game)
+        FirestoreInteraction().writeGame(game)
     }
 
     private fun writeLossToFirestore(result: String){
-        FirestoreGameInteraction().incrementLosses()
+        FirestoreInteraction().incrementLosses()
         val game = createMapOfGame(result)
-        FirestoreGameInteraction().writeGame(game)
+        FirestoreInteraction().writeGame(game)
     }
 
     private fun writeDrawToFirestore(result: String){
-        FirestoreGameInteraction().incrementDraws()
+        FirestoreInteraction().incrementDraws()
         val game = createMapOfGame(result)
-        FirestoreGameInteraction().writeGame(game)
+        FirestoreInteraction().writeGame(game)
     }
 
     private fun setEndOfGameValues(result: String, message: String) {
@@ -450,9 +446,9 @@ class GameRepository() : ViewModel(), GameSetup {
         val turn: String = playerTurn.value
         viewModelScope.launch {
             if (promotion != null) {
-                FirestoreGameInteraction().writePromotion(turn, string, promotion.piece)
+                FirestoreInteraction().writePromotion(turn, string, promotion.piece)
             }else{
-                FirestoreGameInteraction().writeMove(turn, string)
+                FirestoreInteraction().writeMove(turn, string)
             }
         }
         val previousPieceSquare = piece.square
