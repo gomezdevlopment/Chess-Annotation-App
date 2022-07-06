@@ -154,7 +154,7 @@ fun WhiteClock(viewModel: GameViewModel, size: Dp, arrangement: Arrangement.Hori
 @Composable
 fun ChessBoard(chessBoardVector: ImageVector) {
     Image(
-        painter = painterResource(id = R.drawable.wood_board_2),
+        imageVector = chessBoardVector,
         //imageVector = chessBoardVector,
         contentDescription = "Chess Board",
         modifier = Modifier

@@ -13,11 +13,14 @@ import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPiece
 import com.gomezdevlopment.chessnotationapp.model.repositories.GameRepository
 import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GameViewModel(app: Application) : AndroidViewModel(app) {
-    private var gameRepository: GameRepository = GameRepository() //GameRepository.getGameRepository()
+@HiltViewModel
+class GameViewModel @Inject constructor (app: Application, private val gameRepository: GameRepository) : AndroidViewModel(app) {
+    //private var gameRepository: GameRepository = GameRepository() //GameRepository.getGameRepository()
     private var hashMap: MutableMap<Square, ChessPiece> = gameRepository.occupiedSquares
     private var previousSquare: MutableState<Square> = gameRepository.previousSquare
     private var selectedPiece: MutableState<ChessPiece> =
@@ -129,19 +132,19 @@ class GameViewModel(app: Application) : AndroidViewModel(app) {
 
     fun drawOffer(value: String){
         viewModelScope.launch {
-            FirestoreInteraction().writeDrawOffer(getPlayerTurn(), value)
+            gameRepository.firestore.writeDrawOffer(getPlayerTurn(), value)
         }
     }
 
     fun rematchOffer(value: String){
         viewModelScope.launch {
-            FirestoreInteraction().writeRematchOffer(getPlayerTurn(), value)
+            gameRepository.firestore.writeRematchOffer(getPlayerTurn(), value)
         }
     }
 
     fun resign(){
         viewModelScope.launch {
-            FirestoreInteraction().writeResignation(userColor)
+            gameRepository.firestore.writeResignation(userColor)
         }
     }
 

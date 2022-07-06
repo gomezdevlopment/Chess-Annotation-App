@@ -33,14 +33,14 @@ class HomeFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         return ComposeView(requireContext()).apply {
-            val viewModel = GameViewModel(requireActivity().application)
-            val matchmakingViewModel = MatchmakingViewModel()
-            val signOutViewModel = SignOutViewModel(requireActivity().application)
-            val userViewModel = UserViewModel()
+            val gameViewModel: GameViewModel by viewModels()
+            val matchmakingViewModel: MatchmakingViewModel by viewModels()
+            val signOutViewModel: SignOutViewModel by viewModels()
+            val userViewModel: UserViewModel by viewModels()
             setContent {
                 AppTheme(darkTheme = isSystemInDarkTheme()) {
-                    Navigation(viewModel, matchmakingViewModel, signOutViewModel, puzzleViewModel, userViewModel)
-                    SoundFX(viewModel = viewModel)
+                    Navigation(gameViewModel, matchmakingViewModel, signOutViewModel, puzzleViewModel, userViewModel)
+                    SoundFX(viewModel = gameViewModel)
                 }
             }
         }

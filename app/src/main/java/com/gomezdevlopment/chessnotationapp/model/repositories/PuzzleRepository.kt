@@ -13,10 +13,11 @@ import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPiece
 import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPieces
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-class PuzzleRepository() : ViewModel(), GameSetup {
+class PuzzleRepository @Inject constructor(private val firestore: FirestoreInteraction) : ViewModel(), GameSetup {
     override var piecesOnBoard: MutableList<ChessPiece> = mutableStateListOf()
     override var capturedPieces: MutableList<ChessPiece> = mutableStateListOf()
     override var occupiedSquares: MutableMap<Square, ChessPiece> = mutableMapOf()
@@ -144,7 +145,7 @@ class PuzzleRepository() : ViewModel(), GameSetup {
             MainActivity.user!!.puzzleRating = playerRating.value
         }
         viewModelScope.launch {
-            FirestoreInteraction().writePuzzleRating(playerRating.value)
+            firestore.writePuzzleRating(playerRating.value)
         }
     }
 

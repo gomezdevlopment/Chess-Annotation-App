@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
@@ -16,17 +17,14 @@ import com.gomezdevlopment.chessnotationapp.view.AppTheme
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.SoundFX
 import com.gomezdevlopment.chessnotationapp.view.home_screen.Navigation
 import com.gomezdevlopment.chessnotationapp.view_model.*
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class LoadingFragment: Fragment(R.layout.loading_screen) {
-    private lateinit var signInViewModel: SignInViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        signInViewModel = ViewModelProvider(this).get(SignInViewModel::class.java)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val signInViewModel: SignInViewModel by viewModels()
         signInViewModel.checkIfUserIsSignedIn()
 
         signInViewModel.signedOut.observe(viewLifecycleOwner, Observer {

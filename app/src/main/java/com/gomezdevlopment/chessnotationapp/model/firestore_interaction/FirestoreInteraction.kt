@@ -7,14 +7,16 @@ import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.io.Serializable
+import javax.inject.Inject
 
-class FirestoreInteraction {
+class FirestoreInteraction @Inject constructor(private val db: FirebaseFirestore) {
     fun writePromotion(playerTurn: String, string: String, promotionSelection: String) {
         if (MainActivity.gameDocumentReference != null) {
             if (playerTurn == MainActivity.userColor) {
@@ -117,7 +119,7 @@ class FirestoreInteraction {
         }
     }
 
-    private val db = Firebase.firestore
+   // private val db = Firebase.firestore
 
     private fun friendRequest(
         sender: String,

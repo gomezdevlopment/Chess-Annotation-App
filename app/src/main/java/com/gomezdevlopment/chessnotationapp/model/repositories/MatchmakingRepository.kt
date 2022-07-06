@@ -10,18 +10,20 @@ import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.game
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.gameDocumentReference
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import javax.inject.Inject
 
-class MatchmakingRepository : ViewModel() {
+class MatchmakingRepository @Inject constructor(private val db: FirebaseFirestore) : ViewModel() {
 
-    private val db = Firebase.firestore
+    //private val db = Firebase.firestore
     private val gamePoolCollection = "gamePool"
     val navDestination = mutableStateOf("")
     val time = mutableStateOf(60000L)
 
-    var matchSearch: ListenerRegistration? = null
+    private var matchSearch: ListenerRegistration? = null
 
     var resetSearch = mutableStateOf(0)
     //lateinit var gameDocumentReference: DocumentReference
@@ -71,19 +73,16 @@ class MatchmakingRepository : ViewModel() {
         val randomColor = (0..1).shuffled().random()
         var whitePlayer = ""
         var blackPlayer = ""
-        var playerColor = ""
         var opponentColor = ""
 
         when (randomColor) {
             0 -> {
                 whitePlayer = username
-                playerColor = "whitePlayer"
                 userColor = "white"
                 opponentColor = "blackPlayer"
             }
             1 -> {
                 blackPlayer = username
-                playerColor = "blackPlayer"
                 userColor = "black"
                 opponentColor = "whitePlayer"
             }

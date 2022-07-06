@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import com.gomezdevlopment.chessnotationapp.R
@@ -22,7 +23,7 @@ class GameFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         return ComposeView(requireContext()).apply {
-            val viewModel = GameViewModel(requireActivity().application)
+            val viewModel: GameViewModel by viewModels()
             setContent {
                 //GameScreen(viewModel = viewModel)
                 SoundFX(viewModel = viewModel)

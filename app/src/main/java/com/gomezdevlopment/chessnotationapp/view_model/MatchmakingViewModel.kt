@@ -4,11 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gomezdevlopment.chessnotationapp.model.repositories.MatchmakingRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MatchmakingViewModel: ViewModel() {
-    private var matchmakingRepository = MatchmakingRepository()
-
+@HiltViewModel
+class MatchmakingViewModel @Inject constructor(private var matchmakingRepository: MatchmakingRepository): ViewModel() {
     val navDestination = matchmakingRepository.navDestination
     val time by matchmakingRepository.time
     val resetSearch by matchmakingRepository.resetSearch

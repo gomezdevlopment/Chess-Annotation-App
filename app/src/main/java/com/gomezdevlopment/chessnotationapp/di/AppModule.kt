@@ -3,10 +3,17 @@ package com.gomezdevlopment.chessnotationapp.di
 import android.app.Application
 import android.content.Context
 import androidx.room.Room
+import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
+import com.gomezdevlopment.chessnotationapp.model.repositories.AuthenticationRepository
+import com.gomezdevlopment.chessnotationapp.model.repositories.MatchmakingRepository
 import com.gomezdevlopment.chessnotationapp.model.repositories.PuzzleRepository
+import com.gomezdevlopment.chessnotationapp.model.repositories.UserRepository
 import com.gomezdevlopment.chessnotationapp.puzzle_database.PuzzleDAO
 import com.gomezdevlopment.chessnotationapp.puzzle_database.PuzzleDatabase
 import com.gomezdevlopment.chessnotationapp.puzzle_database.RoomRepository
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,7 +40,28 @@ object AppModule {
     @Provides
     fun provideRoomRepository(puzzleDAO: PuzzleDAO) = RoomRepository(puzzleDAO)
 
+    //@Singleton
+    @Provides
+    fun providePuzzleRepository(firestore: FirestoreInteraction) = PuzzleRepository(firestore)
+
+    //@Singleton
+    @Provides
+    fun provideMatchmakingRepository(db: FirebaseFirestore) = MatchmakingRepository(db)
+
+    //@Singleton
+    @Provides
+    fun provideAuthenticationRepository(db: FirebaseFirestore, context: Application) = AuthenticationRepository(db, context)
+
+
+    @Provides
+    fun provideUserRepository(firestore: FirestoreInteraction) = UserRepository(firestore)
+
     @Singleton
     @Provides
-    fun providePuzzleRepository() = PuzzleRepository()
+    fun provideFirestoreDatabase() = FirebaseFirestore.getInstance()
+
+    @Singleton
+    @Provides
+    fun provideFirestoreInteractionClass(db: FirebaseFirestore) = FirestoreInteraction(db)
+
 }

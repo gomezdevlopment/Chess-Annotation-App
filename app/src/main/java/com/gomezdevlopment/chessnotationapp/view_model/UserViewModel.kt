@@ -8,13 +8,18 @@ import androidx.lifecycle.viewModelScope
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
+import com.gomezdevlopment.chessnotationapp.model.data_classes.User
 import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.model.game_logic.FEN
 import com.gomezdevlopment.chessnotationapp.model.pieces.ChessPieces
+import com.gomezdevlopment.chessnotationapp.model.repositories.UserRepository
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class UserViewModel: ViewModel() {
+@HiltViewModel
+class UserViewModel @Inject constructor(private val userRepository: UserRepository): ViewModel() {
     var destination = mutableStateOf("Games")
     var userGames = mutableListOf<Map<String, String>>()
     var color = "white"
@@ -31,7 +36,7 @@ class UserViewModel: ViewModel() {
     }
 
     fun initializeFriendRequestListener(){
-        FirestoreInteraction().friendRequestListener(this)
+        userRepository.firestore.friendRequestListener(this)
     }
 
     fun parseFEN(
@@ -77,7 +82,7 @@ class UserViewModel: ViewModel() {
 
     fun newSearch(friend: String) {
         viewModelScope.launch {
-            FirestoreInteraction().sendFriendRequest(friend)
+            userRepository.firestore.sendFriendRequest(friend)
         }
     }
 }

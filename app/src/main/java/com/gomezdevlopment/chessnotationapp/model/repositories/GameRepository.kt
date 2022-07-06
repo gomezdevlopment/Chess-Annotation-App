@@ -17,8 +17,10 @@ import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColo
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.formatTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class GameRepository() : ViewModel(), GameSetup {
+
+class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : ViewModel(), GameSetup {
     override var piecesOnBoard: MutableList<ChessPiece> = mutableStateListOf()
     override var capturedPieces: MutableList<ChessPiece> = mutableStateListOf()
     override var occupiedSquares: MutableMap<Square, ChessPiece> = mutableMapOf()
@@ -201,21 +203,21 @@ class GameRepository() : ViewModel(), GameSetup {
     }
 
     private fun writeWinToFirestore(result: String){
-        FirestoreInteraction().incrementWins()
+        firestore.incrementWins()
         val game = createMapOfGame(result)
-        FirestoreInteraction().writeGame(game)
+        firestore.writeGame(game)
     }
 
     private fun writeLossToFirestore(result: String){
-        FirestoreInteraction().incrementLosses()
+        firestore.incrementLosses()
         val game = createMapOfGame(result)
-        FirestoreInteraction().writeGame(game)
+        firestore.writeGame(game)
     }
 
     private fun writeDrawToFirestore(result: String){
-        FirestoreInteraction().incrementDraws()
+        firestore.incrementDraws()
         val game = createMapOfGame(result)
-        FirestoreInteraction().writeGame(game)
+        firestore.writeGame(game)
     }
 
     private fun setEndOfGameValues(result: String, message: String) {
@@ -446,9 +448,9 @@ class GameRepository() : ViewModel(), GameSetup {
         val turn: String = playerTurn.value
         viewModelScope.launch {
             if (promotion != null) {
-                FirestoreInteraction().writePromotion(turn, string, promotion.piece)
+                firestore.writePromotion(turn, string, promotion.piece)
             }else{
-                FirestoreInteraction().writeMove(turn, string)
+                firestore.writeMove(turn, string)
             }
         }
         val previousPieceSquare = piece.square
