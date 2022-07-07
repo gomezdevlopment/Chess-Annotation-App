@@ -1,60 +1,58 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.gomezdevlopment.chessnotationapp.R
-import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
-import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
-import com.gomezdevlopment.chessnotationapp.model.utils.Utils
 import com.gomezdevlopment.chessnotationapp.view.*
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
-import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
-import com.gomezdevlopment.chessnotationapp.view.game_screen.board.*
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.friends.FriendsList
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.games.Games
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.settings.BoardThemes
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.settings.Settings
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
-fun UserScreen(userViewModel: UserViewModel, navController: NavController, gameViewModel: GameViewModel) {
-    Column(Modifier.fillMaxSize()) {
-        User()
-        UserNavbar(userViewModel)
-        when (userViewModel.destination.value) {
-            "Games" -> Games(userViewModel, navController, gameViewModel)
-            "Friends" -> Friends(userViewModel)
-            "Settings" -> SettingsNavigation(userViewModel)
-        }
+fun UserNavigation(userViewModel: UserViewModel, homeNavController: NavController, gameViewModel: GameViewModel) {
+    val userNavController = rememberNavController()
+    NavHost(navController = userNavController, startDestination = "user") {
+        composable("user") { UserScreen(userViewModel, homeNavController, userNavController, gameViewModel) }
+        composable("boardThemes") { BoardThemes(userNavController, userViewModel) }
     }
 }
 
 @Composable
-@Preview
-fun Preview() {
-    //GamesCard(result = "Win", opponent = "Fuku")
-    //SettingsItemButton(text = "Board Theme")
+fun UserScreen(userViewModel: UserViewModel, homeNavController: NavController, userNavController: NavController, gameViewModel: GameViewModel) {
+    Column(Modifier.fillMaxSize()) {
+        User()
+        UserNavbar(userViewModel)
+        when (userViewModel.destination.value) {
+            "Games" -> Games(userViewModel, homeNavController, gameViewModel)
+            "Friends" -> Friends(userViewModel)
+            "Settings" -> Settings(userNavController)
+        }
+    }
 }
+
 
 @Composable
 fun Friends(viewModel: UserViewModel) {

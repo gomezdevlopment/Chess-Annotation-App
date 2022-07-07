@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component
+package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.games
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -17,7 +17,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.utils.Utils
@@ -27,7 +26,7 @@ import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
 
 @Composable
-fun Games(viewModel: UserViewModel, navController: NavController, gameViewModel: GameViewModel) {
+fun Games(viewModel: UserViewModel, homeNavController: NavController, gameViewModel: GameViewModel) {
     viewModel.initializeGamesList()
     val games = viewModel.userGames
     LazyColumn(){
@@ -53,7 +52,7 @@ fun Games(viewModel: UserViewModel, navController: NavController, gameViewModel:
                 if (notations != null) {
                     gameViewModel.notations.addAll(notations)
                 }
-                navController.navigate("gameReview")
+                homeNavController.navigate("gameReview")
             }
         }
     }

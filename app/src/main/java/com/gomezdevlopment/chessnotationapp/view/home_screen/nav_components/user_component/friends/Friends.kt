@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component
+package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.friends
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*

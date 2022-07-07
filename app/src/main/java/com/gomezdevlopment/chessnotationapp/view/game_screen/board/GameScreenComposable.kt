@@ -40,7 +40,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     ResignAlertDialog(viewModel = viewModel)
     DrawOfferAlertDialog(viewModel = viewModel)
     DrawOfferedAlertDialog(viewModel = viewModel)
-    Column(Modifier.fillMaxHeight()) {
+    Column(Modifier.fillMaxHeight().background(MaterialTheme.colors.background)) {
         Row(verticalAlignment = Alignment.Top) {
             AnnotationBar(viewModel)
         }

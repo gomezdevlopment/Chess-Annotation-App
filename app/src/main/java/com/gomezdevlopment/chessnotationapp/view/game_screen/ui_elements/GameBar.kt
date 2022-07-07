@@ -1,8 +1,10 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,7 +19,7 @@ import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable
 fun GameBar(viewModel: GameViewModel) {
-    Row(Modifier.wrapContentHeight(), verticalAlignment = Alignment.Bottom) {
+    Row(Modifier.height(60.dp).background(color = MaterialTheme.colors.surface), verticalAlignment = Alignment.Bottom) {
         GameBarItem(
             modifier = Modifier.weight(1f),
             drawableResource = R.drawable.ic_resign,
@@ -97,10 +99,14 @@ fun GameBarItem(
     val icon: ImageVector =
         ImageVector.vectorResource(id = drawableResource)
     Column(
-        modifier
+        verticalArrangement = Arrangement.Center
+        ,modifier = modifier
             .clickable {
                 onClick()
-            }) {
+            }
+            .fillMaxHeight()
+
+    ) {
         Icon(
             imageVector = icon,
             contentDescription = contDescr,

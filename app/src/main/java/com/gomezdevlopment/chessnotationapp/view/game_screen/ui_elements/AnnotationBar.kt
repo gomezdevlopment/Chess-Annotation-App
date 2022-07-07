@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,7 +32,7 @@ fun AnnotationBar(viewModel: GameViewModel) {
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()
-            .background(colorResource(id = R.color.teal_darker)),
+            .background(color = MaterialTheme.colors.background),
         contentAlignment = Alignment.CenterStart
     ) {
 
@@ -58,7 +59,7 @@ fun AnnotationBar(viewModel: GameViewModel) {
                         fontSize = 18.sp,
                         modifier = Modifier.padding(4.dp),
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        color = MaterialTheme.colors.onBackground
                     )
                 }
                 val isSelected = index == viewModel.selectedNotationIndex.value
@@ -88,7 +89,7 @@ fun Annotation(annotation: String, isSelected: Boolean, isCheck: Boolean, viewMo
                 viewModel.setGameState(index)
             }
         ,
-        color = Color.White
+        color = MaterialTheme.colors.onBackground
     )
 }
 
