@@ -117,7 +117,11 @@ class PuzzleViewModel @Inject constructor(
 //                    puzzleRepository.makeComputerMove(correctMoveOrder[moveIndex])
 //                }
 //            }
-            puzzleRepository.makeComputerMove(correctMoveOrder[moveIndex])
+            CoroutineScope(Dispatchers.IO).launch {
+                delay(500)
+                puzzleRepository.makeComputerMove(correctMoveOrder[moveIndex])
+            }
+
         }
     }
 

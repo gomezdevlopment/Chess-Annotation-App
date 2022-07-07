@@ -20,7 +20,7 @@ val cardWhite = Color(0xFFFCFCFC)
 val cardDark = Color(0xFF212928)
 val navBarWhite = Color(0xFFF8F8F8)
 val background = Color(0xFFDFF0F0)
-val backgroundDark = Color(0xFF142524)
+val backgroundDark = Color(0xFF1B2525)
 val white = Color(0xFFFFFFFF)
 
 val greenCorrect = Color(0xFF4CE63B)
