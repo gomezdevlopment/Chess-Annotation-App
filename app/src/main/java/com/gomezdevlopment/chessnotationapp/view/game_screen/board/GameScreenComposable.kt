@@ -2,7 +2,9 @@ package com.gomezdevlopment.chessnotationapp.view.game_screen.board
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
@@ -27,11 +29,13 @@ import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColo
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun GameScreen(viewModel: GameViewModel, navController: NavController) {
+    rememberSystemUiController().setStatusBarColor(MaterialTheme.colors.background)
     val chessBoardVector: ImageVector =
-        ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
+        ImageVector.vectorResource(id = viewModel.chessBoardTheme)
 
     ResignAlertDialog(viewModel = viewModel)
     DrawOfferAlertDialog(viewModel = viewModel)
@@ -69,13 +73,13 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                         .fillMaxWidth()
                         .aspectRatio(1f),
                 ) {
-                    ChessBoard(chessBoardVector = chessBoardVector)
+                    ChessBoard(chessBoardVector = chessBoardVector, modifier = Modifier.chessBoardFullScreen())
                     Pieces(
                         height = maxWidth / 8,
                         pieces = viewModel.piecesOnBoard,
                         playerTurn = viewModel.getPlayerTurn(),
                         userColor = userColor,
-                        selectedPiece= viewModel.getSelectedPiece(),
+                        selectedPiece = viewModel.getSelectedPiece(),
                         pieceClicked = viewModel.isPieceClicked(),
                         kingInCheck = viewModel.kingInCheck(),
                         currentSquare = viewModel.getCurrentSquare().value,
@@ -152,17 +156,19 @@ fun WhiteClock(viewModel: GameViewModel, size: Dp, arrangement: Arrangement.Hori
 
 
 @Composable
-fun ChessBoard(chessBoardVector: ImageVector) {
+fun ChessBoard(chessBoardVector: ImageVector, modifier: Modifier) {
     Image(
         imageVector = chessBoardVector,
         //imageVector = chessBoardVector,
         contentDescription = "Chess Board",
-        modifier = Modifier
-            .fillMaxSize()
-            .aspectRatio(1f)
-            .zIndex(1f)
+        modifier = modifier
     )
 }
+
+fun Modifier.chessBoardFullScreen() =
+    fillMaxSize()
+        .aspectRatio(1f)
+        .zIndex(1f)
 
 @Composable
 fun ChessUILogic(height: Dp, viewModel: GameViewModel, navController: NavController) {

@@ -21,6 +21,7 @@ import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.play
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component.PuzzleScreen
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.UserScreen
 import com.gomezdevlopment.chessnotationapp.view_model.*
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun MatchSearch(
@@ -103,9 +104,21 @@ fun Navigation(
 ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "home") {
-        composable("home") { Home(navController, matchmakingViewModel, gameViewModel, puzzleViewModel, userViewModel) }
-        composable("game") { GameScreen(gameViewModel, navController) }
-        composable("gameReview") { GameReview(gameViewModel, navController) }
+        composable("home") {
+            Home(
+                navController,
+                matchmakingViewModel,
+                gameViewModel,
+                puzzleViewModel,
+                userViewModel
+            )
+        }
+        composable("game") {
+            GameScreen(gameViewModel, navController)
+        }
+        composable("gameReview") {
+            GameReview(gameViewModel, navController)
+        }
         //composable("settings") { Settings(signOutViewModel, navController) }
         composable("matchSearch") {
             MatchSearch(
@@ -127,14 +140,18 @@ fun HomeBottomNavigation(
     userViewModel: UserViewModel
 ) {
     NavHost(navController = navController, startDestination = "play") {
-        composable("play") { PlayScreen(playNavController, matchmakingViewModel, gameViewModel) }
+        composable("play") {
+            PlayScreen(playNavController, matchmakingViewModel, gameViewModel)
+        }
         composable("puzzles") {
-            LaunchedEffect(key1 = true){
+            LaunchedEffect(key1 = true) {
                 puzzleViewModel.initializePuzzles()
             }
             PuzzleScreen(puzzleViewModel)
         }
-        composable("user") { UserScreen(userViewModel, playNavController, gameViewModel) }
+        composable("user") {
+            UserScreen(userViewModel, playNavController, gameViewModel)
+        }
     }
 }
 
@@ -147,7 +164,6 @@ fun Home(
     userViewModel: UserViewModel
 ) {
     val bottomNavBarController = rememberNavController()
-
     Scaffold(bottomBar = { BottomNavBar(navController = bottomNavBarController) }) {
         HomeBottomNavigation(
             navController = bottomNavBarController,

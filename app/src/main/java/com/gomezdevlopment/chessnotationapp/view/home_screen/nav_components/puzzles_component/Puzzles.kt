@@ -29,10 +29,7 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPieces
 import com.gomezdevlopment.chessnotationapp.model.utils.Utils
 import com.gomezdevlopment.chessnotationapp.view.*
-import com.gomezdevlopment.chessnotationapp.view.game_screen.board.ChessBoard
-import com.gomezdevlopment.chessnotationapp.view.game_screen.board.ChessUILogic
-import com.gomezdevlopment.chessnotationapp.view.game_screen.board.Coordinates
-import com.gomezdevlopment.chessnotationapp.view.game_screen.board.Pieces
+import com.gomezdevlopment.chessnotationapp.view.game_screen.board.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.Highlight
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.Outline
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleCapture
@@ -47,7 +44,7 @@ fun PuzzleScreen(viewModel: PuzzleViewModel) {
     }
 
     val chessBoardVector: ImageVector =
-        ImageVector.vectorResource(id = R.drawable.ic_ches_board_grey)
+        ImageVector.vectorResource(id = viewModel.chessBoardTheme)
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -79,7 +76,7 @@ fun PuzzleScreen(viewModel: PuzzleViewModel) {
                 .fillMaxWidth()
                 .aspectRatio(1f),
         ) {
-            ChessBoard(chessBoardVector = chessBoardVector)
+            ChessBoard(chessBoardVector = chessBoardVector, modifier = Modifier.chessBoardFullScreen())
             Pieces(
                 height = maxWidth / 8,
                 pieces = viewModel.piecesOnBoard,

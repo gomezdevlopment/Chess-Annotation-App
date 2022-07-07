@@ -1,6 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.view_model
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -13,21 +14,32 @@ import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.Firestor
 import com.gomezdevlopment.chessnotationapp.model.game_logic.FEN
 import com.gomezdevlopment.chessnotationapp.model.pieces.ChessPieces
 import com.gomezdevlopment.chessnotationapp.model.repositories.UserRepository
+import com.gomezdevlopment.chessnotationapp.model.utils.UserSettings
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class UserViewModel @Inject constructor(private val userRepository: UserRepository): ViewModel() {
+class UserViewModel @Inject constructor(
+    private val userRepository: UserRepository,
+    private val settings: UserSettings
+) : ViewModel() {
     var destination = mutableStateOf("Games")
     var userGames = mutableListOf<Map<String, String>>()
     var color = "white"
     val friendsList = mutableListOf<String>()
     val search = mutableStateOf("")
+    val chessBoardTheme by settings.chessBoardTheme
 
-    fun initializeGamesList(){
-        if(userGames.isEmpty()){
+    fun setChessBoardTheme(boardTheme: Int){
+        viewModelScope.launch {
+            settings.setBoardTheme(boardTheme)
+        }
+    }
+
+    fun initializeGamesList() {
+        if (userGames.isEmpty()) {
             MainActivity.user?.games?.forEachIndexed() { index, game ->
                 userGames.add(index, game)
             }
@@ -35,7 +47,7 @@ class UserViewModel @Inject constructor(private val userRepository: UserReposito
         }
     }
 
-    fun initializeFriendRequestListener(){
+    fun initializeFriendRequestListener() {
         userRepository.firestore.friendRequestListener(this)
     }
 
@@ -55,18 +67,42 @@ class UserViewModel @Inject constructor(private val userRepository: UserReposito
                 } else {
                     var newPiece = ChessPieces().blackRook(rank, file)
                     when (char) {
-                        'r' -> { newPiece = ChessPieces().blackRook(rank, file) }
-                        'n' -> { newPiece = ChessPieces().blackKnight(rank, file) }
-                        'b' -> { newPiece = ChessPieces().blackBishop(rank, file) }
-                        'q' -> { newPiece = ChessPieces().blackQueen(rank, file) }
-                        'k' -> { newPiece = ChessPieces().blackKing(rank, file) }
-                        'p' -> { newPiece = ChessPieces().blackPawn(rank, file) }
-                        'R' -> { newPiece = ChessPieces().whiteRook(rank, file) }
-                        'N' -> { newPiece = ChessPieces().whiteKnight(rank, file) }
-                        'B' -> { newPiece = ChessPieces().whiteBishop(rank, file) }
-                        'Q' -> { newPiece = ChessPieces().whiteQueen(rank, file) }
-                        'K' -> { newPiece = ChessPieces().whiteKing(rank, file) }
-                        'P' -> { newPiece = ChessPieces().whitePawn(rank, file) }
+                        'r' -> {
+                            newPiece = ChessPieces().blackRook(rank, file)
+                        }
+                        'n' -> {
+                            newPiece = ChessPieces().blackKnight(rank, file)
+                        }
+                        'b' -> {
+                            newPiece = ChessPieces().blackBishop(rank, file)
+                        }
+                        'q' -> {
+                            newPiece = ChessPieces().blackQueen(rank, file)
+                        }
+                        'k' -> {
+                            newPiece = ChessPieces().blackKing(rank, file)
+                        }
+                        'p' -> {
+                            newPiece = ChessPieces().blackPawn(rank, file)
+                        }
+                        'R' -> {
+                            newPiece = ChessPieces().whiteRook(rank, file)
+                        }
+                        'N' -> {
+                            newPiece = ChessPieces().whiteKnight(rank, file)
+                        }
+                        'B' -> {
+                            newPiece = ChessPieces().whiteBishop(rank, file)
+                        }
+                        'Q' -> {
+                            newPiece = ChessPieces().whiteQueen(rank, file)
+                        }
+                        'K' -> {
+                            newPiece = ChessPieces().whiteKing(rank, file)
+                        }
+                        'P' -> {
+                            newPiece = ChessPieces().whitePawn(rank, file)
+                        }
                     }
                     pieces.add(newPiece)
                     file++

@@ -1,6 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,11 +13,13 @@ import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.*
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun GameReview(viewModel: GameViewModel, navController: NavController){
+    rememberSystemUiController().setStatusBarColor(MaterialTheme.colors.background)
     val chessBoardVector: ImageVector =
-        ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
+        ImageVector.vectorResource(id = viewModel.chessBoardTheme)
 
     Column(Modifier.fillMaxHeight()) {
         Row(verticalAlignment = Alignment.Top) {
@@ -43,7 +46,7 @@ fun GameReview(viewModel: GameViewModel, navController: NavController){
                         .fillMaxWidth()
                         .aspectRatio(1f),
                 ) {
-                    ChessBoard(chessBoardVector = chessBoardVector)
+                    ChessBoard(chessBoardVector = chessBoardVector, modifier = Modifier.chessBoardFullScreen())
                     Pieces(
                         height = maxWidth / 8,
                         pieces = viewModel.piecesOnBoard,

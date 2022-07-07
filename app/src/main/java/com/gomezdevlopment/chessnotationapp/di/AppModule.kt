@@ -8,9 +8,11 @@ import com.gomezdevlopment.chessnotationapp.model.repositories.AuthenticationRep
 import com.gomezdevlopment.chessnotationapp.model.repositories.MatchmakingRepository
 import com.gomezdevlopment.chessnotationapp.model.repositories.PuzzleRepository
 import com.gomezdevlopment.chessnotationapp.model.repositories.UserRepository
+import com.gomezdevlopment.chessnotationapp.model.utils.UserSettings
 import com.gomezdevlopment.chessnotationapp.puzzle_database.PuzzleDAO
 import com.gomezdevlopment.chessnotationapp.puzzle_database.PuzzleDatabase
 import com.gomezdevlopment.chessnotationapp.puzzle_database.RoomRepository
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.Settings
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -64,4 +66,7 @@ object AppModule {
     @Provides
     fun provideFirestoreInteractionClass(db: FirebaseFirestore) = FirestoreInteraction(db)
 
+    @Singleton
+    @Provides
+    fun provideSettingsClass(app: Application) = UserSettings(app)
 }

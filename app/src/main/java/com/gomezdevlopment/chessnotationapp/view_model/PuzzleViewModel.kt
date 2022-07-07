@@ -5,13 +5,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
 import com.gomezdevlopment.chessnotationapp.model.pieces.ChessPieces
 import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPiece
 import com.gomezdevlopment.chessnotationapp.model.repositories.PuzzleRepository
+import com.gomezdevlopment.chessnotationapp.model.utils.UserSettings
 import com.gomezdevlopment.chessnotationapp.puzzle_database.Puzzle
 import com.gomezdevlopment.chessnotationapp.puzzle_database.RoomRepository
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
@@ -26,9 +26,9 @@ import javax.inject.Inject
 class PuzzleViewModel @Inject constructor(
     private val roomRepository: RoomRepository,
     private val puzzleRepository: PuzzleRepository,
-    context: Application
+    context: Application,
+    private val settings: UserSettings
 ) : ViewModel() {
-
 
     val correct = puzzleRepository.correct
     val endOfPuzzle = puzzleRepository.endOfPuzzle
@@ -59,6 +59,8 @@ class PuzzleViewModel @Inject constructor(
     val image = puzzleRepository.image
 
     val showNoMorePuzzlesCard = mutableStateOf(false)
+
+    val chessBoardTheme by settings.chessBoardTheme
 
     fun setPuzzle() {
         if(puzzleIndex <= puzzles.lastIndex){

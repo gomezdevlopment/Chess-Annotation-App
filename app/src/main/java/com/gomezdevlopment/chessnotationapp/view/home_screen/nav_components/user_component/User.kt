@@ -34,6 +34,7 @@ import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColo
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.*
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun UserScreen(userViewModel: UserViewModel, navController: NavController, gameViewModel: GameViewModel) {
@@ -43,7 +44,7 @@ fun UserScreen(userViewModel: UserViewModel, navController: NavController, gameV
         when (userViewModel.destination.value) {
             "Games" -> Games(userViewModel, navController, gameViewModel)
             "Friends" -> Friends(userViewModel)
-            "Settings" -> Settings()
+            "Settings" -> SettingsNavigation(userViewModel)
         }
     }
 }

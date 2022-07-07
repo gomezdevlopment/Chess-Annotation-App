@@ -11,7 +11,7 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
 import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPiece
 import com.gomezdevlopment.chessnotationapp.model.repositories.GameRepository
-import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
+import com.gomezdevlopment.chessnotationapp.model.utils.UserSettings
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -19,12 +19,29 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class GameViewModel @Inject constructor (app: Application, private val gameRepository: GameRepository) : AndroidViewModel(app) {
+class GameViewModel @Inject constructor(
+    app: Application,
+    private val gameRepository: GameRepository,
+    private val settings: UserSettings
+) : AndroidViewModel(app) {
     //private var gameRepository: GameRepository = GameRepository() //GameRepository.getGameRepository()
     private var hashMap: MutableMap<Square, ChessPiece> = gameRepository.occupiedSquares
     private var previousSquare: MutableState<Square> = gameRepository.previousSquare
     private var selectedPiece: MutableState<ChessPiece> =
-        mutableStateOf(ChessPiece("", "", R.drawable.ic_br_alpha, Square(10, 10), 0, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()))
+        mutableStateOf(
+            ChessPiece(
+                "",
+                "",
+                R.drawable.ic_br_alpha,
+                Square(10, 10),
+                0,
+                mutableListOf(),
+                mutableListOf(),
+                mutableListOf(),
+                mutableListOf(),
+                mutableListOf()
+            )
+        )
     private var pieceClicked: MutableState<Boolean> = mutableStateOf(false)
     private var promotionDialogShowing: MutableState<Boolean> = mutableStateOf(false)
     var selectedNotationIndex: MutableState<Int> = gameRepository.selectedNotationIndex
@@ -50,6 +67,8 @@ class GameViewModel @Inject constructor (app: Application, private val gameRepos
     private val soundPlayer: SoundPlayer = SoundPlayer(app)
 
     val previousGameStates = gameRepository.previousGameStates
+
+    val chessBoardTheme by settings.chessBoardTheme
 
     fun createNewGame(time: Long, isOnline: Boolean) {
         viewModelScope.launch {
@@ -101,11 +120,11 @@ class GameViewModel @Inject constructor (app: Application, private val gameRepos
                     println("pinned moves ${piece.pinnedMoves}")
                     println("pinned pseudo ${piece.pseudoLegalMoves}")
                     //setPieceClickedState(true)
-                    if(isOnline.value){
+                    if (isOnline.value) {
                         if (getPlayerTurn() == userColor) {
                             setPieceClickedState(true)
                         }
-                    }else{
+                    } else {
                         setPieceClickedState(true)
                     }
                 }
@@ -130,19 +149,19 @@ class GameViewModel @Inject constructor (app: Application, private val gameRepos
         }
     }
 
-    fun drawOffer(value: String){
+    fun drawOffer(value: String) {
         viewModelScope.launch {
             gameRepository.firestore.writeDrawOffer(getPlayerTurn(), value)
         }
     }
 
-    fun rematchOffer(value: String){
+    fun rematchOffer(value: String) {
         viewModelScope.launch {
             gameRepository.firestore.writeRematchOffer(getPlayerTurn(), value)
         }
     }
 
-    fun resign(){
+    fun resign() {
         viewModelScope.launch {
             gameRepository.firestore.writeResignation(userColor)
         }
@@ -206,7 +225,7 @@ class GameViewModel @Inject constructor (app: Application, private val gameRepos
         return gameRepository.gameEndSound
     }
 
-    fun playSoundPool(soundName: String){
+    fun playSoundPool(soundName: String) {
         soundPlayer.playSoundPool(soundName)
     }
 

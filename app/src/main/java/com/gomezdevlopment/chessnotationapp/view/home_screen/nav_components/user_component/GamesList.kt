@@ -60,8 +60,8 @@ fun Games(viewModel: UserViewModel, navController: NavController, gameViewModel:
 }
 
 @Composable
-fun ChessBoard() {
-    val chessBoardVector = ImageVector.vectorResource(id = R.drawable.ic_chess_board_teal)
+fun ChessBoard(board: Int) {
+    val chessBoardVector = ImageVector.vectorResource(id = board)
     Image(
         imageVector = chessBoardVector,
         //imageVector = chessBoardVector,
@@ -82,7 +82,7 @@ fun GamesCardBoardState(viewModel: UserViewModel, index: Int){
             .aspectRatio(1f),
     ) {
         val size = (100.dp/8).value
-        ChessBoard()
+        ChessBoard(viewModel.chessBoardTheme)
         val game = viewModel.userGames[index]
         val finalPosition = game[(game.size - 5).toString()]
         if(finalPosition != null){
