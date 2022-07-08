@@ -58,6 +58,7 @@ fun GameReview(viewModel: GameViewModel, navController: NavController){
                         currentSquare = viewModel.getCurrentSquare().value,
                         previousSquare = viewModel.getPreviousSquare().value,
                         kingSquare = viewModel.kingSquare,
+                        theme = viewModel.pieceTheme
                     )
                     Coordinates(size = maxWidth / 8)
                     //ChessUILogic(height = maxWidth / 8, viewModel = viewModel, navController)

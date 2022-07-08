@@ -5,6 +5,7 @@ import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.pieces.ChessPieces
+import com.gomezdevlopment.chessnotationapp.view.theming.alpha
 
 class FEN {
     fun getGameStateAsFEN(
@@ -122,6 +123,7 @@ class FEN {
         val splitFen = fen.split(" ")
         val piecePositions = splitFen[0].split("/")
         var rank = 8
+        val chessPieces = ChessPieces()
         for (string in piecePositions) {
             rank--
             var file = 0
@@ -129,58 +131,26 @@ class FEN {
                 if (char.isDigit()) {
                     file += char.digitToInt()
                 } else {
+                    var newPiece = chessPieces.blackRook(rank, file)
                     when (char) {
-                        'r' -> {
-                            val newPiece = ChessPieces().blackRook(rank, file)
-                            pieces.add(newPiece)
-                        }
-                        'n' -> {
-                            val newPiece = ChessPieces().blackKnight(rank, file)
-                            pieces.add(newPiece)
-                        }
-                        'b' -> {
-                            val newPiece = ChessPieces().blackBishop(rank, file)
-                            pieces.add(newPiece)
-                        }
-                        'q' -> {
-                            val newPiece = ChessPieces().blackQueen(rank, file)
-                            pieces.add(newPiece)
-                        }
-                        'k' -> {
-                            val newPiece = ChessPieces().blackKing(rank, file)
+                        'r' -> { newPiece = chessPieces.blackRook(rank, file) }
+                        'n' -> { newPiece = chessPieces.blackKnight(rank, file) }
+                        'b' -> { newPiece = chessPieces.blackBishop(rank, file) }
+                        'q' -> { newPiece = chessPieces.blackQueen(rank, file) }
+                        'k' -> { newPiece = chessPieces.blackKing(rank, file)
                             blackKingSquare.value = Square(rank, file)
-                            pieces.add(newPiece)
                         }
-                        'p' -> {
-                            val newPiece = ChessPieces().blackPawn(rank, file)
-                            pieces.add(newPiece)
-                        }
-                        'R' -> {
-                            val newPiece = ChessPieces().whiteRook(rank, file)
-                            pieces.add(newPiece)
-                        }
-                        'N' -> {
-                            val newPiece = ChessPieces().whiteKnight(rank, file)
-                            pieces.add(newPiece)
-                        }
-                        'B' -> {
-                            val newPiece = ChessPieces().whiteBishop(rank, file)
-                            pieces.add(newPiece)
-                        }
-                        'Q' -> {
-                            val newPiece = ChessPieces().whiteQueen(rank, file)
-                            pieces.add(newPiece)
-                        }
-                        'K' -> {
-                            val newPiece = ChessPieces().whiteKing(rank, file)
+                        'p' -> { newPiece = chessPieces.blackPawn(rank, file) }
+                        'R' -> { newPiece = chessPieces.whiteRook(rank, file) }
+                        'N' -> { newPiece = chessPieces.whiteKnight(rank, file) }
+                        'B' -> { newPiece = chessPieces.whiteBishop(rank, file) }
+                        'Q' -> { newPiece = chessPieces.whiteQueen(rank, file) }
+                        'K' -> { newPiece = chessPieces.whiteKing(rank, file)
                             whiteKingSquare.value = Square(rank, file)
-                            pieces.add(newPiece)
                         }
-                        'P' -> {
-                            val newPiece = ChessPieces().whitePawn(rank, file)
-                            pieces.add(newPiece)
-                        }
+                        'P' -> { newPiece = chessPieces.whitePawn(rank, file) }
                     }
+                    pieces.add(newPiece)
                     file++
                 }
             }

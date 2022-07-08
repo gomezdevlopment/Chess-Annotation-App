@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,21 +28,14 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.ChessBoard
-import com.gomezdevlopment.chessnotationapp.view.theming.teal
-import com.gomezdevlopment.chessnotationapp.view.theming.blueBoardOutlined
-import com.gomezdevlopment.chessnotationapp.view.theming.greyBoard
-import com.gomezdevlopment.chessnotationapp.view.theming.orangeBoard
-import com.gomezdevlopment.chessnotationapp.view.theming.tealBoard
+import com.gomezdevlopment.chessnotationapp.view.theming.*
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun BoardThemes(navController: NavController, viewModel: UserViewModel) {
-    val boardThemes = listOf(
-        "Teal" to tealBoard,
-        "Orange" to orangeBoard,
-        "Blue Outlined" to blueBoardOutlined,
-        "Grey" to greyBoard
+fun PieceThemes(navController: NavController, viewModel: UserViewModel) {
+    val pieceThemes = listOf(
+        "Alpha" to alphaTheme,
+        "Leipzig" to leipzigTheme,
     )
 
     Column(
@@ -56,26 +50,27 @@ fun BoardThemes(navController: NavController, viewModel: UserViewModel) {
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
                 contentDescription = "Go Back",
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier
+                    .size(30.dp)
                     .clickable {
-                    navController.popBackStack()
-                })
+                        navController.popBackStack()
+                    })
         }
         Row(
             Modifier
                 .fillMaxWidth()
                 .padding(20.dp, 5.dp), horizontalArrangement = Arrangement.Start) {
-            Text("Board Theme", fontWeight = FontWeight.Bold, fontSize = 30.sp)
+            Text("Piece Theme", fontWeight = FontWeight.Bold, fontSize = 30.sp)
         }
-        Row() {
-            LazyVerticalGrid(cells = GridCells.Fixed(2)) {
-                itemsIndexed(boardThemes) { _, board ->
-                    BoardSelectionItem(
-                        boardName = board.first,
-                        board = board.second,
+        Row {
+            LazyColumn(){
+                itemsIndexed(pieceThemes) { _, theme ->
+                    PieceThemeSelectionItem(
+                        pieceThemeName = theme.first,
+                        theme = theme.second,
                         viewModel
                     ) {
-                        viewModel.setChessBoardTheme(board.second)
+                        viewModel.setChessPieceTheme(theme.first)
                     }
                 }
             }
@@ -84,21 +79,21 @@ fun BoardThemes(navController: NavController, viewModel: UserViewModel) {
 }
 
 @Composable
-fun BoardSelectionItem(
-    boardName: String,
-    board: Int,
+fun PieceThemeSelectionItem(
+    pieceThemeName: String,
+    theme: Int,
     viewModel: UserViewModel,
     onClick: () -> Unit
 ) {
-    val chessBoardVector = ImageVector.vectorResource(id = board)
-    val currentSelection = viewModel.chessBoardTheme
+    val pieceThemeVector = ImageVector.vectorResource(id = theme)
+    val currentSelection = viewModel.pieceThemeSelection
 
     Card(
         shape = RoundedCornerShape(10.dp),
-        border = BorderStroke(5.dp, if (board == currentSelection) teal else Color.Transparent),
+        border = BorderStroke(5.dp, if (pieceThemeName == currentSelection) teal else Color.Transparent),
         backgroundColor = MaterialTheme.colors.surface,
         modifier = Modifier
-            .fillMaxWidth(.5f)
+            .fillMaxWidth()
             .padding(15.dp)
             .clickable {
                 onClick()
@@ -109,11 +104,11 @@ fun BoardSelectionItem(
             modifier = Modifier.padding(15.dp)
         ) {
             ChessBoard(
-                chessBoardVector = chessBoardVector,
-                modifier = Modifier.chessBoardThemeSelection()
+                chessBoardVector = pieceThemeVector,
+                modifier = Modifier.fillMaxWidth()
             )
             Text(
-                text = boardName,
+                text = pieceThemeName,
                 fontWeight = FontWeight.Bold,
                 fontSize = 16.sp,
                 modifier = Modifier.padding(5.dp)
@@ -122,7 +117,3 @@ fun BoardSelectionItem(
     }
 }
 
-fun Modifier.chessBoardThemeSelection() =
-    fillMaxWidth()
-        .aspectRatio(1f)
-        .zIndex(1f)

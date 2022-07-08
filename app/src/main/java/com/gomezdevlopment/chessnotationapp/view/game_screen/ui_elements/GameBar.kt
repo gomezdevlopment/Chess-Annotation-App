@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.R
-import com.gomezdevlopment.chessnotationapp.view.tealDarker
+import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable

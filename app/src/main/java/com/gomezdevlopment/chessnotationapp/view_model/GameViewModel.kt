@@ -69,6 +69,7 @@ class GameViewModel @Inject constructor(
     val previousGameStates = gameRepository.previousGameStates
 
     val chessBoardTheme by settings.chessBoardTheme
+    val pieceTheme by settings.pieceThemeMap
 
     fun createNewGame(time: Long, isOnline: Boolean) {
         viewModelScope.launch {

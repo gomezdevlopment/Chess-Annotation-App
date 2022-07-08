@@ -16,9 +16,8 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
-import com.gomezdevlopment.chessnotationapp.view.cardWhite
-import com.gomezdevlopment.chessnotationapp.view.tealDarker
-import com.gomezdevlopment.chessnotationapp.view.textWhite
+import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
+import com.gomezdevlopment.chessnotationapp.view.theming.textWhite
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.MatchmakingViewModel
 

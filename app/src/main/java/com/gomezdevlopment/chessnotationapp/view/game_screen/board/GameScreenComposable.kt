@@ -2,7 +2,6 @@ package com.gomezdevlopment.chessnotationapp.view.game_screen.board
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -11,23 +10,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.GameEvent
-import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
-import com.gomezdevlopment.chessnotationapp.view.*
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
+import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
+import com.gomezdevlopment.chessnotationapp.view.theming.textWhite
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -85,6 +81,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                         currentSquare = viewModel.getCurrentSquare().value,
                         previousSquare = viewModel.getPreviousSquare().value,
                         kingSquare = viewModel.kingSquare,
+                        theme = viewModel.pieceTheme
                     )
                     Coordinates(size = maxWidth / 8)
                     ChessUILogic(height = maxWidth / 8, viewModel = viewModel, navController)

@@ -32,9 +32,17 @@ class UserViewModel @Inject constructor(
     val search = mutableStateOf("")
     val chessBoardTheme by settings.chessBoardTheme
 
+    val pieceThemeSelection by settings.pieceTheme
+
     fun setChessBoardTheme(boardTheme: Int){
         viewModelScope.launch {
             settings.setBoardTheme(boardTheme)
+        }
+    }
+
+    fun setChessPieceTheme(pieceTheme: String){
+        viewModelScope.launch {
+            settings.setPieceTheme(pieceTheme)
         }
     }
 
@@ -58,6 +66,7 @@ class UserViewModel @Inject constructor(
         val splitFen = fen.split(" ")
         val piecePositions = splitFen[0].split("/")
         var rank = 8
+        val chessPieces = ChessPieces()
         for (string in piecePositions) {
             rank--
             var file = 0
@@ -65,43 +74,43 @@ class UserViewModel @Inject constructor(
                 if (char.isDigit()) {
                     file += char.digitToInt()
                 } else {
-                    var newPiece = ChessPieces().blackRook(rank, file)
+                    var newPiece = chessPieces.blackRook(rank, file)
                     when (char) {
                         'r' -> {
-                            newPiece = ChessPieces().blackRook(rank, file)
+                            newPiece = chessPieces.blackRook(rank, file)
                         }
                         'n' -> {
-                            newPiece = ChessPieces().blackKnight(rank, file)
+                            newPiece = chessPieces.blackKnight(rank, file)
                         }
                         'b' -> {
-                            newPiece = ChessPieces().blackBishop(rank, file)
+                            newPiece = chessPieces.blackBishop(rank, file)
                         }
                         'q' -> {
-                            newPiece = ChessPieces().blackQueen(rank, file)
+                            newPiece = chessPieces.blackQueen(rank, file)
                         }
                         'k' -> {
-                            newPiece = ChessPieces().blackKing(rank, file)
+                            newPiece = chessPieces.blackKing(rank, file)
                         }
                         'p' -> {
-                            newPiece = ChessPieces().blackPawn(rank, file)
+                            newPiece = chessPieces.blackPawn(rank, file)
                         }
                         'R' -> {
-                            newPiece = ChessPieces().whiteRook(rank, file)
+                            newPiece = chessPieces.whiteRook(rank, file)
                         }
                         'N' -> {
-                            newPiece = ChessPieces().whiteKnight(rank, file)
+                            newPiece = chessPieces.whiteKnight(rank, file)
                         }
                         'B' -> {
-                            newPiece = ChessPieces().whiteBishop(rank, file)
+                            newPiece = chessPieces.whiteBishop(rank, file)
                         }
                         'Q' -> {
-                            newPiece = ChessPieces().whiteQueen(rank, file)
+                            newPiece = chessPieces.whiteQueen(rank, file)
                         }
                         'K' -> {
-                            newPiece = ChessPieces().whiteKing(rank, file)
+                            newPiece = chessPieces.whiteKing(rank, file)
                         }
                         'P' -> {
-                            newPiece = ChessPieces().whitePawn(rank, file)
+                            newPiece = chessPieces.whitePawn(rank, file)
                         }
                     }
                     pieces.add(newPiece)

@@ -21,15 +21,17 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.gomezdevlopment.chessnotationapp.R
-import com.gomezdevlopment.chessnotationapp.view.*
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.friends.FriendsList
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.games.Games
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.settings.BoardThemes
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.settings.PieceThemes
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.settings.Settings
+import com.gomezdevlopment.chessnotationapp.view.theming.cardWhite
+import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
+import com.gomezdevlopment.chessnotationapp.view.theming.textWhite
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun UserNavigation(userViewModel: UserViewModel, homeNavController: NavController, gameViewModel: GameViewModel) {
@@ -37,6 +39,7 @@ fun UserNavigation(userViewModel: UserViewModel, homeNavController: NavControlle
     NavHost(navController = userNavController, startDestination = "user") {
         composable("user") { UserScreen(userViewModel, homeNavController, userNavController, gameViewModel) }
         composable("boardThemes") { BoardThemes(userNavController, userViewModel) }
+        composable("pieceThemes") { PieceThemes(userNavController, userViewModel) }
     }
 }
 

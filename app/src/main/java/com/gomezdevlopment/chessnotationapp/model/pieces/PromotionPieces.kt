@@ -3,6 +3,10 @@ package com.gomezdevlopment.chessnotationapp.model.pieces
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
+import com.gomezdevlopment.chessnotationapp.model.utils.UserSettings
+import com.gomezdevlopment.chessnotationapp.view.theming.alpha
+import com.gomezdevlopment.chessnotationapp.view.theming.leipzig
+import javax.inject.Inject
 
 data class PromotionPiece(
     val color: String,
@@ -27,7 +31,7 @@ class PromotionPieces() {
     )
 }
 
-class ChessPieces {
+class ChessPieces() {
     fun blackRook(rank:Int, file: Int): ChessPiece {
         return ChessPiece(
             "black",
@@ -122,7 +126,7 @@ class ChessPieces {
         return ChessPiece(
                 "white",
                 "knight",
-                R.drawable.ic_wn_alpha,
+            R.drawable.ic_wn_alpha,
                 Square(rank, file),
                 3, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf()
             )
@@ -141,7 +145,7 @@ class ChessPieces {
         return ChessPiece(
             "white",
             "pawn",
-            R.drawable.ic_wp_alpha,
+             R.drawable.ic_wp_alpha,
             Square(rank, file),
             1, mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf(), mutableListOf())
     }

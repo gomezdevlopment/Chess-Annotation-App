@@ -7,14 +7,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.gomezdevlopment.chessnotationapp.view.tealDarker
-import com.gomezdevlopment.chessnotationapp.view.textWhite
+import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
+import com.gomezdevlopment.chessnotationapp.view.theming.textWhite
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.*
 import androidx.navigation.NavDestination.Companion.hierarchy
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.NavComponent
-import com.gomezdevlopment.chessnotationapp.view.navBarWhite
 
 @Composable
 fun BottomNavBar(navController: NavHostController) {

@@ -15,15 +15,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.gomezdevlopment.chessnotationapp.R
-import com.gomezdevlopment.chessnotationapp.view.orange
-import com.gomezdevlopment.chessnotationapp.view.teal
+import com.gomezdevlopment.chessnotationapp.view.theming.orange
+import com.gomezdevlopment.chessnotationapp.view.theming.teal
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable

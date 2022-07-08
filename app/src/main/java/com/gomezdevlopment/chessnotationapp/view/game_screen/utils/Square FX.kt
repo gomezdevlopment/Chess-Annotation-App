@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.utils.Utils
-import com.gomezdevlopment.chessnotationapp.view.blue
+import com.gomezdevlopment.chessnotationapp.view.theming.blue
 
 @Composable
 fun Highlight(

@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen.board
 
+import androidx.appcompat.resources.R
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.tween
@@ -19,14 +20,11 @@ import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.utils.Utils
-import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
-import com.gomezdevlopment.chessnotationapp.view.blue
+import com.gomezdevlopment.chessnotationapp.view.theming.blue
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
-import com.gomezdevlopment.chessnotationapp.view.orange
-import com.gomezdevlopment.chessnotationapp.view.redIncorrect
-import com.gomezdevlopment.chessnotationapp.view.yellow
-import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
-import kotlinx.coroutines.delay
+import com.gomezdevlopment.chessnotationapp.view.theming.alpha
+import com.gomezdevlopment.chessnotationapp.view.theming.redIncorrect
+import com.gomezdevlopment.chessnotationapp.view.theming.yellow
 
 //@Composable
 //fun Piece(
@@ -107,6 +105,18 @@ import kotlinx.coroutines.delay
 //    }
 //}
 
+private fun pieceIcon(piece: ChessPiece, theme: Map<String, Int>): Int? {
+    when (piece.piece) {
+        "king" -> return if(piece.color == "white") theme["wk"] else theme["bk"]
+        "queen" -> return if(piece.color == "white") theme["wq"] else theme["bq"]
+        "rook" -> return if(piece.color == "white") theme["wr"] else theme["br"]
+        "bishop" -> return if(piece.color == "white") theme["wb"] else theme["bb"]
+        "knight" -> return if(piece.color == "white") theme["wn"] else theme["bn"]
+        "pawn" -> return if(piece.color == "white") theme["wp"] else theme["bp"]
+    }
+    return theme["wp"]
+}
+
 @Composable
 fun Piece(
     piece: ChessPiece,
@@ -116,8 +126,9 @@ fun Piece(
     userColor: String,
     selectedPiece: MutableState<ChessPiece>,
     pieceClicked: MutableState<Boolean>,
-    ) {
-    val imageVector = ImageVector.vectorResource(piece.pieceDrawable)
+    theme: Map<String, Int>
+) {
+    val imageVector = ImageVector.vectorResource(pieceIcon(piece, theme) ?: piece.pieceDrawable)
 
     key(piece) {
         Image(
@@ -165,7 +176,8 @@ fun Pieces(
     kingInCheck: Boolean,
     currentSquare: Square,
     previousSquare: Square,
-    kingSquare: MutableState<Square>
+    kingSquare: MutableState<Square>,
+    theme: Map<String, Int>
 ) {
     pieces.forEach() { piece ->
         key(piece) {
@@ -185,6 +197,7 @@ fun Pieces(
                 userColor = userColor,
                 selectedPiece = selectedPiece,
                 pieceClicked = pieceClicked,
+                theme = theme
             )
         }
     }
@@ -193,7 +206,7 @@ fun Pieces(
         //Highlight(height = height, square = previousSquare, color = yellow, .9f)
     }
 
-    if(currentSquare.rank != 10){
+    if (currentSquare.rank != 10) {
         Outline(height = height, square = currentSquare, color = yellow)
         //Highlight(height = height, square = currentSquare, yellow, .9f)
     }

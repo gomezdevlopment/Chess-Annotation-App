@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp.view
+package com.gomezdevlopment.chessnotationapp.view.theming
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors

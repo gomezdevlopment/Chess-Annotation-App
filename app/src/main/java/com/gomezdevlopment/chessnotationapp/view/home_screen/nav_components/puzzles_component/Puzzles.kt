@@ -16,25 +16,22 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.R
-import com.gomezdevlopment.chessnotationapp.model.GameEvent
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPieces
 import com.gomezdevlopment.chessnotationapp.model.utils.Utils
 import com.gomezdevlopment.chessnotationapp.view.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.*
-import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.Highlight
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.Outline
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleCapture
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleMove
-import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
+import com.gomezdevlopment.chessnotationapp.view.theming.pink
+import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
 import com.gomezdevlopment.chessnotationapp.view_model.PuzzleViewModel
 
 @Composable
@@ -88,6 +85,7 @@ fun PuzzleScreen(viewModel: PuzzleViewModel) {
                 currentSquare = viewModel.getCurrentSquare().value,
                 previousSquare = viewModel.getPreviousSquare().value,
                 kingSquare = viewModel.kingSquare,
+                theme = viewModel.pieceTheme
             )
             Coordinates(size = maxWidth / 8)
             PuzzleUILogic(height = maxWidth / 8, viewModel = viewModel)

@@ -39,7 +39,6 @@ class PuzzleViewModel @Inject constructor(
     val occupiedSquares = puzzleRepository.occupiedSquares
     val userColor = puzzleRepository.userColor
     val piecesOnBoard: List<ChessPiece> = puzzleRepository.piecesOnBoard
-
     val selectedPiece: MutableState<ChessPiece> = mutableStateOf(ChessPieces().whiteKing(10,10))
     val legalMoves = selectedPiece.value.legalMoves
 
@@ -61,6 +60,7 @@ class PuzzleViewModel @Inject constructor(
     val showNoMorePuzzlesCard = mutableStateOf(false)
 
     val chessBoardTheme by settings.chessBoardTheme
+    val pieceTheme by settings.pieceThemeMap
 
     fun setPuzzle() {
         if(puzzleIndex <= puzzles.lastIndex){

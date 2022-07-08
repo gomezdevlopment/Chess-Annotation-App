@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.R
-import com.gomezdevlopment.chessnotationapp.view.*
+import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
 
 
 @Composable
@@ -23,7 +23,7 @@ fun Settings(userNavController: NavController) {
             userNavController.navigate("boardThemes")
         }
         SettingsItemButton(text = "Pieces Theme") {
-            userNavController.navigate("boardThemes")
+            userNavController.navigate("pieceThemes")
         }
         SettingsItemButton(text = "Theme") {
             userNavController.navigate("boardThemes")
