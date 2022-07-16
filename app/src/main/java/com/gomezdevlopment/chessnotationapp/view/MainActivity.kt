@@ -28,8 +28,6 @@ class MainActivity : AppCompatActivity() {
         var gameDocumentReference: DocumentReference? = null
         var userDocumentReference: DocumentReference? = null
         var game: OnlineGame? = null
-
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

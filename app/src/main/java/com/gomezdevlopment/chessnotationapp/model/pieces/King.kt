@@ -3,11 +3,9 @@ package com.gomezdevlopment.chessnotationapp.model.pieces
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
-import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic2
 
 class King {
     private val gameLogic = GameLogic()
-    private val gameLogic2 = GameLogic2()
 
     fun moves(
         piece: ChessPiece,
@@ -18,7 +16,7 @@ class King {
         kingSquare: Square,
         piecesCheckingKing: MutableList<ChessPiece>
     ) {
-        gameLogic2.clearMoves(piece)
+        gameLogic.clearMoves(piece)
         var moveSquare = Square(piece.square.rank + 1, piece.square.file + 1)
         piece.pseudoLegalMoves.add(moveSquare)
         moveSquare = Square(piece.square.rank + 1, piece.square.file - 1)
@@ -37,10 +35,10 @@ class King {
         piece.pseudoLegalMoves.add(moveSquare)
 
         piece.pseudoLegalMoves.forEach {
-            if(gameLogic2.isOnBoard(it)){
+            if(gameLogic.isOnBoard(it)){
                 piece.attacks.add(it)
             }
-            if(gameLogic2.isLegalMove(it, occupiedSquares, piece, piecesCheckingKing)
+            if(gameLogic.isLegalMove(it, occupiedSquares, piece, piecesCheckingKing)
                 && !attackedSquares.contains(it)){
                 piece.legalMoves.add(it)
             }

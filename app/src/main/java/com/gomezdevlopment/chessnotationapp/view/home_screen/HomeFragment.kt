@@ -6,13 +6,19 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
+import com.gomezdevlopment.chessnotationapp.model.utils.UserSettings
 import com.gomezdevlopment.chessnotationapp.view.theming.AppTheme
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.SoundFX
+import com.gomezdevlopment.chessnotationapp.view.theming.backgroundDark
+import com.gomezdevlopment.chessnotationapp.view.theming.background
 import com.gomezdevlopment.chessnotationapp.view_model.*
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.AndroidEntryPoint
+
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
@@ -36,8 +42,16 @@ class HomeFragment : Fragment() {
             val matchmakingViewModel: MatchmakingViewModel by viewModels()
             val signOutViewModel: SignOutViewModel by viewModels()
             val userViewModel: UserViewModel by viewModels()
+            val userSettings: UserSettings by viewModels()
             setContent {
-                AppTheme(darkTheme = isSystemInDarkTheme()) {
+                val darkTheme = if(userSettings.theme.value == "System") isSystemInDarkTheme() else userSettings.isDarkThemeSelected.value ?: false
+                if(darkTheme){
+                    rememberSystemUiController().setStatusBarColor(backgroundDark, false)
+                }else{
+                    rememberSystemUiController().setStatusBarColor(com.gomezdevlopment.chessnotationapp.view.theming.background, true)
+                }
+
+                AppTheme(darkTheme = darkTheme) {
                     Navigation(gameViewModel, matchmakingViewModel, signOutViewModel, puzzleViewModel, userViewModel)
                     SoundFX(viewModel = gameViewModel)
                 }

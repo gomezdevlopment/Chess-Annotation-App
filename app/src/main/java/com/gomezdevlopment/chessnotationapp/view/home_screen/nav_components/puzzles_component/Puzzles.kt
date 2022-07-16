@@ -85,7 +85,8 @@ fun PuzzleScreen(viewModel: PuzzleViewModel) {
                 currentSquare = viewModel.getCurrentSquare().value,
                 previousSquare = viewModel.getPreviousSquare().value,
                 kingSquare = viewModel.kingSquare,
-                theme = viewModel.pieceTheme
+                theme = viewModel.pieceTheme,
+                pieceAnimationSpeed = 300
             )
             Coordinates(size = maxWidth / 8)
             PuzzleUILogic(height = maxWidth / 8, viewModel = viewModel)
@@ -436,7 +437,7 @@ fun AllPuzzlesCompletedCard(
                 }
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     TextButton(onClick = {  }) {
-                        Text("Close", color = tealDarker)
+                        Text("Close", color = MaterialTheme.colors.primary)
                     }
                     Spacer(modifier = Modifier.height(20.dp))
                 }

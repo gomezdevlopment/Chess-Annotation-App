@@ -3,6 +3,7 @@ package com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProgressIndicatorDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -51,7 +52,7 @@ fun CountDownIndicator(
                 modifier = Modifier
                     .height(size)
                     .width(size),
-                color = tealDarker,
+                color = MaterialTheme.colors.primary,
                 strokeWidth = stroke.dp,
             )
 

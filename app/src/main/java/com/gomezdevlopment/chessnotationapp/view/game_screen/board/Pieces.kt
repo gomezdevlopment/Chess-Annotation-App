@@ -177,7 +177,8 @@ fun Pieces(
     currentSquare: Square,
     previousSquare: Square,
     kingSquare: MutableState<Square>,
-    theme: Map<String, Int>
+    theme: Map<String, Int>,
+    pieceAnimationSpeed: Int
 ) {
     pieces.forEach() { piece ->
         key(piece) {
@@ -187,7 +188,7 @@ fun Pieces(
             val offset = Offset(offsetX, offsetY)
             val animatedOffset by animateOffsetAsState(
                 targetValue = offset,
-                tween(150, easing = LinearEasing),
+                tween(pieceAnimationSpeed, easing = LinearEasing),
             )
             Piece(
                 piece = piece,

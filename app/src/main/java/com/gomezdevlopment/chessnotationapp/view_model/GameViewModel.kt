@@ -24,6 +24,7 @@ class GameViewModel @Inject constructor(
     private val gameRepository: GameRepository,
     private val settings: UserSettings
 ) : AndroidViewModel(app) {
+
     //private var gameRepository: GameRepository = GameRepository() //GameRepository.getGameRepository()
     private var hashMap: MutableMap<Square, ChessPiece> = gameRepository.occupiedSquares
     private var previousSquare: MutableState<Square> = gameRepository.previousSquare
@@ -70,6 +71,7 @@ class GameViewModel @Inject constructor(
 
     val chessBoardTheme by settings.chessBoardTheme
     val pieceTheme by settings.pieceThemeMap
+    val pieceAnimationSpeed by settings.pieceAnimationSpeed
 
     fun createNewGame(time: Long, isOnline: Boolean) {
         viewModelScope.launch {

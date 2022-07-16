@@ -31,8 +31,9 @@ class UserViewModel @Inject constructor(
     val friendsList = mutableListOf<String>()
     val search = mutableStateOf("")
     val chessBoardTheme by settings.chessBoardTheme
-
     val pieceThemeSelection by settings.pieceTheme
+    val pieceAnimationSpeed by settings.pieceAnimationSpeed
+    val themeSelection by settings.theme
 
     fun setChessBoardTheme(boardTheme: Int){
         viewModelScope.launch {
@@ -43,6 +44,18 @@ class UserViewModel @Inject constructor(
     fun setChessPieceTheme(pieceTheme: String){
         viewModelScope.launch {
             settings.setPieceTheme(pieceTheme)
+        }
+    }
+
+    fun setTheme(theme: String){
+        viewModelScope.launch {
+            settings.setTheme(theme)
+        }
+    }
+
+    fun setPieceAnimationSpeed(speed: Int){
+        viewModelScope.launch {
+            settings.setPieceAnimationSpeed(speed)
         }
     }
 

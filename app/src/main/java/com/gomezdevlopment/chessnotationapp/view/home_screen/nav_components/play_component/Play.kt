@@ -78,7 +78,7 @@ fun VSPlayerCard(navController: NavController, viewModel: GameViewModel) {
                         viewModel.isOnline.value = false
                         navController.navigate("game")
                     },
-                backgroundColor = tealDarker,
+                backgroundColor = MaterialTheme.colors.primary,
                 shape = RoundedCornerShape(3.dp),
                 elevation = 3.dp,
             )
@@ -170,7 +170,7 @@ fun GameSelectionCard(drawableID: Int, title: String, onClick: () -> Unit) {
                     imageVector = userIcon, contentDescription = "Play Game",
                     Modifier
                         .size(50.dp)
-                        .padding(1.dp), tint = tealDarker
+                        .padding(1.dp), tint = MaterialTheme.colors.primary
                 )
             }
             Spacer(modifier = Modifier.height(50.dp))
@@ -181,10 +181,10 @@ fun GameSelectionCard(drawableID: Int, title: String, onClick: () -> Unit) {
                 Button(
                     onClick = onClick,
                     shape = RoundedCornerShape(8.dp),
-                    colors = ButtonDefaults.buttonColors(backgroundColor = tealDarker),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
                     modifier = Modifier.padding(10.dp)
                 ) {
-                    Text("New Game", color = textWhite)
+                    Text("New Game", color = MaterialTheme.colors.onPrimary)
                 }
             }
             Spacer(modifier = Modifier.height(20.dp))

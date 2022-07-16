@@ -52,7 +52,7 @@ fun MatchSearch(
                         .width(100.dp)
                         .aspectRatio(1f),
                     strokeWidth = 5.dp,
-                    color = tealDarker
+                    color = MaterialTheme.colors.primary
                 )
             }
 
@@ -62,7 +62,7 @@ fun MatchSearch(
                 Text(
                     text = "Cancel",
                     fontWeight = FontWeight.ExtraBold,
-                    color = tealDarker,
+                    color = MaterialTheme.colors.primary,
                     fontSize = 24.sp
                 )
             }

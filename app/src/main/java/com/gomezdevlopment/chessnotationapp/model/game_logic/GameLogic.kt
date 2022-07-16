@@ -1,178 +1,161 @@
 package com.gomezdevlopment.chessnotationapp.model.game_logic
 
+import android.os.Build
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
-import com.gomezdevlopment.chessnotationapp.model.pieces.*
+import kotlin.math.abs
 
-class GameLogic {
-//    fun isPieceInPath(occupiedSquares: MutableMap<Square, ChessPiece>, square: Square): Boolean {
-//        if (occupiedSquares.contains(square)) {
-//            return true
-//        }
-//        return false
-//    }
-//
-//    fun pieceInPath(
-//        occupiedSquares: MutableMap<Square, ChessPiece>,
-//        listOfMoves: MutableList<Square>,
-//        square: Square
-//    ): Boolean {
-//        listOfMoves.add(square)
-//        return (isPieceInPath(occupiedSquares, square))
-//    }
-//
-//    fun illegalMove(
-//        square: Square,
-//        occupiedSquares: MutableMap<Square, ChessPiece>,
-//        piece: ChessPiece,
-//        squaresToBlock: MutableList<Square>,
-//        xRayAttacks: MutableList<Square>,
-//        kingSquare: Square,
-//        piecesCheckingKing: MutableList<Square>
-//    ): Boolean {
-//        //prevent king from entering into check when in check
-//        if (piecesCheckingKing.isNotEmpty()) {
-//            if (squaresToBlock.contains(square) && piece.piece == "king"){
-//                //println("King cant move into check")
-//                return true
-//            }
-//
-//            if (!squaresToBlock.contains(square) && !piecesCheckingKing.contains(square) && piece.piece != "king") {
-//                //println("Piece must block or capture attacker!")
-//                return true
-//            }
-//
-//            if(piecesCheckingKing.size > 1 && piece.piece != "king"){
-//                //println("Double Check or greater")
-//                return true }
-//
-//            //if(isPinned()) return true
-//        }
-//        if (square.rank > 7 || square.rank < 0 || square.file > 7 || square.file < 0) return true
-//        if (!isCapture(square, occupiedSquares, piece)){
-//            //println("Not a Capture")
-//            return true
-//        }
-//        if (isPinned(square, xRayAttacks, piece, kingSquare)) {
-//            //println("Pinned")
-//            return true
-//        }
-//        return false
-//    }
-//
-//    fun isPinned(
-//        square: Square,
-//        xRayAttacks: MutableList<Square>,
-//        piece: ChessPiece,
-//        kingSquare: Square
-//    ): Boolean {
-//        if (xRayAttacks.contains(kingSquare) && xRayAttacks.contains(piece.square) && piece.piece != "king") {
-//            //Pinned Vertically
-//            if (kingSquare.file == piece.square.file) {
-//                if (kingSquare.file != square.file) {
-//                    return true
-//                }
-//            }
-//            //Pinned Horizontally
-//            else if (kingSquare.rank == piece.square.rank) {
-//                if (square.rank != kingSquare.rank) {
-//                    return true
-//                }
-//            }
-//            //Pinned Upper Left Diagonal
-//            else if (piece.square.rank > kingSquare.rank && piece.square.file < kingSquare.file) {
-//                if (square.rank - kingSquare.rank != kingSquare.file - square.file) {
-//                    return true
-//                }
-//            }
-//            //Pinned Upper Right Diagonal
-//            else if (piece.square.rank > kingSquare.rank && piece.square.file > kingSquare.file) {
-//                //println("pawn pinned")
-//                if (square.rank - kingSquare.rank != square.file - kingSquare.file) {
-//                    return true
-//                }
-//            }
-//            //Pinned Lower Left Diagonal
-//            else if (piece.square.rank < kingSquare.rank && piece.square.file < kingSquare.file) {
-//                if (kingSquare.rank - square.rank != kingSquare.file - square.file) {
-//                    return true
-//                }
-//            }
-//            //Pinned Lower Right Diagonal
-//            else if (piece.square.rank < kingSquare.rank && piece.square.file > kingSquare.file) {
-//                if (kingSquare.rank - square.rank != square.file - kingSquare.file) {
-//                    return true
-//                }
-//            }
-//        }
-//        return false
-//    }
-//
-//    private fun isCapture(
-//        square: Square,
-//        occupiedSquares: MutableMap<Square, ChessPiece>,
-//        piece: ChessPiece
-//    ): Boolean {
-//        var isLegalMove = true
-//        if (occupiedSquares.containsKey(square)) {
-//            isLegalMove = occupiedSquares[square]?.color != piece.color
-//            if (piece.piece == "pawn") {
-//                if (piece.square.file == square.file) {
-//                    isLegalMove = false
-//                }
-//            }
-//        }
-//        return isLegalMove
-//    }
-//
-//    fun isDefending(
-//        square: Square,
-//        occupiedSquares: MutableMap<Square, ChessPiece>
-//    ): Boolean {
-//        var isDefending = false
-//        if (occupiedSquares.containsKey(square)) {
-//            isDefending = true
-//        }
-//        return isDefending
-//    }
-//
-//    fun isEnPassant(
-//        previousSquare: Square,
-//        currentSquare: Square,
-//        square: Square,
-//        occupiedSquares: MutableMap<Square, ChessPiece>,
-//        piece: ChessPiece,
-//        kingSquare: Square,
-//        squaresToBlock: MutableList<Square>
-//    ): Boolean {
-//        if(piece.piece == "pawn"){
-//            if (piece.color == "white") {
-//                if (previousSquare.rank == 6 && currentSquare.rank == 4) {
-//                    if (square.rank == currentSquare.rank + 1 && square.file == currentSquare.file) {
-//                        if (occupiedSquares[currentSquare]?.piece == "pawn" && occupiedSquares[currentSquare]?.color == "black") {
-//                            if(!kingInCheckIfEnPassant(piece, occupiedSquares, kingSquare, squaresToBlock)){
-//                                return true
-//                            }
-//                        }
-//                    }
-//                }
-//            } else {
-//                if (piece.color == "black") {
-//                    if (previousSquare.rank == 1 && currentSquare.rank == 3) {
-//                        if (square.rank == currentSquare.rank - 1 && square.file == currentSquare.file) {
-//                            if (occupiedSquares[currentSquare]?.piece == "pawn" && occupiedSquares[currentSquare]?.color == "white") {
-//                                if(!kingInCheckIfEnPassant(piece, occupiedSquares, kingSquare, squaresToBlock)){
-//                                    return true
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        return false
-//    }
-//
+class GameLogic() {
+
+    private val kingFound = mutableStateOf(false)
+    private val firstPieceFound = mutableStateOf(false)
+    private val secondPieceFound = mutableStateOf(false)
+    private val pinnedPiece = mutableListOf<ChessPiece>()
+
+    fun addMove(
+        occupiedSquares: MutableMap<Square, ChessPiece>,
+        square: Square,
+        enemyKing: Square,
+        piece: ChessPiece,
+        moves: List<Square>,
+        kingInCheck: MutableState<Boolean>,
+        piecesCheckingKing: MutableList<ChessPiece>,
+        pinnedPieces: MutableList<ChessPiece>
+    ) {
+        piece.pseudoLegalMoves.add(square)
+
+        if (!firstPieceFound.value) {
+            piece.attacks.add(square)
+            if (isLegalMove(square, occupiedSquares, piece, piecesCheckingKing)) {
+                piece.legalMoves.add(square)
+            }
+        }
+
+        if ((firstPieceFound.value && secondPieceFound.value) || kingFound.value) return
+
+        if (occupiedSquares.contains(square)) {
+            if (!firstPieceFound.value) {
+
+                val pieceOnSquare = occupiedSquares[square]
+                if (pieceOnSquare?.color != piece.color && pieceOnSquare?.piece != "king") {
+                    if (pieceOnSquare != null) {
+                        pinnedPiece.add(pieceOnSquare)
+                    }
+                }
+
+                piece.attacks.add(square)
+
+                firstPieceFound.value = true
+
+                if (square == enemyKing) {
+                    piece.xRays.addAll(moves)
+                    kingFound.value = true
+                    kingInCheck.value = true
+                }
+                return
+            }
+
+            if (!secondPieceFound.value) {
+                secondPieceFound.value = true
+                if (square == enemyKing) {
+                    piece.xRays.addAll(moves)
+                    if(pinnedPiece.isNotEmpty()){
+                        pinnedPieces.addAll(pinnedPiece)
+                        pinnedPieces.last().pinnedMoves.add(piece.square)
+                        pinnedPieces.last().pinnedMoves.addAll(moves)
+                    }
+                    kingFound.value = true
+                }
+                return
+            }
+        }
+        return
+    }
+
+    fun isLegalMove(
+        square: Square,
+        occupiedSquares: MutableMap<Square, ChessPiece>,
+        piece: ChessPiece,
+        piecesCheckingKing: MutableList<ChessPiece>,
+    ): Boolean {
+        if (!isOnBoard(square)) return false
+        if (squareContainsFriendlyPiece(square, occupiedSquares, piece)) return false
+
+        if (piece.pinnedMoves.isNotEmpty()) {
+            if (piece.pinnedMoves.contains(square)) return true
+            return false
+        }
+
+        if (piecesCheckingKing.isNotEmpty()) {
+            if (piece.piece == "king") {
+                piecesCheckingKing.forEach {
+                    val checkingPiece = it
+                    if (checkingPiece.piece != "pawn") {
+                        if (checkingPiece.pseudoLegalMoves.contains(square)) {
+                            return false
+                        }
+                    }
+                }
+                return true
+            }
+
+            if(piecesCheckingKing.size > 1) return false
+
+            if (piecesCheckingKing[0].square == square) return true
+
+            if(piecesCheckingKing[0].xRays.contains(square)) return true
+            return false
+        }
+
+        return true
+    }
+
+    fun isOnBoard(square: Square): Boolean {
+        if (square.rank > 7 || square.rank < 0 || square.file > 7 || square.file < 0) return false
+        return true
+    }
+
+    private fun squareContainsFriendlyPiece(
+        square: Square,
+        occupiedSquares: MutableMap<Square, ChessPiece>,
+        piece: ChessPiece
+    ): Boolean {
+        if (occupiedSquares.containsKey(square)) {
+            if (piece.color == occupiedSquares[square]?.color) return true
+        }
+        return false
+    }
+
+    fun clearMoves(piece: ChessPiece) {
+        piece.legalMoves.clear()
+        piece.pseudoLegalMoves.clear()
+        piece.attacks.clear()
+        piece.xRays.clear()
+    }
+
+    fun isEnPassant(
+        previousSquare: Square,
+        currentSquare: Square,
+        square: Square,
+        occupiedSquares: MutableMap<Square, ChessPiece>,
+        piece: ChessPiece,
+        wasPinned: Boolean
+    ): Boolean {
+        if (abs(previousSquare.rank - currentSquare.rank) == 2) {
+            val rank = (previousSquare.rank + currentSquare.rank) / 2
+            if (square == Square(rank, currentSquare.file)) {
+                if (occupiedSquares[currentSquare]?.piece == "pawn" && occupiedSquares[currentSquare]?.color != piece.color) {
+                    if (!wasPinned) {
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
+
     fun canKingSideCastle(
         square: Square,
         occupiedSquares: MutableMap<Square, ChessPiece>,
@@ -208,45 +191,4 @@ class GameLogic {
         }
         return true
     }
-//
-//    fun squareContainsEnemyKing(
-//        hashMap: MutableMap<Square, ChessPiece>,
-//        square: Square,
-//        piece: ChessPiece
-//    ): Boolean {
-//        if (hashMap[square]?.piece == "king" && hashMap[square]?.color != piece.color) {
-//            return true
-//        }
-//        return false
-//    }
-//
-//    fun addXRayMoves(listOfXRays: MutableList<Square>, listOfMoves: MutableList<Square>) {
-//        listOfXRays.addAll(listOfMoves)
-//        listOfMoves.clear()
-//    }
-
-//    private fun kingInCheckIfEnPassant(
-//        pawn: ChessPiece,
-//        hashMap: MutableMap<Square, ChessPiece>,
-//        kingSquare: Square,
-//        squaresToBlock: MutableList<Square>
-//    ): Boolean {
-//        val xRayAttacksIfEnPassant = mutableListOf<Square>()
-//        val hashMapIfEnPassant: MutableMap<Square, ChessPiece> = HashMap()
-//        hashMapIfEnPassant.putAll(hashMap)
-//        hashMapIfEnPassant.remove(pawn.square)
-//        val iterator = hashMap.keys.iterator()
-//        while (iterator.hasNext()) {
-//            val square = iterator.next()
-//            val piece = hashMap[square]
-//            if (piece?.color != pawn.color) {
-//                when (piece?.piece) {
-//                    "queen" -> { xRayAttacksIfEnPassant.addAll(Queen().xRayAttacks(piece, hashMapIfEnPassant, false, squaresToBlock))}
-//                    "rook" -> { xRayAttacksIfEnPassant.addAll(Rook().xRayAttacks(piece, hashMapIfEnPassant, false, squaresToBlock)) }
-//                    "bishop" -> { xRayAttacksIfEnPassant.addAll(Bishop().xRayAttacks(piece, hashMapIfEnPassant, false, squaresToBlock))}
-//                }
-//            }
-//        }
-//        return xRayAttacksIfEnPassant.contains(kingSquare) && xRayAttacksIfEnPassant.contains(pawn.square)
-//    }
 }

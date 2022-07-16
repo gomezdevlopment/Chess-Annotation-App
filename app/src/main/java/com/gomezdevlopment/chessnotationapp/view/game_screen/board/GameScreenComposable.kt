@@ -81,7 +81,8 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                         currentSquare = viewModel.getCurrentSquare().value,
                         previousSquare = viewModel.getPreviousSquare().value,
                         kingSquare = viewModel.kingSquare,
-                        theme = viewModel.pieceTheme
+                        theme = viewModel.pieceTheme,
+                        pieceAnimationSpeed = viewModel.pieceAnimationSpeed
                     )
                     Coordinates(size = maxWidth / 8)
                     ChessUILogic(height = maxWidth / 8, viewModel = viewModel, navController)
@@ -245,7 +246,7 @@ fun ResignAlertDialog(viewModel: GameViewModel) {
     if (viewModel.openResignDialog.value) {
         AlertDialog(
             onDismissRequest = { viewModel.openResignDialog.value = false },
-            title = { Text(text = "Resign?", color = tealDarker, fontWeight = FontWeight.Bold) },
+            title = { Text(text = "Resign?", color = MaterialTheme.colors.primary, fontWeight = FontWeight.Bold) },
             //text = { Text("Hello! This is our Alert Dialog..", color = textWhite) },
             confirmButton = {
                 TextButton(
@@ -254,7 +255,7 @@ fun ResignAlertDialog(viewModel: GameViewModel) {
                         viewModel.openResignDialog.value = false
                     }
                 ) {
-                    Text("Confirm", color = tealDarker)
+                    Text("Confirm", color = MaterialTheme.colors.primary)
                 }
             },
             dismissButton = {
@@ -263,7 +264,7 @@ fun ResignAlertDialog(viewModel: GameViewModel) {
                         viewModel.openResignDialog.value = false
                     }
                 ) {
-                    Text("Cancel", color = tealDarker)
+                    Text("Cancel", color = MaterialTheme.colors.primary)
                 }
             },
             backgroundColor = textWhite,
@@ -280,7 +281,7 @@ fun DrawOfferAlertDialog(viewModel: GameViewModel) {
             title = {
                 Text(
                     text = "Offer Draw?",
-                    color = tealDarker,
+                    color = MaterialTheme.colors.primary,
                     fontWeight = FontWeight.Bold
                 )
             },
@@ -292,7 +293,7 @@ fun DrawOfferAlertDialog(viewModel: GameViewModel) {
                         viewModel.openDrawOfferDialog.value = false
                     }
                 ) {
-                    Text("Confirm", color = tealDarker)
+                    Text("Confirm", color = MaterialTheme.colors.primary)
                 }
             },
             dismissButton = {
@@ -301,7 +302,7 @@ fun DrawOfferAlertDialog(viewModel: GameViewModel) {
                         viewModel.openDrawOfferDialog.value = false
                     }
                 ) {
-                    Text("Cancel", color = tealDarker)
+                    Text("Cancel", color = MaterialTheme.colors.primary)
                 }
             },
             backgroundColor = textWhite,
@@ -318,7 +319,7 @@ fun DrawOfferedAlertDialog(viewModel: GameViewModel) {
             title = {
                 Text(
                     text = "Accept Draw Offer?",
-                    color = tealDarker,
+                    color = MaterialTheme.colors.primary,
                     fontWeight = FontWeight.Bold
                 )
             },
@@ -330,7 +331,7 @@ fun DrawOfferedAlertDialog(viewModel: GameViewModel) {
                         viewModel.openDrawOfferedDialog.value = false
                     }
                 ) {
-                    Text("Accept", color = tealDarker)
+                    Text("Accept", color = MaterialTheme.colors.primary)
                 }
             },
             dismissButton = {
@@ -340,7 +341,7 @@ fun DrawOfferedAlertDialog(viewModel: GameViewModel) {
                         viewModel.openDrawOfferedDialog.value = false
                     }
                 ) {
-                    Text("Decline", color = tealDarker)
+                    Text("Decline", color = MaterialTheme.colors.primary)
                 }
             },
             backgroundColor = textWhite,

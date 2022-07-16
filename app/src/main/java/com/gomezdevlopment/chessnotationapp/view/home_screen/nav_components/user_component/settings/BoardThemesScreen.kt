@@ -27,11 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.ChessBoard
-import com.gomezdevlopment.chessnotationapp.view.theming.teal
-import com.gomezdevlopment.chessnotationapp.view.theming.blueBoardOutlined
-import com.gomezdevlopment.chessnotationapp.view.theming.greyBoard
-import com.gomezdevlopment.chessnotationapp.view.theming.orangeBoard
-import com.gomezdevlopment.chessnotationapp.view.theming.tealBoard
+import com.gomezdevlopment.chessnotationapp.view.theming.*
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -40,7 +36,7 @@ fun BoardThemes(navController: NavController, viewModel: UserViewModel) {
     val boardThemes = listOf(
         "Teal" to tealBoard,
         "Orange" to orangeBoard,
-        "Blue Outlined" to blueBoardOutlined,
+        "Blue" to blueBoard,
         "Grey" to greyBoard
     )
 

@@ -10,6 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
@@ -51,7 +52,7 @@ fun UserScreen(userViewModel: UserViewModel, homeNavController: NavController, u
         when (userViewModel.destination.value) {
             "Games" -> Games(userViewModel, homeNavController, gameViewModel)
             "Friends" -> Friends(userViewModel)
-            "Settings" -> Settings(userNavController)
+            "Settings" -> Settings(userNavController, userViewModel)
         }
     }
 }
@@ -70,7 +71,7 @@ fun User() {
     Row(
         Modifier
             .fillMaxWidth()
-            .background(tealDarker)
+            .background(MaterialTheme.colors.primary)
             .padding(20.dp),
     ) {
         Image(
@@ -80,7 +81,7 @@ fun User() {
             modifier = Modifier
                 .size(64.dp)
                 .clip(CircleShape)
-                .border(2.dp, tealDarker, CircleShape)
+                .border(2.dp, MaterialTheme.colors.primary, CircleShape)
         )
         Column() {
             Text(
@@ -88,12 +89,12 @@ fun User() {
                 Modifier.padding(10.dp, 5.dp),
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
-                color = textWhite
+                color = MaterialTheme.colors.onPrimary
             )
             val wins = user?.wins
             val losses = user?.losses
             val draws = user?.draws
-            Text("$wins Wins/$losses Losses/$draws Draws", Modifier.padding(10.dp, 5.dp), color = textWhite)
+            Text("$wins Wins/$losses Losses/$draws Draws", Modifier.padding(10.dp, 5.dp), color = MaterialTheme.colors.onPrimary)
         }
     }
 }
@@ -107,7 +108,7 @@ fun UserNavbar(userViewModel: UserViewModel) {
     Row(
         verticalAlignment = Alignment.CenterVertically, modifier = Modifier
             .fillMaxWidth()
-            .background(tealDarker)
+            .background(MaterialTheme.colors.primary)
             .padding(0.dp, 10.dp)
     ) {
         UserNavbarItem(
@@ -136,24 +137,24 @@ fun UserNavbarItem(modifier: Modifier,
             .padding(15.dp, 5.dp)
             .fillMaxWidth(),
         onClick = {viewModel.destination.value = text},
-        colors = ButtonDefaults.buttonColors(backgroundColor = if (isSelected) MaterialTheme.colors.surface else tealDarker),
+        colors = ButtonDefaults.buttonColors(backgroundColor = if (isSelected) MaterialTheme.colors.surface else MaterialTheme.colors.primary),
         elevation = ButtonDefaults.elevation(0.dp)
     ) {
         Column() {
             Text(
                 text = text,
                 fontSize = 16.sp,
-                color = if (isSelected) tealDarker else textWhite,
+                color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.onPrimary,
                 modifier = Modifier.padding(0.dp)
             )
         }
     }
 }
 
-private fun Modifier.highlight(isSelected: Boolean) =
+private fun Modifier.highlight(isSelected: Boolean, color: Color) =
     padding(10.dp, 1.dp)
         .background(
-            color = if (isSelected) cardWhite else tealDarker,
+            color = if (isSelected) cardWhite else color,
             shape = RoundedCornerShape(20.dp),
         )
 

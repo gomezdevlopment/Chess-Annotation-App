@@ -2,6 +2,7 @@ package com.gomezdevlopment.chessnotationapp.view.login
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +21,7 @@ fun Loading() {
                 .width(100.dp)
                 .aspectRatio(1f),
             strokeWidth = 5.dp,
-            color = tealDarker
+            color = MaterialTheme.colors.primary
         )
     }
 

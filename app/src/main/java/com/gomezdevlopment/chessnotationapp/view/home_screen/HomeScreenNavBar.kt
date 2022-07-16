@@ -56,7 +56,7 @@ fun RowScope.AddItem(
             if (currentDestination?.route != component.route)
                 navController.navigate(component.route)
         },
-        selectedContentColor = tealDarker,
+        selectedContentColor = MaterialTheme.colors.primary,
         unselectedContentColor = textWhite
     )
 }

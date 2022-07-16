@@ -1,14 +1,11 @@
 package com.gomezdevlopment.chessnotationapp.model.pieces
 
-import androidx.compose.runtime.mutableStateOf
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic
-import com.gomezdevlopment.chessnotationapp.model.game_logic.GameLogic2
 
 class Pawn {
     private val gameLogic = GameLogic()
-    private val gameLogic2 = GameLogic2()
 
     fun moves(
         piece: ChessPiece,
@@ -35,7 +32,7 @@ class Pawn {
             piece.pinnedMoves.clear()
         }
 
-        gameLogic2.clearMoves(piece)
+        gameLogic.clearMoves(piece)
 
         var moveSquare: Square
         if (piece.color == "white") {
@@ -65,7 +62,7 @@ class Pawn {
         }
 
         piece.pseudoLegalMoves.forEach {
-            if (gameLogic2.isLegalMove(
+            if (gameLogic.isLegalMove(
                     it,
                     occupiedSquares,
                     piece,
@@ -95,40 +92,14 @@ class Pawn {
 
         piece.attacks.forEach { move ->
             if (occupiedSquares.containsKey(move)) {
-                if (gameLogic2.isLegalMove(move, occupiedSquares, piece, piecesCheckingKing)) {
+                if (gameLogic.isLegalMove(move, occupiedSquares, piece, piecesCheckingKing)) {
                     piece.legalMoves.add(move)
                 }
             }
-            if (gameLogic2.isEnPassant(previousSquare, currentSquare, move, occupiedSquares, piece, wasPinned)) {
+            if (gameLogic.isEnPassant(previousSquare, currentSquare, move, occupiedSquares, piece, wasPinned)) {
                 piece.legalMoves.add(move)
-                //println("pinned value: $wasPinned")
-                //println(piece)
             }
         }
-//        if(piece.square == (Square(3, 5))){
-//            println("Was Pinned: $wasPinned")
-//            println("Pinned Moves: ${piece.pinnedMoves.size}")
-//            println("Legal Moves: ${piece.legalMoves}")
-//        }
         piece.pinnedMoves.clear()
     }
-
-
-
-//    fun pawnAttacks(piece: ChessPiece): MutableList<Square> {
-//        val attacks = mutableListOf<Square>()
-//        var moveSquare: Square
-//        if (piece.color == "white") {
-//            moveSquare = Square(piece.square.rank + 1, piece.square.file - 1)
-//            attacks.add(moveSquare)
-//            moveSquare = Square(piece.square.rank + 1, piece.square.file + 1)
-//            attacks.add(moveSquare)
-//        } else {
-//            moveSquare = Square(piece.square.rank - 1, piece.square.file - 1)
-//            attacks.add(moveSquare)
-//            moveSquare = Square(piece.square.rank - 1, piece.square.file + 1)
-//            attacks.add(moveSquare)
-//        }
-//        return attacks
-//    }
 }

@@ -110,7 +110,7 @@ fun GameBarItem(
         Icon(
             imageVector = icon,
             contentDescription = contDescr,
-            tint = tealDarker,
+            tint = MaterialTheme.colors.primary,
             modifier = Modifier
                 .height(50.dp)
                 .padding(padding)
