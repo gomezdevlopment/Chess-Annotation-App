@@ -34,6 +34,7 @@ class UserViewModel @Inject constructor(
     val pieceThemeSelection by settings.pieceTheme
     val pieceAnimationSpeed by settings.pieceAnimationSpeed
     val themeSelection by settings.theme
+    val highlightStyle by settings.highlightStyle
 
     fun setChessBoardTheme(boardTheme: Int){
         viewModelScope.launch {
@@ -50,6 +51,12 @@ class UserViewModel @Inject constructor(
     fun setTheme(theme: String){
         viewModelScope.launch {
             settings.setTheme(theme)
+        }
+    }
+
+    fun setHighlightStyle(theme: String){
+        viewModelScope.launch {
+            settings.setHighlightStyle(theme)
         }
     }
 

@@ -86,7 +86,8 @@ fun PuzzleScreen(viewModel: PuzzleViewModel) {
                 previousSquare = viewModel.getPreviousSquare().value,
                 kingSquare = viewModel.kingSquare,
                 theme = viewModel.pieceTheme,
-                pieceAnimationSpeed = 300
+                pieceAnimationSpeed = 300,
+                highlightStyle = viewModel.highlightStyle
             )
             Coordinates(size = maxWidth / 8)
             PuzzleUILogic(height = maxWidth / 8, viewModel = viewModel)

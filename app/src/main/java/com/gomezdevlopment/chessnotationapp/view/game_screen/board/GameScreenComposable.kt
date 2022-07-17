@@ -82,7 +82,8 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                         previousSquare = viewModel.getPreviousSquare().value,
                         kingSquare = viewModel.kingSquare,
                         theme = viewModel.pieceTheme,
-                        pieceAnimationSpeed = viewModel.pieceAnimationSpeed
+                        pieceAnimationSpeed = viewModel.pieceAnimationSpeed,
+                        highlightStyle = viewModel.highlightStyle
                     )
                     Coordinates(size = maxWidth / 8)
                     ChessUILogic(height = maxWidth / 8, viewModel = viewModel, navController)

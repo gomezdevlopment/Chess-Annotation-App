@@ -27,17 +27,20 @@ import javax.inject.Inject
 
 @HiltViewModel
 class UserSettings @Inject constructor(private val context: Application): ViewModel(){
+
     private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
     val BOARD_THEME = intPreferencesKey("board")
     val PIECE_THEME = stringPreferencesKey("pieceTheme")
     val THEME = stringPreferencesKey("theme")
     val PIECE_ANIMATION_SPEED = intPreferencesKey("pieceAnimationSpeed")
+    val HIGHLIGHT_STYLE = stringPreferencesKey("highlightStyle")
     val chessBoardTheme = mutableStateOf(R.drawable.ic_chess_board_teal)
     val pieceTheme = mutableStateOf("Alpha")
     val pieceThemeMap: MutableState<Map<String, Int>> = mutableStateOf(alpha)
     val pieceAnimationSpeed = mutableStateOf(150)
     val theme = mutableStateOf("System")
     val isDarkThemeSelected = mutableStateOf(false)
+    val highlightStyle = mutableStateOf("outline")
 
     private fun setPieceThemeMap(theme: String) {
         when(theme){
@@ -73,6 +76,13 @@ class UserSettings @Inject constructor(private val context: Application): ViewMo
         }
     }
 
+    suspend fun setHighlightStyle(highlightStyle: String){
+        context.dataStore.edit { settings ->
+            settings[HIGHLIGHT_STYLE] = highlightStyle
+            this.highlightStyle.value = highlightStyle
+        }
+    }
+
     suspend fun setPieceAnimationSpeed(speed: Int){
         context.dataStore.edit { settings ->
             settings[PIECE_ANIMATION_SPEED] = speed
@@ -95,6 +105,11 @@ class UserSettings @Inject constructor(private val context: Application): ViewMo
         return preferences[THEME] ?: "System"
     }
 
+    private suspend fun highlightStyle(): String {
+        val preferences = context.dataStore.data.first()
+        return preferences[HIGHLIGHT_STYLE] ?: "Outline"
+    }
+
     private suspend fun pieceAnimationSpeed(): Int {
         val preferences = context.dataStore.data.first()
         return preferences[PIECE_ANIMATION_SPEED] ?: 150
@@ -106,6 +121,7 @@ class UserSettings @Inject constructor(private val context: Application): ViewMo
             pieceTheme.value = pieceTheme()
             pieceAnimationSpeed.value = pieceAnimationSpeed()
             theme.value = theme()
+            highlightStyle.value = highlightStyle()
             isDarkThemeSelected.value = false
             if(theme.value == "Dark"){
                 isDarkThemeSelected.value = true

@@ -28,11 +28,9 @@ fun Settings(userNavController: NavController, userViewModel: UserViewModel) {
         "Slow" to 350,
     )
 
-    val themeOptions = listOf(
-        "Light",
-        "Dark",
-        "System",
-    )
+    val themeOptions = listOf("Light", "Dark", "System",)
+    val highlightStyles = listOf("Outline", "Solid")
+
     Column(Modifier.padding(30.dp)) {
         SettingsItemButton(text = "Board Theme") {
             userNavController.navigate("boardThemes")
@@ -58,6 +56,16 @@ fun Settings(userNavController: NavController, userViewModel: UserViewModel) {
                 }
             }
         }
+        Text("Piece Highlight Styles", modifier = Modifier.padding(10.dp))
+        Row() {
+            highlightStyles.forEach {
+                ChipItem(text = it,
+                    border = BorderStroke(1.dp, if (it == userViewModel.highlightStyle) teal else Color.Transparent)) {
+                    userViewModel.setHighlightStyle(it)
+                }
+            }
+        }
+
     }
 }
 

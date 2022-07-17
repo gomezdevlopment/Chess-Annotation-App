@@ -151,13 +151,6 @@ fun UserNavbarItem(modifier: Modifier,
     }
 }
 
-private fun Modifier.highlight(isSelected: Boolean, color: Color) =
-    padding(10.dp, 1.dp)
-        .background(
-            color = if (isSelected) cardWhite else color,
-            shape = RoundedCornerShape(20.dp),
-        )
-
 //@Composable
 //fun Settings(signOutViewModel: SignOutViewModel, navController: NavController) {
 //    Column(verticalArrangement = Arrangement.Center) {

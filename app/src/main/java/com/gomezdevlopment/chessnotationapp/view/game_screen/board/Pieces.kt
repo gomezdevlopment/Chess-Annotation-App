@@ -107,12 +107,12 @@ import com.gomezdevlopment.chessnotationapp.view.theming.yellow
 
 private fun pieceIcon(piece: ChessPiece, theme: Map<String, Int>): Int? {
     when (piece.piece) {
-        "king" -> return if(piece.color == "white") theme["wk"] else theme["bk"]
-        "queen" -> return if(piece.color == "white") theme["wq"] else theme["bq"]
-        "rook" -> return if(piece.color == "white") theme["wr"] else theme["br"]
-        "bishop" -> return if(piece.color == "white") theme["wb"] else theme["bb"]
-        "knight" -> return if(piece.color == "white") theme["wn"] else theme["bn"]
-        "pawn" -> return if(piece.color == "white") theme["wp"] else theme["bp"]
+        "king" -> return if (piece.color == "white") theme["wk"] else theme["bk"]
+        "queen" -> return if (piece.color == "white") theme["wq"] else theme["bq"]
+        "rook" -> return if (piece.color == "white") theme["wr"] else theme["br"]
+        "bishop" -> return if (piece.color == "white") theme["wb"] else theme["bb"]
+        "knight" -> return if (piece.color == "white") theme["wn"] else theme["bn"]
+        "pawn" -> return if (piece.color == "white") theme["wp"] else theme["bp"]
     }
     return theme["wp"]
 }
@@ -178,7 +178,8 @@ fun Pieces(
     previousSquare: Square,
     kingSquare: MutableState<Square>,
     theme: Map<String, Int>,
-    pieceAnimationSpeed: Int
+    pieceAnimationSpeed: Int,
+    highlightStyle: String,
 ) {
     pieces.forEach() { piece ->
         key(piece) {
@@ -203,28 +204,40 @@ fun Pieces(
         }
     }
     if (previousSquare.rank != 10) {
-        Outline(height = height, square = previousSquare, color = yellow)
-        //Highlight(height = height, square = previousSquare, color = yellow, .9f)
+        if (highlightStyle == "Outline") {
+            Outline(height = height, square = previousSquare, color = yellow)
+        } else {
+            Highlight(height = height, square = previousSquare, color = yellow, .9f)
+        }
     }
 
     if (currentSquare.rank != 10) {
-        Outline(height = height, square = currentSquare, color = yellow)
-        //Highlight(height = height, square = currentSquare, yellow, .9f)
+        if (highlightStyle == "Outline") {
+            Outline(height = height, square = currentSquare, color = yellow)
+        } else {
+            Highlight(height = height, square = currentSquare, yellow, .9f)
+        }
     }
 
     if (pieceClicked.value && selectedPiece.value.color == userColor) {
-        Outline(height = height, square = selectedPiece.value.square, color = blue)
-//        Highlight(
-//            height = height,
-//            square = selectedPiece.value.square,
-//            color = blue,
-//            transparency = 1f
-//        )
+        if (highlightStyle == "Outline") {
+            Outline(height = height, square = selectedPiece.value.square, color = blue)
+        } else {
+            Highlight(
+                height = height,
+                square = selectedPiece.value.square,
+                color = blue,
+                transparency = 1f
+            )
+        }
     }
 
     if (kingInCheck) {
-        Outline(height = height, square = kingSquare.value, color = redIncorrect)
-        //Highlight(height = height, square = kingSquare.value, orange, 1f)
+        if(highlightStyle == "outline"){
+            Outline(height = height, square = kingSquare.value, color = redIncorrect)
+        }else{
+            Highlight(height = height, square = kingSquare.value, redIncorrect, 1f)
+        }
     }
 
 }

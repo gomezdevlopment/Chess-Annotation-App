@@ -72,6 +72,7 @@ class GameViewModel @Inject constructor(
     val chessBoardTheme by settings.chessBoardTheme
     val pieceTheme by settings.pieceThemeMap
     val pieceAnimationSpeed by settings.pieceAnimationSpeed
+    val highlightStyle by settings.highlightStyle
 
     fun createNewGame(time: Long, isOnline: Boolean) {
         viewModelScope.launch {

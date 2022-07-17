@@ -30,6 +30,7 @@ class PuzzleViewModel @Inject constructor(
     private val settings: UserSettings
 ) : ViewModel() {
 
+
     val correct = puzzleRepository.correct
     val endOfPuzzle = puzzleRepository.endOfPuzzle
     val puzzleRating: MutableState<String> = mutableStateOf("")
@@ -61,6 +62,7 @@ class PuzzleViewModel @Inject constructor(
 
     val chessBoardTheme by settings.chessBoardTheme
     val pieceTheme by settings.pieceThemeMap
+    val highlightStyle by settings.highlightStyle
 
     fun setPuzzle() {
         if(puzzleIndex <= puzzles.lastIndex){
