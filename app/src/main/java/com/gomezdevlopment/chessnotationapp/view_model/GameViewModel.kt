@@ -112,25 +112,24 @@ class GameViewModel @Inject constructor(
         return pieceClicked
     }
 
+    fun pieceIsClickable(): Boolean{
+        return (currentPosition.value && !endOfGame.value && !isPromotionDialogShowing().value)
+    }
+
     fun selectPiece(piece: ChessPiece) {
         if (currentPosition.value && !endOfGame.value) {
             if (!isPromotionDialogShowing().value) {
                 setPieceClickedState(false)
                 selectedPiece.value = piece
                 if (getPlayerTurn() == getSelectedPiece().value.color) {
-                    println("Xrays ${piece.xRays}")
-                    println("Attacks ${piece.attacks}")
-                    println("legal moves ${piece.legalMoves}")
-                    println("pinned moves ${piece.pinnedMoves}")
-                    println("pinned pseudo ${piece.pseudoLegalMoves}")
-                    //setPieceClickedState(true)
-                    if (isOnline.value) {
-                        if (getPlayerTurn() == userColor) {
-                            setPieceClickedState(true)
-                        }
-                    } else {
-                        setPieceClickedState(true)
-                    }
+                    setPieceClickedState(true)
+//                    if (isOnline.value) {
+//                        if (getPlayerTurn() == userColor) {
+//                            setPieceClickedState(true)
+//                        }
+//                    } else {
+//                        setPieceClickedState(true)
+//                    }
                 }
             }
         }

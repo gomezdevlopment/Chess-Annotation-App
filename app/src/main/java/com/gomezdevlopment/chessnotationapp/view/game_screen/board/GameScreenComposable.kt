@@ -158,7 +158,6 @@ fun WhiteClock(viewModel: GameViewModel, size: Dp, arrangement: Arrangement.Hori
 fun ChessBoard(chessBoardVector: ImageVector, modifier: Modifier) {
     Image(
         imageVector = chessBoardVector,
-        //imageVector = chessBoardVector,
         contentDescription = "Chess Board",
         modifier = modifier
     )
@@ -197,7 +196,7 @@ fun ChessUILogic(height: Dp, viewModel: GameViewModel, navController: NavControl
 //        Outline(height = height, square = attack, color = Color.Blue)
 //    }
 
-    if (showMoves) {
+    if (showMoves && viewModel.pieceIsClickable()) {
         val legalMoves = viewModel.onEvent(GameEvent.OnPieceClicked, clickedPiece.value)
         for (move in legalMoves) {
             if (hashMap.containsKey(move)) {

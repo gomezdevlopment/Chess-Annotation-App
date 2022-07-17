@@ -74,11 +74,12 @@ fun VSPlayerCard(navController: NavController, viewModel: GameViewModel) {
                     .width(maxWidth * 0.9f)
                     .wrapContentHeight()
                     .clickable {
-                        MainActivity.userColor = "white"
+                        MainActivity.userColor = "both"
                         viewModel.isOnline.value = false
+                        viewModel.createNewGame(3600000, false)
                         navController.navigate("game")
                     },
-                backgroundColor = MaterialTheme.colors.primary,
+                backgroundColor = MaterialTheme.colors.surface,
                 shape = RoundedCornerShape(3.dp),
                 elevation = 3.dp,
             )
@@ -92,10 +93,9 @@ fun VSPlayerCard(navController: NavController, viewModel: GameViewModel) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            "Play Now",
+                            "Play Local Game",
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.h4,
-                            color = textWhite,
                             modifier = Modifier.padding(20.dp)
                         )
                     }
@@ -109,20 +109,21 @@ fun VSPlayerCard(navController: NavController, viewModel: GameViewModel) {
                             imageVector = userIcon, contentDescription = "Play Game",
                             Modifier
                                 .size(50.dp)
-                                .padding(10.dp), tint = textWhite
+                                .padding(10.dp),
+                            tint = MaterialTheme.colors.primary
                         )
                         Text(
                             "vs",
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.h4,
-                            color = textWhite,
                             modifier = Modifier.padding(20.dp)
                         )
                         Icon(
                             imageVector = userIcon, contentDescription = "Play Game",
                             Modifier
                                 .size(50.dp)
-                                .padding(10.dp), tint = textWhite
+                                .padding(10.dp),
+                            tint = MaterialTheme.colors.primary
                         )
                     }
                 }

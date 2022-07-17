@@ -219,7 +219,7 @@ fun Pieces(
         }
     }
 
-    if (pieceClicked.value && selectedPiece.value.color == userColor) {
+    if (pieceClicked.value && selectedPiece.value.color == userColor || userColor == "both") {
         if (highlightStyle == "Outline") {
             Outline(height = height, square = selectedPiece.value.square, color = blue)
         } else {

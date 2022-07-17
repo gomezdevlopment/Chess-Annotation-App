@@ -516,15 +516,15 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
         if (piece.color == "white") {
             if (piece.piece == "king") {
                 whiteKingSquare.value = newSquare
-                kingSquare.value = whiteKingSquare.value
             }
             playerTurn.value = "black"
+            kingSquare.value = blackKingSquare.value
         } else {
             if (piece.piece == "king") {
                 blackKingSquare.value = newSquare
-                kingSquare.value = blackKingSquare.value
             }
             playerTurn.value = "white"
+            kingSquare.value = whiteKingSquare.value
         }
         previousGameStates.add(
             GameState(
@@ -556,6 +556,7 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
             selectedNotationIndex.value += 1
         }
         startStopClocks()
+        println(kingSquare.value)
     }
 
     fun makeMove(pieceCopy: ChessPiece, newSquare: Square, depth: Int, promotion: String) {

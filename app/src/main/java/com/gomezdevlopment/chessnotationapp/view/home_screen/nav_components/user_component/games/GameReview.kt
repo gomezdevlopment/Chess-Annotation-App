@@ -63,7 +63,6 @@ fun GameReview(viewModel: GameViewModel, navController: NavController){
                         highlightStyle = viewModel.highlightStyle
                     )
                     Coordinates(size = maxWidth / 8)
-                    //ChessUILogic(height = maxWidth / 8, viewModel = viewModel, navController)
                 }
             }
             BoxWithConstraints(Modifier.fillMaxWidth()) {
