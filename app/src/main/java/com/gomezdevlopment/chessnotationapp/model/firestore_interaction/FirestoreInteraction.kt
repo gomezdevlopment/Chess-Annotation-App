@@ -38,11 +38,7 @@ class FirestoreInteraction @Inject constructor(private val db: FirebaseFirestore
                     ?.addOnFailureListener { e ->
                         println(e)
                     }
-            } else {
-                println("not your turn ${MainActivity.userColor}")
             }
-        } else {
-            println("document null")
         }
     }
 
@@ -164,7 +160,6 @@ class FirestoreInteraction @Inject constructor(private val db: FirebaseFirestore
                 .get()
                 .addOnSuccessListener { query ->
                     if(!query.isEmpty){
-                        println("success")
                         query.forEach() { document ->
                             val docRef = db.collection("friends").document(document.id)
                             docRef.addSnapshotListener { value, error ->

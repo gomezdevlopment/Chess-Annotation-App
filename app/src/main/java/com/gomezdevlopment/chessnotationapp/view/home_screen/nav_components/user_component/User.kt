@@ -74,15 +74,6 @@ fun User() {
             .background(MaterialTheme.colors.primary)
             .padding(20.dp),
     ) {
-        Image(
-            imageVector = ImageVector.vectorResource(id = R.drawable.ic_user_icon),
-            contentDescription = "User Picture",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(64.dp)
-                .clip(CircleShape)
-                .border(2.dp, MaterialTheme.colors.primary, CircleShape)
-        )
         Column() {
             Text(
                 user?.username ?: "Username",

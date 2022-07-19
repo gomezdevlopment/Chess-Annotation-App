@@ -58,8 +58,7 @@ fun GameBar(viewModel: GameViewModel) {
 
 @Composable
 fun ReviewGameBar(viewModel: GameViewModel, navController: NavController) {
-    Row(Modifier.wrapContentHeight(), verticalAlignment = Alignment.Bottom) {
-
+    Row(Modifier.height(60.dp), verticalAlignment = Alignment.Bottom) {
         GameBarItem(
             modifier = Modifier.weight(1f),
             drawableResource = R.drawable.ic_home,
@@ -67,7 +66,36 @@ fun ReviewGameBar(viewModel: GameViewModel, navController: NavController) {
             padding = 10.dp
         ) {
             navController.popBackStack()
-            //navController.navigate("home")
+        }
+        GameBarItem(
+            modifier = Modifier.weight(1f),
+            drawableResource = R.drawable.ic_round_arrow_left,
+            contDescr = "Previous Move",
+            padding = 10.dp
+        ) {
+            viewModel.previousNotation()
+        }
+        GameBarItem(
+            modifier = Modifier.weight(1f),
+            drawableResource = R.drawable.ic_round_arrow_right,
+            contDescr = "Next Move",
+            padding = 10.dp
+        ) {
+            viewModel.nextNotation()
+        }
+    }
+}
+
+@Composable
+fun LocalGameBar(viewModel: GameViewModel, navController: NavController) {
+    Row(Modifier.height(60.dp), verticalAlignment = Alignment.Bottom) {
+        GameBarItem(
+            modifier = Modifier.weight(1f),
+            drawableResource = R.drawable.ic_home,
+            contDescr = "Go Home",
+            padding = 10.dp
+        ) {
+            navController.popBackStack()
         }
         GameBarItem(
             modifier = Modifier.weight(1f),

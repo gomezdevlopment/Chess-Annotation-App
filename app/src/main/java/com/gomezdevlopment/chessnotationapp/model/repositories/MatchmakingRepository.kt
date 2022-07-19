@@ -139,4 +139,9 @@ class MatchmakingRepository @Inject constructor(private val db: FirebaseFirestor
         navDestination.value = "home"
         resetSearch.value += 1
     }
+
+    override fun onCleared() {
+        cancelSearch()
+        super.onCleared()
+    }
 }

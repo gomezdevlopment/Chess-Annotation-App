@@ -219,7 +219,7 @@ fun Pieces(
         }
     }
 
-    if (pieceClicked.value && selectedPiece.value.color == userColor || userColor == "both") {
+    if (pieceClicked.value && (selectedPiece.value.color == userColor || userColor == "both")) {
         if (highlightStyle == "Outline") {
             Outline(height = height, square = selectedPiece.value.square, color = blue)
         } else {
@@ -233,7 +233,7 @@ fun Pieces(
     }
 
     if (kingInCheck) {
-        if(highlightStyle == "outline"){
+        if(highlightStyle == "Outline"){
             Outline(height = height, square = kingSquare.value, color = redIncorrect)
         }else{
             Highlight(height = height, square = kingSquare.value, redIncorrect, 1f)

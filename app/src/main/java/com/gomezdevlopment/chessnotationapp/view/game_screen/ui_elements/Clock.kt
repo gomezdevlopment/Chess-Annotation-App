@@ -59,7 +59,7 @@ fun CountDownIndicator(
             Column(modifier = Modifier.align(Alignment.Center)) {
                 Text(
                     text = time,
-                    color = Color.Black,
+                    color = MaterialTheme.colors.onBackground,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     fontWeight = FontWeight.Bold,
                     fontSize = 12.sp

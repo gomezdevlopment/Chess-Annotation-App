@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.games
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -17,11 +18,11 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun GameReview(viewModel: GameViewModel, navController: NavController){
-    rememberSystemUiController().setStatusBarColor(MaterialTheme.colors.background)
+//    rememberSystemUiController().setStatusBarColor(MaterialTheme.colors.background)
     val chessBoardVector: ImageVector =
         ImageVector.vectorResource(id = viewModel.chessBoardTheme)
 
-    Column(Modifier.fillMaxHeight()) {
+    Column(Modifier.fillMaxHeight().background(MaterialTheme.colors.background),) {
         Row(verticalAlignment = Alignment.Top) {
             AnnotationBar(viewModel)
         }
@@ -30,12 +31,12 @@ fun GameReview(viewModel: GameViewModel, navController: NavController){
                 when (MainActivity.userColor) {
                     "white" -> {
                         Column() {
-                            BlackCaptures(viewModel)
+                            BlackCaptures(viewModel, Arrangement.End)
                         }
                     }
                     "black" -> {
                         Column() {
-                            WhiteCaptures(viewModel)
+                            WhiteCaptures(viewModel, Arrangement.End)
                         }
                     }
                 }
@@ -69,12 +70,12 @@ fun GameReview(viewModel: GameViewModel, navController: NavController){
                 when (MainActivity.userColor) {
                     "white" -> {
                         Column() {
-                            WhiteCaptures(viewModel)
+                            WhiteCaptures(viewModel, Arrangement.Start)
                         }
                     }
                     "black" -> {
                         Column() {
-                            BlackCaptures(viewModel)
+                            BlackCaptures(viewModel, Arrangement.Start)
                         }
                     }
                 }

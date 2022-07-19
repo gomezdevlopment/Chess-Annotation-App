@@ -43,7 +43,6 @@ fun FriendsCard(username: String, status: String, onClick: () -> Unit) {
             .padding(20.dp, 5.dp)
             .clickable {
                 onClick()
-                println(status)
             }) {
         Row() {
             Text(username)

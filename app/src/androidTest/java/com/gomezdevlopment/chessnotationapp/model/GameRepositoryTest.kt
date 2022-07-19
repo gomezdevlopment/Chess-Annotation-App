@@ -8,16 +8,13 @@ import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPieces
 import com.gomezdevlopment.chessnotationapp.model.repositories.GameRepository
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
-class GameRepositoryTest {
-    private val gameRepository: GameRepository = GameRepository()
-
+class GameRepositoryTest @Inject constructor(val gameRepository: GameRepository) {
     private fun analyzePositions(depth: Int): Int {
         gameRepository.checkAllLegalMoves()
         val legalMoves = gameRepository.allLegalMoves.toList()
-        //println(legalMoves)
-        //println("Legal Move Count: ${legalMoves.size}")
         var numberOfMoves = 0
         val pieces = gameRepository.piecesOnBoard.toList()
         val playerTurn = gameRepository.playerTurn.value

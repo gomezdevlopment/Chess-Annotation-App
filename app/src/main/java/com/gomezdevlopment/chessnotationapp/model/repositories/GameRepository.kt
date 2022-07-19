@@ -13,8 +13,10 @@ import com.gomezdevlopment.chessnotationapp.model.pieces.*
 import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.gameDocumentReference
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.formatTime
+import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel.Companion.userGames
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -205,18 +207,21 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
     private fun writeWinToFirestore(result: String){
         firestore.incrementWins()
         val game = createMapOfGame(result)
+        userGames.add(0, game)
         firestore.writeGame(game)
     }
 
     private fun writeLossToFirestore(result: String){
         firestore.incrementLosses()
         val game = createMapOfGame(result)
+        userGames.add(0, game)
         firestore.writeGame(game)
     }
 
     private fun writeDrawToFirestore(result: String){
         firestore.incrementDraws()
         val game = createMapOfGame(result)
+        userGames.add(0, game)
         firestore.writeGame(game)
     }
 
@@ -556,7 +561,6 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
             selectedNotationIndex.value += 1
         }
         startStopClocks()
-        println(kingSquare.value)
     }
 
     fun makeMove(pieceCopy: ChessPiece, newSquare: Square, depth: Int, promotion: String) {

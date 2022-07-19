@@ -1,11 +1,9 @@
 package com.gomezdevlopment.chessnotationapp.view_model
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
@@ -26,7 +24,7 @@ class UserViewModel @Inject constructor(
     private val settings: UserSettings
 ) : ViewModel() {
     var destination = mutableStateOf("Games")
-    var userGames = mutableListOf<Map<String, String>>()
+
     var color = "white"
     val friendsList = mutableListOf<String>()
     val search = mutableStateOf("")
@@ -35,6 +33,11 @@ class UserViewModel @Inject constructor(
     val pieceAnimationSpeed by settings.pieceAnimationSpeed
     val themeSelection by settings.theme
     val highlightStyle by settings.highlightStyle
+    var initialized by mutableStateOf(false)
+
+    companion object{
+        var userGames = mutableListOf<Map<String, String>>()
+    }
 
     fun setChessBoardTheme(boardTheme: Int){
         viewModelScope.launch {
@@ -67,6 +70,7 @@ class UserViewModel @Inject constructor(
     }
 
     fun initializeGamesList() {
+        initialized = true
         if (userGames.isEmpty()) {
             MainActivity.user?.games?.forEachIndexed() { index, game ->
                 userGames.add(index, game)
@@ -79,68 +83,6 @@ class UserViewModel @Inject constructor(
         userRepository.firestore.friendRequestListener(this)
     }
 
-    fun parseFEN(
-        fen: String,
-    ): MutableList<ChessPiece> {
-        val pieces = mutableListOf<ChessPiece>()
-        val splitFen = fen.split(" ")
-        val piecePositions = splitFen[0].split("/")
-        var rank = 8
-        val chessPieces = ChessPieces()
-        for (string in piecePositions) {
-            rank--
-            var file = 0
-            for (char in string) {
-                if (char.isDigit()) {
-                    file += char.digitToInt()
-                } else {
-                    var newPiece = chessPieces.blackRook(rank, file)
-                    when (char) {
-                        'r' -> {
-                            newPiece = chessPieces.blackRook(rank, file)
-                        }
-                        'n' -> {
-                            newPiece = chessPieces.blackKnight(rank, file)
-                        }
-                        'b' -> {
-                            newPiece = chessPieces.blackBishop(rank, file)
-                        }
-                        'q' -> {
-                            newPiece = chessPieces.blackQueen(rank, file)
-                        }
-                        'k' -> {
-                            newPiece = chessPieces.blackKing(rank, file)
-                        }
-                        'p' -> {
-                            newPiece = chessPieces.blackPawn(rank, file)
-                        }
-                        'R' -> {
-                            newPiece = chessPieces.whiteRook(rank, file)
-                        }
-                        'N' -> {
-                            newPiece = chessPieces.whiteKnight(rank, file)
-                        }
-                        'B' -> {
-                            newPiece = chessPieces.whiteBishop(rank, file)
-                        }
-                        'Q' -> {
-                            newPiece = chessPieces.whiteQueen(rank, file)
-                        }
-                        'K' -> {
-                            newPiece = chessPieces.whiteKing(rank, file)
-                        }
-                        'P' -> {
-                            newPiece = chessPieces.whitePawn(rank, file)
-                        }
-                    }
-                    pieces.add(newPiece)
-                    file++
-                }
-            }
-        }
-        return pieces
-    }
-
     fun onSearchChanged(newValue: String) {
         search.value = newValue
     }
@@ -149,5 +91,15 @@ class UserViewModel @Inject constructor(
         viewModelScope.launch {
             userRepository.firestore.sendFriendRequest(friend)
         }
+    }
+
+    fun parseFEN(
+        fen: String,
+    ): MutableList<ChessPiece> {
+        return userRepository.parseFEN(fen)
+    }
+
+    fun goToGameReview(gameViewModel: GameViewModel, game: Map<String, String>, homeNavController: NavController){
+        userRepository.goToGameReview(gameViewModel, game, homeNavController)
     }
 }

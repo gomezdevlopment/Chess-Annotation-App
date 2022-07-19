@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -18,13 +19,13 @@ import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 
 @Composable
-fun WhiteCaptures(pieces: List<ChessPiece>) {
+fun WhiteCaptures(pieces: List<ChessPiece>, arrangement: Arrangement.Horizontal) {
     LazyRow(
         Modifier
             .fillMaxWidth()
             .height(30.dp)
             .padding(10.dp, 0.dp),
-        horizontalArrangement = Arrangement.Start,
+        horizontalArrangement = arrangement,
         verticalAlignment = Alignment.CenterVertically
     ) {
         var pieceValue = 0
@@ -38,20 +39,20 @@ fun WhiteCaptures(pieces: List<ChessPiece>) {
         }
         item {
             if (pieceValue > 0) {
-                Text(text = "+$pieceValue", fontSize = 10.sp)
+                Text(text = "+$pieceValue", fontSize = 10.sp, color = MaterialTheme.colors.onBackground)
             }
         }
     }
 }
 
 @Composable
-fun BlackCaptures(pieces: List<ChessPiece>) {
+fun BlackCaptures(pieces: List<ChessPiece>, arrangement: Arrangement.Horizontal) {
     LazyRow(
         Modifier
             .fillMaxWidth()
             .height(30.dp)
             .padding(10.dp, 0.dp),
-        horizontalArrangement = Arrangement.End,
+        horizontalArrangement = arrangement,
         verticalAlignment = Alignment.CenterVertically
     ) {
         var pieceValue = 0
@@ -65,7 +66,7 @@ fun BlackCaptures(pieces: List<ChessPiece>) {
         }
         item {
             if (pieceValue > 0) {
-                Text(text = "+$pieceValue", fontSize = 10.sp)
+                Text(text = "+$pieceValue", fontSize = 10.sp, color = MaterialTheme.colors.onBackground)
             }
         }
     }
@@ -85,17 +86,17 @@ fun PieceIcon(piece: ChessPiece) {
 }
 
 @Composable
-fun WhiteCaptures(viewModel: GameViewModel){
+fun WhiteCaptures(viewModel: GameViewModel, arrangement: Arrangement.Horizontal){
     val capturedPieces = remember {
         viewModel.capturedPieces
     }
-    WhiteCaptures(pieces = capturedPieces)
+    WhiteCaptures(pieces = capturedPieces, arrangement)
 }
 
 @Composable
-fun BlackCaptures(viewModel: GameViewModel){
+fun BlackCaptures(viewModel: GameViewModel, arrangement: Arrangement.Horizontal){
     val capturedPieces = remember {
         viewModel.capturedPieces
     }
-    BlackCaptures(pieces = capturedPieces)
+    BlackCaptures(pieces = capturedPieces, arrangement)
 }

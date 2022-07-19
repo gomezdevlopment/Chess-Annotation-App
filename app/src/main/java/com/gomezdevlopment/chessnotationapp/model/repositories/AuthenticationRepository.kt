@@ -32,11 +32,9 @@ class AuthenticationRepository @Inject constructor(private val db: FirebaseFires
 
     fun checkIfUserIsSignedIn() {
         if (firebaseAuth.currentUser != null) {
-            println("current user not null")
             getUserDocument()
             userMutableLiveData.postValue(firebaseAuth.currentUser)
         }else{
-            println("current user null")
             userMutableLiveData.postValue(null)
         }
 
@@ -48,10 +46,8 @@ class AuthenticationRepository @Inject constructor(private val db: FirebaseFires
             .get()
             .addOnSuccessListener {
                 if (it.isEmpty) {
-                    println("sign out")
                     signOut()
                 } else {
-                    println("sign in")
                     val docRef = db.collection("users").document(it.documents[0].id)
                     userDocumentReference = docRef
                     val userDocumentToObject = it.documents[0].toObject(User::class.java)

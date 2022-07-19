@@ -24,8 +24,6 @@ class GameViewModel @Inject constructor(
     private val gameRepository: GameRepository,
     private val settings: UserSettings
 ) : AndroidViewModel(app) {
-
-    //private var gameRepository: GameRepository = GameRepository() //GameRepository.getGameRepository()
     private var hashMap: MutableMap<Square, ChessPiece> = gameRepository.occupiedSquares
     private var previousSquare: MutableState<Square> = gameRepository.previousSquare
     private var selectedPiece: MutableState<ChessPiece> =
@@ -43,10 +41,10 @@ class GameViewModel @Inject constructor(
                 mutableListOf()
             )
         )
-    private var pieceClicked: MutableState<Boolean> = mutableStateOf(false)
-    private var promotionDialogShowing: MutableState<Boolean> = mutableStateOf(false)
-    var selectedNotationIndex: MutableState<Int> = gameRepository.selectedNotationIndex
-    private var currentPosition: MutableState<Boolean> = mutableStateOf(true)
+    private val pieceClicked: MutableState<Boolean> = mutableStateOf(false)
+    private val promotionDialogShowing: MutableState<Boolean> = mutableStateOf(false)
+    val selectedNotationIndex: MutableState<Int> = gameRepository.selectedNotationIndex
+    private val currentPosition: MutableState<Boolean> = mutableStateOf(true)
     val cardVisible = gameRepository.endOfGameCardVisible
     val endOfGame = gameRepository.endOfGame
     val endOfGameResult = gameRepository.endOfGameResult
@@ -57,8 +55,8 @@ class GameViewModel @Inject constructor(
     val openDrawOfferDialog = mutableStateOf(false)
     val openDrawOfferedDialog = gameRepository.openDrawOfferedDialog
     val isOnline = mutableStateOf(true)
-    var whiteTimer = gameRepository.whiteTimer
-    var blackTimer = gameRepository.blackTimer
+    val whiteTimer = gameRepository.whiteTimer
+    val blackTimer = gameRepository.blackTimer
     val whiteTime: StateFlow<String> = gameRepository.whiteTime
     val whiteProgress: StateFlow<Float> = gameRepository.whiteProgress
     val blackTime: StateFlow<String> = gameRepository.blackTime
@@ -75,6 +73,12 @@ class GameViewModel @Inject constructor(
     val highlightStyle by settings.highlightStyle
 
     fun createNewGame(time: Long, isOnline: Boolean) {
+        pieceClicked.value = false
+        promotionDialogShowing.value = false
+        //selectedNotationIndex = gameRepository.selectedNotationIndex
+        currentPosition.value = true
+        openResignDialog.value = false
+        openDrawOfferDialog.value = false
         viewModelScope.launch {
             gameRepository.resetGame(time, isOnline)
         }
@@ -112,7 +116,7 @@ class GameViewModel @Inject constructor(
         return pieceClicked
     }
 
-    fun pieceIsClickable(): Boolean{
+    fun pieceIsClickable(): Boolean {
         return (currentPosition.value && !endOfGame.value && !isPromotionDialogShowing().value)
     }
 
@@ -191,10 +195,6 @@ class GameViewModel @Inject constructor(
     fun getPlayerTurn(): String {
         return gameRepository.playerTurn.value
     }
-
-//    fun kingSquare(): MutableState<Square> {
-//        return gameRepository.kingSquare()
-//    }
 
     fun kingInCheck(): Boolean {
         return gameRepository.kingInCheck.value

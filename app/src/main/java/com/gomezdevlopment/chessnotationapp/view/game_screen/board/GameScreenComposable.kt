@@ -19,6 +19,7 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.model.GameEvent
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
@@ -36,7 +37,10 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     ResignAlertDialog(viewModel = viewModel)
     DrawOfferAlertDialog(viewModel = viewModel)
     DrawOfferedAlertDialog(viewModel = viewModel)
-    Column(Modifier.fillMaxHeight().background(MaterialTheme.colors.background)) {
+    Column(
+        Modifier
+            .fillMaxHeight()
+            .background(MaterialTheme.colors.background)) {
         Row(verticalAlignment = Alignment.Top) {
             AnnotationBar(viewModel)
         }
@@ -49,7 +53,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                             BlackClock(viewModel = viewModel, size = size, Arrangement.Start)
                         }
                         Column() {
-                            BlackCaptures(viewModel)
+                            BlackCaptures(viewModel, Arrangement.End)
                         }
                     }
                     "black" -> {
@@ -57,7 +61,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                             WhiteClock(viewModel = viewModel, size = size, Arrangement.Start)
                         }
                         Column() {
-                            WhiteCaptures(viewModel)
+                            WhiteCaptures(viewModel, Arrangement.End)
                         }
                     }
                 }
@@ -69,7 +73,10 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                         .fillMaxWidth()
                         .aspectRatio(1f),
                 ) {
-                    ChessBoard(chessBoardVector = chessBoardVector, modifier = Modifier.chessBoardFullScreen())
+                    ChessBoard(
+                        chessBoardVector = chessBoardVector,
+                        modifier = Modifier.chessBoardFullScreen()
+                    )
                     Pieces(
                         height = maxWidth / 8,
                         pieces = viewModel.piecesOnBoard,
@@ -97,7 +104,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                             WhiteClock(viewModel = viewModel, size = size, Arrangement.End)
                         }
                         Column() {
-                            WhiteCaptures(viewModel)
+                            WhiteCaptures(viewModel, Arrangement.Start)
                         }
                     }
                     "black" -> {
@@ -105,7 +112,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                             BlackClock(viewModel = viewModel, size = size, Arrangement.End)
                         }
                         Column() {
-                            BlackCaptures(viewModel)
+                            BlackCaptures(viewModel, Arrangement.Start)
                         }
                     }
                 }
@@ -113,7 +120,11 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
         }
 
         Row(verticalAlignment = Alignment.Bottom) {
-            GameBar(viewModel = viewModel)
+            if (userColor == "both") {
+                LocalGameBar(viewModel = viewModel, navController = navController)
+            }else{
+                GameBar(viewModel = viewModel)
+            }
         }
     }
 }
@@ -246,7 +257,13 @@ fun ResignAlertDialog(viewModel: GameViewModel) {
     if (viewModel.openResignDialog.value) {
         AlertDialog(
             onDismissRequest = { viewModel.openResignDialog.value = false },
-            title = { Text(text = "Resign?", color = MaterialTheme.colors.primary, fontWeight = FontWeight.Bold) },
+            title = {
+                Text(
+                    text = "Resign?",
+                    color = MaterialTheme.colors.primary,
+                    fontWeight = FontWeight.Bold
+                )
+            },
             //text = { Text("Hello! This is our Alert Dialog..", color = textWhite) },
             confirmButton = {
                 TextButton(
