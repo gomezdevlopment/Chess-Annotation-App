@@ -93,11 +93,6 @@ class PuzzleViewModel @Inject constructor(
     private fun makeFirstMove(){
         puzzleRepository.makeComputerMove(correctMoveOrder[moveIndex])
         puzzleRepository.setCorrectMove(correctMoveOrder[moveIndex])
-//        CoroutineScope(Dispatchers.IO).launch {
-//            delay(1000)
-//
-//        }
-
     }
 
     fun getPlayerTurn(): String = puzzleRepository.playerTurn.value
@@ -113,43 +108,23 @@ class PuzzleViewModel @Inject constructor(
 
         if(moveIndex >= correctMoveOrder.lastIndex || !correct.value){
             puzzleRepository.endOfPuzzle.value = true
-            puzzleRepository.updatePlayerRating(currentPuzzle.rating.toFloat())
         }else{
-//            CoroutineScope(Dispatchers.IO).launch {
-//                delay(500)
-//                viewModelScope.launch {
-//                    puzzleRepository.makeComputerMove(correctMoveOrder[moveIndex])
-//                }
-//            }
             CoroutineScope(Dispatchers.IO).launch {
-                delay(500)
+                delay(700)
                 puzzleRepository.makeComputerMove(correctMoveOrder[moveIndex])
+                puzzleRepository.setCorrectMove(correctMoveOrder[moveIndex])
             }
-
         }
     }
 
-//    init {
-//        CoroutineScope(Dispatchers.IO).launch {
-//            val userPuzzleRating = MainActivity.user?.puzzleRating
-//            if(userPuzzleRating != null){
-//                puzzleRepository.playerRating.value = userPuzzleRating
-//            }
-//            puzzles = roomRepository.getPuzzles(puzzleRepository.playerRating.value).shuffled()
-//            if(puzzles.isNotEmpty()){
-//                println(puzzles)
-//                setPuzzle()
-//            }
-//        }
-//    }
 
-    fun initializePuzzles(){
+    fun initializePuzzles(difficultyLevel: Int){
         CoroutineScope(Dispatchers.IO).launch {
-            val userPuzzleRating = MainActivity.user?.puzzleRating
-            if(userPuzzleRating != null){
-                puzzleRepository.playerRating.value = userPuzzleRating
+            when(difficultyLevel){
+                1 -> puzzles = roomRepository.getBeginnerPuzzles().shuffled()
+                2 -> puzzles = roomRepository.getIntermediatePuzzles().shuffled()
+                3 -> puzzles = roomRepository.getAdvancedPuzzles().shuffled()
             }
-            puzzles = roomRepository.getPuzzles(puzzleRepository.playerRating.value).shuffled()
             if(puzzles.isNotEmpty()){
                 setPuzzle()
             }

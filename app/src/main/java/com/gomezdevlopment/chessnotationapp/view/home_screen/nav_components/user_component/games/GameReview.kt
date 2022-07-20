@@ -61,7 +61,9 @@ fun GameReview(viewModel: GameViewModel, navController: NavController){
                         kingSquare = viewModel.kingSquare,
                         theme = viewModel.pieceTheme,
                         pieceAnimationSpeed = viewModel.pieceAnimationSpeed,
-                        highlightStyle = viewModel.highlightStyle
+                        highlightStyle = viewModel.highlightStyle,
+                        hint = false,
+                        correctPiece = null
                     )
                     Coordinates(size = maxWidth / 8)
                 }

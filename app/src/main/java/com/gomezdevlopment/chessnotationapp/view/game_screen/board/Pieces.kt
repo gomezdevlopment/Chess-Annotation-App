@@ -1,9 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen.board
 
 import androidx.appcompat.resources.R
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.animateOffsetAsState
-import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.aspectRatio
@@ -11,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
@@ -20,11 +19,8 @@ import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.utils.Utils
-import com.gomezdevlopment.chessnotationapp.view.theming.blue
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
-import com.gomezdevlopment.chessnotationapp.view.theming.alpha
-import com.gomezdevlopment.chessnotationapp.view.theming.redIncorrect
-import com.gomezdevlopment.chessnotationapp.view.theming.yellow
+import com.gomezdevlopment.chessnotationapp.view.theming.*
 
 //@Composable
 //fun Piece(
@@ -126,21 +122,34 @@ fun Piece(
     userColor: String,
     selectedPiece: MutableState<ChessPiece>,
     pieceClicked: MutableState<Boolean>,
-    theme: Map<String, Int>
+    theme: Map<String, Int>,
+    hint: Boolean,
+    correctPiece: ChessPiece?
 ) {
     val imageVector = ImageVector.vectorResource(pieceIcon(piece, theme) ?: piece.pieceDrawable)
 
+    val infiniteTransition = rememberInfiniteTransition()
+    val scale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.2f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(700),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
     key(piece) {
         Image(
             imageVector = imageVector,
             contentDescription = "Chess Piece",
             modifier =
-            (if (piece.color == playerTurn && (piece.color == userColor || userColor == "both")) Modifier.clickable(
-                selectedPiece,
-                pieceClicked,
-                piece,
-                height, offset
-            ) else Modifier.notClickable(height, offset))
+            (if (piece.color == playerTurn && (piece.color == userColor || userColor == "both"))
+                Modifier.clickable(
+                    selectedPiece,
+                    pieceClicked,
+                    piece,
+                    height, offset
+                ).scale(if (hint && piece == correctPiece) scale else 1f)
+            else Modifier.notClickable(height, offset))
         )
     }
 }
@@ -180,6 +189,8 @@ fun Pieces(
     theme: Map<String, Int>,
     pieceAnimationSpeed: Int,
     highlightStyle: String,
+    hint: Boolean,
+    correctPiece: ChessPiece?
 ) {
     pieces.forEach() { piece ->
         key(piece) {
@@ -199,7 +210,9 @@ fun Pieces(
                 userColor = userColor,
                 selectedPiece = selectedPiece,
                 pieceClicked = pieceClicked,
-                theme = theme
+                theme = theme,
+                hint = hint,
+                correctPiece = correctPiece
             )
         }
     }
@@ -233,9 +246,9 @@ fun Pieces(
     }
 
     if (kingInCheck) {
-        if(highlightStyle == "Outline"){
+        if (highlightStyle == "Outline") {
             Outline(height = height, square = kingSquare.value, color = redIncorrect)
-        }else{
+        } else {
             Highlight(height = height, square = kingSquare.value, redIncorrect, 1f)
         }
     }

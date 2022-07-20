@@ -8,6 +8,6 @@ sealed class NavComponent(
     val icon: Int
 ){
     object Play: NavComponent("play", "Play", R.drawable.ic_chess_board)
-    object Puzzles: NavComponent("puzzles", "Puzzles", R.drawable.ic_puzzle)
+    object Puzzles: NavComponent("puzzleDifficultySelection", "Puzzles", R.drawable.ic_puzzle)
     object User: NavComponent("user", "User", R.drawable.ic_user_icon)
 }

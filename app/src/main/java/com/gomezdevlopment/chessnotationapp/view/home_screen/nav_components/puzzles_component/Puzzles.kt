@@ -1,5 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -7,9 +9,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -20,6 +25,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
@@ -35,7 +41,8 @@ import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
 import com.gomezdevlopment.chessnotationapp.view_model.PuzzleViewModel
 
 @Composable
-fun PuzzleScreen(viewModel: PuzzleViewModel) {
+fun PuzzleScreen(viewModel: PuzzleViewModel, navController: NavController) {
+
     if(viewModel.showNoMorePuzzlesCard.value){
         AllPuzzlesCompletedCard(header = "Congratulations!", message = "You completed all Puzzles!")
     }
@@ -47,19 +54,24 @@ fun PuzzleScreen(viewModel: PuzzleViewModel) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val ratingString = "Your Rating: ${viewModel.playerRating.value}"
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(10.dp, 5.dp), horizontalArrangement = Arrangement.Start) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack,
+                contentDescription = "Go Back",
+                modifier = Modifier.size(30.dp)
+                    .clickable {
+                        navController.popBackStack()
+                    })
+        }
         BoxWithConstraints(
             Modifier
                 .weight(1f)
         ) {
             Column(verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    ratingString,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(20.dp),
-
-                )
                 Text(
                     viewModel.puzzleRating.value,
                     fontSize = 20.sp,
@@ -87,7 +99,9 @@ fun PuzzleScreen(viewModel: PuzzleViewModel) {
                 kingSquare = viewModel.kingSquare,
                 theme = viewModel.pieceTheme,
                 pieceAnimationSpeed = 300,
-                highlightStyle = viewModel.highlightStyle
+                highlightStyle = viewModel.highlightStyle,
+                hint = viewModel.hint.value,
+                correctPiece = viewModel.correctPiece.value
             )
             Coordinates(size = maxWidth / 8)
             PuzzleUILogic(height = maxWidth / 8, viewModel = viewModel)
@@ -248,12 +262,6 @@ private fun PuzzleUILogic(height: Dp, viewModel: PuzzleViewModel) {
         val correctPiece = viewModel.correctPiece.value
         if (correctPiece != null) {
             Outline(height, correctPiece.square, pink)
-//            Highlight(
-//                height = height,
-//                square = correctPiece.square,
-//                color = pink,
-//                transparency = .8f
-//            )
         }
 
     }
@@ -266,6 +274,33 @@ private fun PuzzleUILogic(height: Dp, viewModel: PuzzleViewModel) {
             targetRank.value,
             targetFile.value,
             viewModel
+        )
+    }
+}
+
+@Composable
+fun HintOutline(
+    height: Dp,
+    square: Square,
+    color: Color,
+    modifier: Modifier
+) {
+    val offsetX = Utils().offsetX(height.value, square.file)
+    val offsetY = Utils().offsetY(height.value, square.rank)
+    Canvas(
+        modifier = modifier
+            .height(height)
+            .aspectRatio(1f)
+            .absoluteOffset(offsetX.dp, offsetY.dp)
+            .padding(3.dp)
+            .zIndex(2f)
+
+    ) {
+        drawRect(
+            color = color,
+            size = size,
+            alpha = 1f,
+            style = Stroke(size.width * .075f)
         )
     }
 }

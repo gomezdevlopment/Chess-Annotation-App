@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -18,6 +19,7 @@ import androidx.navigation.compose.rememberNavController
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.GameScreen
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.games.GameReview
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.play_component.PlayScreen
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component.PuzzleDifficultySelectionScreen
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component.PuzzleScreen
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.UserNavigation
 import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
@@ -30,7 +32,9 @@ fun MatchSearch(
     navController: NavController
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colors.background),
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = MaterialTheme.colors.background),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -143,11 +147,11 @@ fun HomeBottomNavigation(
         composable("play") {
             PlayScreen(playNavController, matchmakingViewModel, gameViewModel)
         }
+        composable("puzzleDifficultySelection") {
+            PuzzleDifficultySelectionScreen(puzzleViewModel, navController)
+        }
         composable("puzzles") {
-            LaunchedEffect(key1 = true) {
-                puzzleViewModel.initializePuzzles()
-            }
-            PuzzleScreen(puzzleViewModel)
+            PuzzleScreen(puzzleViewModel, navController)
         }
         composable("user") {
             UserNavigation(userViewModel, playNavController, gameViewModel)

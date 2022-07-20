@@ -139,15 +139,15 @@ class PuzzleRepository @Inject constructor(private val firestore: FirestoreInter
         }
     }
 
-    fun updatePlayerRating(puzzleRating: Float){
-        playerRating.value = Elo().eloRating(playerRating.value.toFloat(), puzzleRating, k, correct.value)
-        if(MainActivity.user != null){
-            MainActivity.user!!.puzzleRating = playerRating.value
-        }
-        viewModelScope.launch {
-            firestore.writePuzzleRating(playerRating.value)
-        }
-    }
+//    fun updatePlayerRating(puzzleRating: Float){
+//        playerRating.value = Elo().eloRating(playerRating.value.toFloat(), puzzleRating, k, correct.value)
+//        if(MainActivity.user != null){
+//            MainActivity.user!!.puzzleRating = playerRating.value
+//        }
+//        viewModelScope.launch {
+//            firestore.writePuzzleRating(playerRating.value)
+//        }
+//    }
 
 
     private fun convertMoveToSquare(move: String, fileIndex: Int, rankIndex: Int): Square {
@@ -169,29 +169,29 @@ class PuzzleRepository @Inject constructor(private val firestore: FirestoreInter
     }
 }
 
-class Elo() {
-
-    private fun probability(
-        rating1: Float,
-        rating2: Float
-    ): Float {
-        return 1.0f * 1.0f / (1 + 1.0f * 10.0.pow(
-            (1.0f *
-                    (rating1 - rating2) / 400).toDouble()
-        ).toFloat())
-    }
-
-    fun eloRating(eloPlayer: Float, eloPuzzle: Float, K: Int, d: Boolean): Int {
-        val pA = probability(eloPuzzle, eloPlayer)
-        val pB = probability(eloPlayer, eloPuzzle)
-        var newElo = eloPlayer
-
-        newElo += if (d) {
-            K * (1 - pA)
-        } else {
-            K * (0 - pA)
-        }
-
-        return newElo.roundToInt()
-    }
-}
+//class Elo() {
+//
+//    private fun probability(
+//        rating1: Float,
+//        rating2: Float
+//    ): Float {
+//        return 1.0f * 1.0f / (1 + 1.0f * 10.0.pow(
+//            (1.0f *
+//                    (rating1 - rating2) / 400).toDouble()
+//        ).toFloat())
+//    }
+//
+//    fun eloRating(eloPlayer: Float, eloPuzzle: Float, K: Int, d: Boolean): Int {
+//        val pA = probability(eloPuzzle, eloPlayer)
+//        val pB = probability(eloPlayer, eloPuzzle)
+//        var newElo = eloPlayer
+//
+//        newElo += if (d) {
+//            K * (1 - pA)
+//        } else {
+//            K * (0 - pA)
+//        }
+//
+//        return newElo.roundToInt()
+//    }
+//}
