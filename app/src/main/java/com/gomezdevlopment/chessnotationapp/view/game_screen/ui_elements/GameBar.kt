@@ -69,6 +69,14 @@ fun ReviewGameBar(viewModel: GameViewModel, navController: NavController) {
         }
         GameBarItem(
             modifier = Modifier.weight(1f),
+            drawableResource = R.drawable.ic_export,
+            contDescr = "Export",
+            padding = 10.dp
+        ) {
+            viewModel.exportGameFile()
+        }
+        GameBarItem(
+            modifier = Modifier.weight(1f),
             drawableResource = R.drawable.ic_round_arrow_left,
             contDescr = "Previous Move",
             padding = 10.dp

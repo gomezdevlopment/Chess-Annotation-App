@@ -123,7 +123,6 @@ fun Navigation(
         composable("gameReview") {
             GameReview(gameViewModel, navController)
         }
-        //composable("settings") { Settings(signOutViewModel, navController) }
         composable("matchSearch") {
             MatchSearch(
                 gameViewModel,

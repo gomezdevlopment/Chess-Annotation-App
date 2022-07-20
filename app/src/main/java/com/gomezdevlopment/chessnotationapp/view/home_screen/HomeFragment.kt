@@ -1,5 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -7,9 +9,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.utils.UserSettings
 import com.gomezdevlopment.chessnotationapp.view.theming.AppTheme
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.SoundFX
@@ -22,13 +28,10 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class HomeFragment : Fragment() {
-
-    private lateinit var homeViewModel: HomeViewModel
     private lateinit var puzzleViewModel: PuzzleViewModel
+    val gameViewModel: GameViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
-        homeViewModel.init()
         puzzleViewModel = ViewModelProvider(this).get(PuzzleViewModel::class.java)
     }
 
@@ -38,7 +41,6 @@ class HomeFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         return ComposeView(requireContext()).apply {
-            val gameViewModel: GameViewModel by viewModels()
             val matchmakingViewModel: MatchmakingViewModel by viewModels()
             val signOutViewModel: SignOutViewModel by viewModels()
             val userViewModel: UserViewModel by viewModels()
@@ -61,46 +63,22 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-//        val whiteMovesRecycler = binding.whiteMovesRecycler
-//        val blackMovesRecycler = binding.blackMovesRecycler
-//
-//        whiteMovesRecycler.layoutManager = LinearLayoutManager(view.context)
-//        whiteMovesAdapter = MoveAdapter(arrayListOf())
-//        whiteMovesRecycler.adapter = whiteMovesAdapter
-//
-//        blackMovesRecycler.layoutManager = LinearLayoutManager(view.context)
-//        blackMovesAdapter = MoveAdapter(arrayListOf())
-//        blackMovesRecycler.adapter = blackMovesAdapter
-//
-//        homeViewModel.getBlackMoves().observe(viewLifecycleOwner, Observer {
-//            blackMovesAdapter.addData(it)
-//        })
-//
-//        homeViewModel.getWhiteMoves().observe(viewLifecycleOwner, Observer {
-//            whiteMovesAdapter.addData(it)
-//        })
-//
-//        binding.newGameButton.setOnClickListener {
-//            //homeViewModel.createNewGameDialog(view.context)
-//            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_gameFragment)
-//        }
-//
-//        binding.exportButton.setOnClickListener {
-//            if (whiteMovesAdapter.itemCount > 0) {
-//                exportGameFile(view.context)
-//            }
-//        }
-//
-//        binding.floatingActionButton.setOnClickListener {
-//            Navigation.findNavController(view)
-//                .navigate(R.id.action_homeFragment_to_addNotationFragment)
-//        }
-//
-//        binding.settingsIcon.setOnClickListener {
-//            Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_settingsFragment)
-//        }
-//    }
-//
+
+        gameViewModel.export.observe(viewLifecycleOwner, Observer {
+            if(it){
+                val uri by gameViewModel.uri
+                if(uri != null){
+                    val sendIntent = Intent(Intent.ACTION_SEND)
+//                sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    sendIntent.putExtra(Intent.EXTRA_STREAM, uri)
+                    sendIntent.type = "text/pgn"
+                    ContextCompat.startActivity(this.requireContext(), Intent.createChooser(sendIntent, "SHARE"), null)
+                }
+            }
+        })
+
+
 //    private fun exportGameFile(context: Context) {
 //        if (homeViewModel.getWhiteMoves().value.isNullOrEmpty()) {
 //            Toast.makeText(context, "Cannot export game because there are no annotations!", Toast.LENGTH_SHORT).show()

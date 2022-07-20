@@ -1,8 +1,18 @@
 package com.gomezdevlopment.chessnotationapp.view_model
 
+import android.app.Activity
 import android.app.Application
+import android.content.Intent
+import android.content.Intent.FLAG_ACTIVITY_NEW_TASK
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.runtime.*
+import androidx.core.app.ActivityOptionsCompat
+import androidx.core.content.ContextCompat.startActivity
+import androidx.core.content.FileProvider
+import androidx.core.view.ContentInfoCompat
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.*
@@ -12,15 +22,19 @@ import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
 import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPiece
 import com.gomezdevlopment.chessnotationapp.model.repositories.GameRepository
 import com.gomezdevlopment.chessnotationapp.model.utils.UserSettings
+import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import java.io.File
+import java.lang.StringBuilder
 import javax.inject.Inject
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
-    app: Application,
+    private val app: Application,
     private val gameRepository: GameRepository,
     private val settings: UserSettings
 ) : AndroidViewModel(app) {
@@ -237,4 +251,47 @@ class GameViewModel @Inject constructor(
         return gameRepository.annotations
     }
 
+    val export: MutableLiveData<Boolean> = MutableLiveData(false)
+    val uri: MutableState<Uri?> = mutableStateOf(null)
+
+    fun exportGameFile() {
+        val annotations = getAnnotations()
+        if (annotations.isEmpty()) {
+            Toast.makeText(app, "Cannot export game because there are no annotations!", Toast.LENGTH_SHORT).show()
+        } else {
+            uri.value = createPGNFile(app)
+            export.postValue(true)
+        }
+    }
+
+    private fun createPGNFile(context: Application): Uri {
+        val filename = "chess_game.pgn"
+        val path = context.getExternalFilesDir(null)
+        val pgnFile = File(path, filename)
+        pgnFile.delete()
+        pgnFile.createNewFile()
+        pgnFile.appendText(createPGNString())
+        return FileProvider.getUriForFile(
+            context,
+            app.packageName.toString() + ".provider",
+            pgnFile
+        )
+    }
+
+    private fun createPGNString(): String {
+        val pgnString = StringBuilder()
+        val annotations = getAnnotations().subList(1, getAnnotations().size)
+        annotations.forEachIndexed { index, notation ->
+            var blackMove = ""
+            if(index+1 <= annotations.lastIndex){
+                blackMove = annotations[index+1]
+            }
+
+            if(index % 2 == 0){
+                pgnString.append("${(index/2)+1}. $notation $blackMove ")
+            }
+
+        }
+        return pgnString.toString()
+    }
 }
