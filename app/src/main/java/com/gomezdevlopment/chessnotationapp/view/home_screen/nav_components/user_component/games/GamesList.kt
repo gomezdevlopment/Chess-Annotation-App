@@ -40,8 +40,15 @@ fun Games(
         println("init")
         viewModel.initializeGamesList()
     }
-    val recentGames = userGames.subList(0, 3)
-    val olderGames = userGames.subList(3, userGames.lastIndex)
+
+    var recentGames = userGames
+    var olderGames = listOf<Map<String, String>>()
+
+    if(userGames.size > 3){
+        recentGames = userGames.subList(0, 3)
+        olderGames = userGames.subList(3, userGames.lastIndex)
+    }
+
     LazyColumn() {
 
         item {
