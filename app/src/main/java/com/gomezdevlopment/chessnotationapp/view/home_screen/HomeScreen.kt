@@ -49,6 +49,7 @@ fun MatchSearch(
                     "Searching for Match...",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 16.sp,
+                    color = MaterialTheme.colors.onBackground
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 CircularProgressIndicator(

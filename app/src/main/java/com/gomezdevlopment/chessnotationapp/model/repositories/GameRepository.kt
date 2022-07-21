@@ -139,12 +139,14 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
         }
     }
 
+    val lastMove = mutableStateOf("")
     private fun snapshotListener() {
         if (gameDocumentReference != null) {
             gameDocumentReference?.addSnapshotListener { value, error ->
                 val onlineGame = value?.toObject(OnlineGame::class.java)
                 if (onlineGame?.resignation != "") {
                     resignation(onlineGame?.resignation)
+                    startStopClocks()
                 }
                 val drawOffer = onlineGame?.drawOffer
                 if (drawOffer != null) {
@@ -155,6 +157,7 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
                     }
                     if (drawOffer == "accept") {
                         drawAccepted()
+                        startStopClocks()
                     }
                 }
                 //Move
@@ -169,6 +172,10 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
                             changePiecePosition(square, piece, null)
                         }
                     }
+                    if(lastMove.value != previousMoveString){
+                        startStopClocks()
+                    }
+                    lastMove.value = previousMoveString
                 }
             }
         }
@@ -560,7 +567,7 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
             currentNotation.clear()
             selectedNotationIndex.value += 1
         }
-        startStopClocks()
+        //startStopClocks()
     }
 
     fun makeMove(pieceCopy: ChessPiece, newSquare: Square, depth: Int, promotion: String) {

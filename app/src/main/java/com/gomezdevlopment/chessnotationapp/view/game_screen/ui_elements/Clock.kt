@@ -21,12 +21,11 @@ import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.flow.StateFlow
 
 fun formatTime(time: Long): String {
-    val timeFormat = "%02d:%02d:%02d"
+    val timeFormat = "%02d:%02d"
     return String.format(
         timeFormat,
         TimeUnit.MILLISECONDS.toMinutes(time),
-        TimeUnit.MILLISECONDS.toSeconds(time) % 60,
-        (time % 1000) / 10
+        TimeUnit.MILLISECONDS.toSeconds(time) % 60
     )
 }
 
