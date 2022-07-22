@@ -8,9 +8,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Card
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -19,16 +17,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
-import com.gomezdevlopment.chessnotationapp.model.data_classes.OnlineGame
-import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.utils.Utils
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.notClickable
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel.Companion.userGames
-import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun Games(

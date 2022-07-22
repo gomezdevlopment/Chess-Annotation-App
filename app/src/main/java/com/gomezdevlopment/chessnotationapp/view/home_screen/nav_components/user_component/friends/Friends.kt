@@ -69,7 +69,7 @@ fun FriendSearchBar(viewModel: UserViewModel) {
         leadingIcon = { Icon(imageVector = Icons.Filled.Search, contentDescription = "Search")  },
         keyboardActions = KeyboardActions(
             onSearch = {
-                viewModel.newSearch(search)
+//                viewModel.newSearch(search)
             }
         )
     )

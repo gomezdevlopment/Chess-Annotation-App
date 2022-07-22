@@ -61,9 +61,9 @@ fun UserScreen(userViewModel: UserViewModel, homeNavController: NavController, u
 @Composable
 fun Friends(viewModel: UserViewModel) {
     FriendsList(viewModel = viewModel)
-    LaunchedEffect(true){
-        viewModel.initializeFriendRequestListener()
-    }
+//    LaunchedEffect(true){
+//        viewModel.initializeFriendRequestListener()
+//    }
 }
 
 @Composable

@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp.model.data_classes
+package com.gomezdevlopment.chessnotationapp.realtime_database
 
 data class User(
     val email: String = "",
@@ -8,5 +8,6 @@ data class User(
     val wins: Int = 0,
     val losses: Int = 0,
     val draws: Int = 0,
-    var puzzleRating: Int = 600
+    var puzzleRating: Int = 600,
+    var online: Boolean = true
 )

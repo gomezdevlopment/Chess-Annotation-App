@@ -1,4 +1,4 @@
-package com.gomezdevlopment.chessnotationapp.model.data_classes
+package com.gomezdevlopment.chessnotationapp.realtime_database
 
 data class OnlineGame(
     val joinable: Boolean = true,

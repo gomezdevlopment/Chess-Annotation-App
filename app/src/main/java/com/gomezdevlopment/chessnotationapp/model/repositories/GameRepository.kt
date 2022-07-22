@@ -6,23 +6,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
-import com.gomezdevlopment.chessnotationapp.model.data_classes.OnlineGame
+import com.gomezdevlopment.chessnotationapp.realtime_database.OnlineGame
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.*
 import com.gomezdevlopment.chessnotationapp.model.pieces.*
 import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
+import com.gomezdevlopment.chessnotationapp.realtime_database.RealtimeDatabaseGameInteraction
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
-import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.gameDocumentReference
-import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.formatTime
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel.Companion.userGames
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
-class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : ViewModel(), GameSetup {
+class GameRepository @Inject constructor(val dbInteraction: RealtimeDatabaseGameInteraction) :
+    ViewModel(), GameSetup {
     override var piecesOnBoard: MutableList<ChessPiece> = mutableStateListOf()
     override var capturedPieces: MutableList<ChessPiece> = mutableStateListOf()
     override var occupiedSquares: MutableMap<Square, ChessPiece> = mutableMapOf()
@@ -94,7 +97,6 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
     var gameEndSound: MutableState<Boolean> = mutableStateOf(false)
 
 
-
     init {
         initialPosition()
         //testPositionKiwipete()
@@ -133,55 +135,68 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
         initialPosition()
         checkAllLegalMoves()
         if (isOnline) {
-            snapshotListener()
+            eventListener()
         } else {
-            gameDocumentReference = null
+            //gameDocumentReference = null
         }
     }
 
     val lastMove = mutableStateOf("")
-    private fun snapshotListener() {
-        if (gameDocumentReference != null) {
-            gameDocumentReference?.addSnapshotListener { value, error ->
-                val onlineGame = value?.toObject(OnlineGame::class.java)
-                if (onlineGame?.resignation != "") {
-                    resignation(onlineGame?.resignation)
-                    startStopClocks()
-                }
-                val drawOffer = onlineGame?.drawOffer
-                if (drawOffer != null) {
-                    if (drawOffer == "white" || drawOffer == "black") {
-                        if (drawOffer != userColor) {
-                            openDrawOfferedDialog.value = true
+
+    fun eventListener() {
+        if (MainActivity.gameID != null) {
+            dbInteraction.dbGameReference.child(MainActivity.gameID.toString())
+                .addValueEventListener(object : ValueEventListener {
+                    var gameMap: OnlineGame? = null
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        gameMap = snapshot.getValue(OnlineGame::class.java)
+                        if (gameMap?.resignation != "") {
+                            resignation(gameMap?.resignation)
+                            startStopClocks()
+                        }
+                        val drawOffer = gameMap?.drawOffer
+                        if (drawOffer != null) {
+                            if (drawOffer == "white" || drawOffer == "black") {
+                                if (drawOffer != userColor) {
+                                    openDrawOfferedDialog.value = true
+                                }
+                            }
+                            if (drawOffer == "accept") {
+                                drawAccepted()
+                                startStopClocks()
+                            }
+                        }
+                        //Move
+                        val previousMoveString = gameMap?.previousMove.toString()
+                        if (previousMoveString != "") {
+                            val piece = getPieceFromDocument(previousMoveString)
+                            val square: Square = getSquareFromDocument(previousMoveString)
+                            if (piece != null && piece.color != userColor) {
+                                if (piece.piece == "pawn" && (square.rank == 0 || square.rank == 7)) {
+                                    changePiecePosition(
+                                        square,
+                                        piece,
+                                        getPromotionSelectionFromDocument(previousMoveString)
+                                    )
+                                } else {
+                                    changePiecePosition(square, piece, null)
+                                }
+                            }
+                            if (lastMove.value != previousMoveString) {
+                                startStopClocks()
+                            }
+                            lastMove.value = previousMoveString
                         }
                     }
-                    if (drawOffer == "accept") {
-                        drawAccepted()
-                        startStopClocks()
+
+                    override fun onCancelled(error: DatabaseError) {
+                        println(error)
                     }
-                }
-                //Move
-                val previousMoveString = onlineGame?.previousMove.toString()
-                if (previousMoveString != "") {
-                    val piece = getPieceFromDocument(previousMoveString)
-                    val square: Square = getSquareFromDocument(previousMoveString)
-                    if (piece != null && piece.color != userColor) {
-                        if (piece.piece == "pawn" && (square.rank == 0 || square.rank == 7)) {
-                            changePiecePosition(square, piece, getPromotionSelectionFromDocument(previousMoveString))
-                        } else {
-                            changePiecePosition(square, piece, null)
-                        }
-                    }
-                    if(lastMove.value != previousMoveString){
-                        startStopClocks()
-                    }
-                    lastMove.value = previousMoveString
-                }
-            }
+                })
         }
     }
 
-    private fun createMapOfGame(result: String): Map<String, String>{
+    private fun createMapOfGame(result: String): Map<String, String> {
         val game = mutableMapOf<String, String>()
         val gameNotationString = StringBuilder("")
         annotations.forEach {
@@ -197,12 +212,12 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
 
         var opponentName = MainActivity.game?.whitePlayer
         var color = "black"
-        if(userColor == "white"){
-            opponentName =  MainActivity.game?.blackPlayer
+        if (userColor == "white") {
+            opponentName = MainActivity.game?.blackPlayer
             color = "white"
         }
 
-        if(opponentName != null){
+        if (opponentName != null) {
             game["opponent"] = opponentName
         }
 
@@ -211,25 +226,25 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
         return game
     }
 
-    private fun writeWinToFirestore(result: String){
-        firestore.incrementWins()
+    private fun writeWinToFirestore(result: String) {
+        dbInteraction.incrementWins()
         val game = createMapOfGame(result)
         userGames.add(0, game)
-        firestore.writeGame(game)
+        dbInteraction.writeGame(game)
     }
 
-    private fun writeLossToFirestore(result: String){
-        firestore.incrementLosses()
+    private fun writeLossToFirestore(result: String) {
+        dbInteraction.incrementLosses()
         val game = createMapOfGame(result)
         userGames.add(0, game)
-        firestore.writeGame(game)
+        dbInteraction.writeGame(game)
     }
 
-    private fun writeDrawToFirestore(result: String){
-        firestore.incrementDraws()
+    private fun writeDrawToFirestore(result: String) {
+        dbInteraction.incrementDraws()
         val game = createMapOfGame(result)
         userGames.add(0, game)
-        firestore.writeGame(game)
+        dbInteraction.writeGame(game)
     }
 
     private fun setEndOfGameValues(result: String, message: String) {
@@ -327,41 +342,41 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
             capturedPieces.removeLast()
         }
 
-        if(state.whiteKingSquare == Square(0, 4)){
-            if(currentSquare.value == Square(0,6)){
-                val rook = occupiedSquares[Square(0,5)]
+        if (state.whiteKingSquare == Square(0, 4)) {
+            if (currentSquare.value == Square(0, 6)) {
+                val rook = occupiedSquares[Square(0, 5)]
                 if (rook != null) {
                     occupiedSquares.remove(rook.square)
-                    rook.square = Square(0,7)
+                    rook.square = Square(0, 7)
                     occupiedSquares[rook.square] = rook
                 }
             }
 
-            if(currentSquare.value == Square(0,2)){
-                val rook = occupiedSquares[Square(0,3)]
+            if (currentSquare.value == Square(0, 2)) {
+                val rook = occupiedSquares[Square(0, 3)]
                 if (rook != null) {
                     occupiedSquares.remove(rook.square)
-                    rook.square = Square(0,0)
+                    rook.square = Square(0, 0)
                     occupiedSquares[rook.square] = rook
                 }
             }
         }
 
-        if(state.blackKingSquare == Square(7, 4)){
-            if(currentSquare.value == Square(7,6)){
-                val rook = occupiedSquares[Square(7,5)]
+        if (state.blackKingSquare == Square(7, 4)) {
+            if (currentSquare.value == Square(7, 6)) {
+                val rook = occupiedSquares[Square(7, 5)]
                 if (rook != null) {
                     occupiedSquares.remove(rook.square)
-                    rook.square = Square(7,7)
+                    rook.square = Square(7, 7)
                     occupiedSquares[rook.square] = rook
                 }
             }
 
-            if(currentSquare.value == Square(7,2)){
-                val rook = occupiedSquares[Square(7,3)]
+            if (currentSquare.value == Square(7, 2)) {
+                val rook = occupiedSquares[Square(7, 3)]
                 if (rook != null) {
                     occupiedSquares.remove(rook.square)
-                    rook.square = Square(7,0)
+                    rook.square = Square(7, 0)
                     occupiedSquares[rook.square] = rook
                 }
             }
@@ -417,7 +432,8 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
         if (piece.piece == "king") {
             if (castleKingSide().value) {
                 if (newSquare.file == piece.square.file + 2) {
-                    val rook: ChessPiece = occupiedSquares[Square(newSquare.rank, newSquare.file + 1)]!!
+                    val rook: ChessPiece =
+                        occupiedSquares[Square(newSquare.rank, newSquare.file + 1)]!!
                     occupiedSquares.remove(Square(newSquare.rank, newSquare.file + 1))
                     changePieceSquare(rook, Square(newSquare.rank, newSquare.file - 1))
                     occupiedSquares[rook.square] = rook
@@ -455,14 +471,18 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
 //        return "${previousSquare.rank}${previousSquare.file}${square.rank}${square.file}"
 //    }
 
-    override fun changePiecePosition(newSquare: Square, piece: ChessPiece, promotion: PromotionPiece?) {
+    override fun changePiecePosition(
+        newSquare: Square,
+        piece: ChessPiece,
+        promotion: PromotionPiece?
+    ) {
         val string = convertMoveToStringOfRanksAndFiles(piece, newSquare)
         val turn: String = playerTurn.value
         viewModelScope.launch {
             if (promotion != null) {
-                firestore.writePromotion(turn, string, promotion.piece)
-            }else{
-                firestore.writeMove(turn, string)
+                dbInteraction.writePromotion(turn, string, promotion.piece)
+            } else {
+                dbInteraction.writeMove(turn, string)
             }
         }
         val previousPieceSquare = piece.square
@@ -561,7 +581,7 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
                 }
             }
         }
-        if(!endOfGame.value){
+        if (!endOfGame.value) {
             notation.checkmateOrCheck(checkmate.value, kingInCheck.value)
             annotations.add(currentNotation.toString())
             currentNotation.clear()
@@ -686,7 +706,7 @@ class GameRepository @Inject constructor(val firestore: FirestoreInteraction) : 
         endOfGameConditions.checkThreefoldRepetition(previousGameStates, threeFoldRepetition)
         endOfGameConditions.checkFiftyMoveCount(allLegalMoves, fiftyMoveCount.value, fiftyMoveRule)
 
-        fun setNotations(){
+        fun setNotations() {
             notation.checkmateOrCheck(checkmate.value, kingInCheck.value)
             annotations.add(currentNotation.toString())
             currentNotation.clear()

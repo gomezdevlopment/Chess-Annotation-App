@@ -164,19 +164,19 @@ class GameViewModel @Inject constructor(
 
     fun drawOffer(value: String) {
         viewModelScope.launch {
-            gameRepository.firestore.writeDrawOffer(getPlayerTurn(), value)
+            gameRepository.dbInteraction.writeDrawOffer(getPlayerTurn(), value)
         }
     }
 
-    fun rematchOffer(value: String) {
-        viewModelScope.launch {
-            gameRepository.firestore.writeRematchOffer(getPlayerTurn(), value)
-        }
-    }
+//    fun rematchOffer(value: String) {
+//        viewModelScope.launch {
+//            gameRepository.dbInteraction.writeRematchOffer(getPlayerTurn(), value)
+//        }
+//    }
 
     fun resign() {
         viewModelScope.launch {
-            gameRepository.firestore.writeResignation(userColor)
+            gameRepository.dbInteraction.writeResignation(userColor)
         }
     }
 

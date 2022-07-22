@@ -1,72 +1,85 @@
 package com.gomezdevlopment.chessnotationapp.model.repositories
 
 
-
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.gomezdevlopment.chessnotationapp.model.data_classes.OnlineGame
+import com.gomezdevlopment.chessnotationapp.realtime_database.OnlineGame
+import com.gomezdevlopment.chessnotationapp.realtime_database.RealtimeDatabaseRepository
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
-import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.game
-import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.gameDocumentReference
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.gameID
+import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ListenerRegistration
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
+import com.google.firebase.database.*
 import javax.inject.Inject
 
-class MatchmakingRepository @Inject constructor(private val db: FirebaseFirestore) : ViewModel() {
+class MatchmakingRepository @Inject constructor(
+    private val db: FirebaseDatabase,
+    private val dbRepository: RealtimeDatabaseRepository
+) : ViewModel() {
 
     //private val db = Firebase.firestore
     private val gamePoolCollection = "gamePool"
     val navDestination = mutableStateOf("")
     val time = mutableStateOf(60000L)
 
-    private var matchSearch: ListenerRegistration? = null
+    private var matchSearch: ValueEventListener? = null
 
     var resetSearch = mutableStateOf(0)
+    val dbReference = db.getReference(OnlineGame::class.java.simpleName)
+    var gameReference: DatabaseReference? = null
     //lateinit var gameDocumentReference: DocumentReference
 
     fun joinGame(timeControl: Long) {
         time.value = timeControl
-        db.collection(gamePoolCollection)
-            .whereEqualTo("joinable", true)
-            .whereEqualTo("timeControl", timeControl)
-            .limit(1)
-            .get()
-            .addOnSuccessListener { gamePool ->
-                if (gamePool.isEmpty) {
-                    createGame(timeControl, MainActivity.user?.username.toString())
-                } else {
-                    val docRef = db.collection(gamePoolCollection).document(gamePool.documents[0].id)
-                    game = gamePool.documents[0].toObject(OnlineGame::class.java)
-                    gameDocumentReference = docRef
-                    docRef.update("joinable", false)
-                    if (game?.blackPlayer == "") {
-                        userColor = "black"
-                        docRef.update("blackPlayer", MainActivity.user?.username)
-                            .addOnSuccessListener {
-                                navDestination.value = "game"
+        val query = dbReference.orderByChild("timeControl").equalTo(timeControl.toDouble())
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.exists()) {
+                    snapshot.children.forEach { game ->
+                        val onlineGame = game.getValue(OnlineGame::class.java)
+                        if (onlineGame?.joinable == true) {
+                            gameID = game.key
+                            val key = gameID
+                            val username = user?.username
+                            if (key != null && username != null) {
+                                if (onlineGame.blackPlayer == "") {
+                                    userColor = "black"
+                                    val gameCopy = onlineGame.copy(joinable = false, blackPlayer = username)
+                                    dbReference.child(key).updateChildren(gameToMap(gameCopy))
+                                    navDestination.value = "game"
+                                } else {
+                                    userColor = "white"
+                                    val gameCopy = onlineGame.copy(joinable = false, blackPlayer = username)
+                                    dbReference.child(key).updateChildren(gameToMap(gameCopy))
+                                    navDestination.value = "game"
+                                }
                             }
-                            .addOnFailureListener { e ->
-                                println(e)
-                            }
-                    } else {
-                        userColor ="white"
-                        docRef.update("whitePlayer", MainActivity.user?.username)
-                            .addOnSuccessListener {
-                                navDestination.value = "game"
-                            }
-                            .addOnFailureListener { e ->
-                                println(e)
-                            }
+                        }
                     }
+                } else {
+                    createGame(timeControl, MainActivity.user?.username.toString())
                 }
             }
-            .addOnFailureListener {
-                println("Fail")
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
             }
+
+        })
+    }
+
+    private fun gameToMap(onlineGame: OnlineGame): Map<String, Any> {
+        return mapOf<String, Any>(
+            "joinable" to onlineGame.joinable,
+            "whitePlayer" to onlineGame.whitePlayer,
+            "blackPlayer" to onlineGame.blackPlayer,
+            "timeControl" to onlineGame.timeControl,
+            "previousMove" to onlineGame.previousMove,
+            "resignation" to onlineGame.resignation,
+            "drawOffer" to onlineGame.drawOffer,
+            "rematchOffer" to onlineGame.rematchOffer,
+            "cancel" to onlineGame.cancel
+        )
     }
 
     private fun createGame(timeControl: Long, username: String) {
@@ -88,54 +101,59 @@ class MatchmakingRepository @Inject constructor(private val db: FirebaseFirestor
             }
         }
 
-        val newGame = hashMapOf(
-            "joinable" to true,
-            "whitePlayer" to whitePlayer,
-            "blackPlayer" to blackPlayer,
-            "timeControl" to timeControl,
-            "previousMove" to "",
-            "resignation" to "",
-            "drawOffer" to "",
-            "rematchOffer" to "",
-            "cancel" to false
+
+        val newGame = OnlineGame(
+            joinable = true,
+            whitePlayer = whitePlayer,
+            blackPlayer = blackPlayer,
+            timeControl = timeControl,
         )
-        db.collection(gamePoolCollection)
-            .add(newGame)
-            .addOnSuccessListener {
-                waitForMatch(it, opponentColor)
-            }
-            .addOnFailureListener { e ->
-                println(e.message)
-            }
+
+
+        dbRepository.addGameToDatabase(newGame, username) {
+            waitForMatch(username, opponentColor)
+        }
+
     }
 
-    private fun waitForMatch(docRef: DocumentReference, opponentColor: String){
-        matchSearch = docRef.addSnapshotListener { value, error ->
-            game = value?.toObject(OnlineGame::class.java)
-            gameDocumentReference = docRef
-            if(opponentColor == "whitePlayer"){
-                if(game?.whitePlayer != ""){
-                    navDestination.value = "game"
-                    matchSearch?.remove()
-                }
-            }else{
-                if(game?.blackPlayer != ""){
-                    navDestination.value = "game"
-                    matchSearch?.remove()
-                }
-            }
+    private fun waitForMatch(username: String, opponentColor: String) {
+        gameReference = dbReference.child(username)
+        matchSearch =
+            dbReference.child(username).addValueEventListener(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        val game = snapshot.getValue(OnlineGame::class.java)
+                        if (opponentColor == "whitePlayer") {
+                            if (game?.whitePlayer != "") {
+                                navDestination.value = "game"
+                                matchSearch?.let {
+                                    dbReference.child(username).removeEventListener(it)
+                                }
+                            }
+                        } else {
+                            if (game?.blackPlayer != "") {
+                                navDestination.value = "game"
+                                matchSearch?.let {
+                                    dbReference.child(username).removeEventListener(it)
+                                }
+                            }
+                        }
 
-            if(game?.cancel == true){
-                matchSearch?.remove()
-            }
-        }
+                        if (game?.cancel == true) {
+                            matchSearch?.let { dbReference.child(username).removeEventListener(it) }
+                        }
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+
+                }
+            })
     }
 
-    fun cancelSearch(){
-        gameDocumentReference?.update("cancel", true)
-        gameDocumentReference?.delete()?.addOnFailureListener {
-            println(it.message)
-        }
+    fun cancelSearch() {
+        gameReference?.updateChildren(mapOf("cancel" to true))
+        gameReference?.removeValue()
         navDestination.value = "home"
         resetSearch.value += 1
     }

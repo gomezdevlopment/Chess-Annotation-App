@@ -5,12 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
-import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
-import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
-import com.gomezdevlopment.chessnotationapp.model.data_classes.User
-import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
-import com.gomezdevlopment.chessnotationapp.model.game_logic.FEN
-import com.gomezdevlopment.chessnotationapp.model.pieces.ChessPieces
 import com.gomezdevlopment.chessnotationapp.model.repositories.UserRepository
 import com.gomezdevlopment.chessnotationapp.model.utils.UserSettings
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
@@ -79,19 +73,19 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    fun initializeFriendRequestListener() {
-        userRepository.firestore.friendRequestListener(this)
-    }
+//    fun initializeFriendRequestListener() {
+//        userRepository.firestore.friendRequestListener(this)
+//    }
 
     fun onSearchChanged(newValue: String) {
         search.value = newValue
     }
 
-    fun newSearch(friend: String) {
-        viewModelScope.launch {
-            userRepository.firestore.sendFriendRequest(friend)
-        }
-    }
+//    fun newSearch(friend: String) {
+//        viewModelScope.launch {
+//            userRepository.firestore.sendFriendRequest(friend)
+//        }
+//    }
 
     fun parseFEN(
         fen: String,

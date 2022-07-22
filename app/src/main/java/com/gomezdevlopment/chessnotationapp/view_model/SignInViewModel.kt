@@ -1,8 +1,5 @@
 package com.gomezdevlopment.chessnotationapp.view_model
 
-import android.app.Application
-import android.view.View
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,6 +8,7 @@ import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(private val appRepository: AuthenticationRepository) : ViewModel() {
