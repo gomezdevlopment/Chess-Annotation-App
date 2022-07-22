@@ -22,16 +22,23 @@ class RealtimeDatabaseDAO @Inject constructor(private val db: FirebaseDatabase) 
 
     fun getUserMap(email: String) {
         var userMap: User? = null
-        println(email)
         val query = db.getReference(User::class.java.simpleName).orderByChild("email").equalTo(email)
 
-        query.addListenerForSingleValueEvent(object : ValueEventListener {
+        query.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                println("snapshot")
                 snapshot.children.forEach { user ->
                     println(user)
                     userMap = user.getValue(User::class.java)
                     MainActivity.user = userMap
+                    user.child("games").children.forEach {
+                        println(it)
+                        val key = it.key
+                        val value = it.value
+                        if(key != null && value != null){
+                            MainActivity.user?.games?.games?.add(value as MutableMap<String, String>)
+                        }
+                        println("User Games: ${MainActivity.user?.games}")
+                    }
                 }
             }
 

@@ -10,6 +10,7 @@ import com.gomezdevlopment.chessnotationapp.model.utils.UserSettings
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -64,10 +65,11 @@ class UserViewModel @Inject constructor(
     }
 
     fun initializeGamesList() {
+        println(MainActivity.user)
         initialized = true
         if (userGames.isEmpty()) {
-            MainActivity.user?.games?.forEachIndexed() { index, game ->
-                userGames.add(index, game)
+            MainActivity.user?.games?.games?.forEach { game ->
+                userGames.add(game)
             }
             userGames.reverse()
         }

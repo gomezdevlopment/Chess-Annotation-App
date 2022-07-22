@@ -62,7 +62,7 @@ object AppModule {
 
 
     @Provides
-    fun provideUserRepository(firestore: FirestoreInteraction) = UserRepository(firestore)
+    fun provideUserRepository() = UserRepository()
 
     @Singleton
     @Provides

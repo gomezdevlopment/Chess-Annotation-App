@@ -8,11 +8,12 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.model.pieces.ChessPieces
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
+import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class UserRepository @Inject constructor(val firestore: FirestoreInteraction): ViewModel() {
+class UserRepository @Inject constructor(): ViewModel() {
     fun goToGameReview(gameViewModel: GameViewModel, game: Map<String, String>, homeNavController: NavController){
         val annotations = mutableListOf<String>()
         for (i in 0..game.size - 4) {

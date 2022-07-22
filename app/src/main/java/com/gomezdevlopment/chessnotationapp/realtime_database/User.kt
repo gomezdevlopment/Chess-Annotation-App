@@ -3,7 +3,7 @@ package com.gomezdevlopment.chessnotationapp.realtime_database
 data class User(
     val email: String = "",
     val password: String = "",
-    val games: List<Map<String, String>> = listOf(),
+    var games: Games = Games(),
     val username: String = "",
     val wins: Int = 0,
     val losses: Int = 0,

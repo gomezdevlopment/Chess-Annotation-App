@@ -85,6 +85,7 @@ class GameViewModel @Inject constructor(
         currentPosition.value = true
         openResignDialog.value = false
         openDrawOfferDialog.value = false
+
         viewModelScope.launch {
             gameRepository.resetGame(time, isOnline)
         }
@@ -285,5 +286,9 @@ class GameViewModel @Inject constructor(
 
         }
         return pgnString.toString()
+    }
+
+    fun removeGameListener(){
+        gameRepository.removeGameListener()
     }
 }

@@ -14,7 +14,7 @@ class RealtimeDatabaseGameInteraction @Inject constructor(
     val db: FirebaseDatabase
 ) {
     val dbGameReference = db.getReference(OnlineGame::class.java.simpleName)
-    private val dbUserReference = db.getReference(OnlineGame::class.java.simpleName)
+    private val dbUserReference = db.getReference(User::class.java.simpleName)
 
     fun writePromotion(
         playerTurn: String,
@@ -36,8 +36,11 @@ class RealtimeDatabaseGameInteraction @Inject constructor(
 
 
     fun writeMove(playerTurn: String, string: String) {
+        println(playerTurn)
         if (gameID != null) {
+            println("gameId not null")
             if (playerTurn == MainActivity.userColor) {
+                println(userColor)
                 val previousMove = mapOf(
                     "previousMove" to string
                 )
@@ -105,7 +108,7 @@ class RealtimeDatabaseGameInteraction @Inject constructor(
         if (gameID != null) {
             val username = user?.username
             if (username != null) {
-                val map = getUserMap()
+                val map = user
                 val wins = map?.wins
                 if (wins != null) {
                     val newWinCount = mapOf("wins" to wins + 1)
@@ -118,24 +121,11 @@ class RealtimeDatabaseGameInteraction @Inject constructor(
         }
     }
 
-    private fun getUserMap(): User? {
-        var userMap: User? = null
-        val username = user?.username
-        if (username != null) {
-            dbUserReference.child(username).get().addOnSuccessListener {
-                it.children.map { user ->
-                    userMap = user.getValue(User::class.java)
-                }
-            }
-        }
-        return userMap
-    }
-
     fun incrementLosses() {
         if (gameID != null) {
             val username = user?.username
             if (username != null) {
-                val map = getUserMap()
+                val map = user
                 val losses = map?.losses
                 if (losses != null) {
                     val newLossCount = mapOf("losses" to losses + 1)
@@ -152,7 +142,7 @@ class RealtimeDatabaseGameInteraction @Inject constructor(
         if (gameID != null) {
             val username = user?.username
             if (username != null) {
-                val map = getUserMap()
+                val map = user
                 val draws = map?.draws
                 if (draws != null) {
                     val newDrawCount = mapOf("draws" to draws + 1)

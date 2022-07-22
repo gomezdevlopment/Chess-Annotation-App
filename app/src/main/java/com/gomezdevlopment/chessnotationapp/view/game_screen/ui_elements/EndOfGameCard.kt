@@ -67,6 +67,7 @@ fun EndOfGameCard(
                     {
                         cardVisible.value = false
                         navController.navigate("home")
+                        viewModel.removeGameListener()
                     }
                     RoundDialogButton("Rematch")
                     {

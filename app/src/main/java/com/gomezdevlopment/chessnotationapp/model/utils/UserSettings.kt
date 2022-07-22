@@ -37,7 +37,7 @@ class UserSettings @Inject constructor(private val context: Application): ViewMo
     val chessBoardTheme = mutableStateOf(R.drawable.ic_chess_board_teal)
     val pieceTheme = mutableStateOf("Alpha")
     val pieceThemeMap: MutableState<Map<String, Int>> = mutableStateOf(alpha)
-    val pieceAnimationSpeed = mutableStateOf(150)
+    val pieceAnimationSpeed = mutableStateOf(100)
     val theme = mutableStateOf("System")
     val isDarkThemeSelected = mutableStateOf(false)
     val highlightStyle = mutableStateOf("outline")

@@ -9,5 +9,6 @@ data class OnlineGame(
     val resignation: String = "",
     val drawOffer: String = "",
     val rematchOffer: String = "",
-    val cancel: Boolean = false
+    val cancel: Boolean = false,
+    val players:Int = 1
 )

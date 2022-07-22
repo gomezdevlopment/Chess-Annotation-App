@@ -120,8 +120,9 @@ fun Pieces(
             val offset = Offset(offsetX, offsetY)
             val animatedOffset by animateOffsetAsState(
                 targetValue = offset,
-                tween(pieceAnimationSpeed, easing = LinearEasing),
+                tween(pieceAnimationSpeed, delayMillis = 0, easing = LinearOutSlowInEasing),
             )
+
             Piece(
                 piece = piece,
                 height = height,

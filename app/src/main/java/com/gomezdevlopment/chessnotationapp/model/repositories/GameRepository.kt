@@ -132,6 +132,7 @@ class GameRepository @Inject constructor(val dbInteraction: RealtimeDatabaseGame
         initialTime.value = time
         openDrawOfferedDialog.value = false
         capturedPieces.clear()
+        selectedNotationIndex.value = 0
         initialPosition()
         checkAllLegalMoves()
         if (isOnline) {
@@ -143,12 +144,14 @@ class GameRepository @Inject constructor(val dbInteraction: RealtimeDatabaseGame
 
     val lastMove = mutableStateOf("")
 
-    fun eventListener() {
+    private var listener: ValueEventListener? = null
+    private fun eventListener() {
         if (MainActivity.gameID != null) {
-            dbInteraction.dbGameReference.child(MainActivity.gameID.toString())
+            listener = dbInteraction.dbGameReference.child(MainActivity.gameID.toString())
                 .addValueEventListener(object : ValueEventListener {
                     var gameMap: OnlineGame? = null
                     override fun onDataChange(snapshot: DataSnapshot) {
+                        println("data changed")
                         gameMap = snapshot.getValue(OnlineGame::class.java)
                         if (gameMap?.resignation != "") {
                             resignation(gameMap?.resignation)
@@ -190,10 +193,42 @@ class GameRepository @Inject constructor(val dbInteraction: RealtimeDatabaseGame
                     }
 
                     override fun onCancelled(error: DatabaseError) {
-                        println(error)
+
                     }
                 })
         }
+    }
+
+    fun removeGameListener() {
+        dbInteraction.dbGameReference.child(MainActivity.gameID.toString()).get()
+            .addOnSuccessListener {
+                if (it != null) {
+                    val map = it.getValue(OnlineGame::class.java)
+                    val players = map?.players
+                    if (players == 2) {
+                        val playerCount = mapOf("players" to 1)
+                        dbInteraction.dbGameReference.child(MainActivity.gameID.toString())
+                            .updateChildren(playerCount)
+                        listener?.let { gameListener ->
+                            dbInteraction.dbGameReference.child(MainActivity.gameID.toString())
+                                .removeEventListener(
+                                    gameListener
+                                )
+                        }
+                    } else {
+                        val playerCount = mapOf("players" to 0)
+                        dbInteraction.dbGameReference.child(MainActivity.gameID.toString())
+                            .updateChildren(playerCount)
+                        listener?.let { gameListener ->
+                            dbInteraction.dbGameReference.child(MainActivity.gameID.toString())
+                                .removeEventListener(
+                                    gameListener
+                                )
+                        }
+                        dbInteraction.dbGameReference.child(MainActivity.gameID.toString()).removeValue()
+                    }
+                }
+            }
     }
 
     private fun createMapOfGame(result: String): Map<String, String> {

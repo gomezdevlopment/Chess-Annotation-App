@@ -44,20 +44,22 @@ class MatchmakingRepository @Inject constructor(
                             if (key != null && username != null) {
                                 if (onlineGame.blackPlayer == "") {
                                     userColor = "black"
-                                    val gameCopy = onlineGame.copy(joinable = false, blackPlayer = username)
+                                    val gameCopy = onlineGame.copy(joinable = false, blackPlayer = username, players = 2)
                                     dbReference.child(key).updateChildren(gameToMap(gameCopy))
                                     navDestination.value = "game"
+                                    MainActivity.game = gameCopy
                                 } else {
                                     userColor = "white"
-                                    val gameCopy = onlineGame.copy(joinable = false, blackPlayer = username)
+                                    val gameCopy = onlineGame.copy(joinable = false, whitePlayer = username, players = 2)
                                     dbReference.child(key).updateChildren(gameToMap(gameCopy))
                                     navDestination.value = "game"
+                                    MainActivity.game = gameCopy
                                 }
                             }
                         }
                     }
                 } else {
-                    createGame(timeControl, MainActivity.user?.username.toString())
+                    createGame(timeControl, user?.username.toString())
                 }
             }
 
@@ -78,7 +80,8 @@ class MatchmakingRepository @Inject constructor(
             "resignation" to onlineGame.resignation,
             "drawOffer" to onlineGame.drawOffer,
             "rematchOffer" to onlineGame.rematchOffer,
-            "cancel" to onlineGame.cancel
+            "cancel" to onlineGame.cancel,
+            "players" to onlineGame.players
         )
     }
 
@@ -111,6 +114,7 @@ class MatchmakingRepository @Inject constructor(
 
 
         dbRepository.addGameToDatabase(newGame, username) {
+            gameID = username
             waitForMatch(username, opponentColor)
         }
 
@@ -125,6 +129,7 @@ class MatchmakingRepository @Inject constructor(
                         val game = snapshot.getValue(OnlineGame::class.java)
                         if (opponentColor == "whitePlayer") {
                             if (game?.whitePlayer != "") {
+                                MainActivity.game = game
                                 navDestination.value = "game"
                                 matchSearch?.let {
                                     dbReference.child(username).removeEventListener(it)
@@ -132,6 +137,7 @@ class MatchmakingRepository @Inject constructor(
                             }
                         } else {
                             if (game?.blackPlayer != "") {
+                                MainActivity.game = game
                                 navDestination.value = "game"
                                 matchSearch?.let {
                                     dbReference.child(username).removeEventListener(it)

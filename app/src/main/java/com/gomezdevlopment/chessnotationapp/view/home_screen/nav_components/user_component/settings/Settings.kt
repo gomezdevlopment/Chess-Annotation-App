@@ -23,9 +23,9 @@ import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
 @Composable
 fun Settings(userNavController: NavController, userViewModel: UserViewModel) {
     val animationSpeedOptions = listOf(
-        "Fast" to 150,
+        "Fast" to 50,
         "Medium" to 250,
-        "Slow" to 350,
+        "Slow" to 450,
     )
 
     val themeOptions = listOf("Light", "Dark", "System",)

@@ -6,6 +6,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.databinding.ActivityMainBinding
+import com.gomezdevlopment.chessnotationapp.realtime_database.Games
 import com.gomezdevlopment.chessnotationapp.realtime_database.OnlineGame
 import com.gomezdevlopment.chessnotationapp.realtime_database.User
 import com.google.firebase.firestore.DocumentReference
@@ -18,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     companion object{
+//        var games: Games? = null
         var user: User? = null
         var userColor: String = "both"
 //        var gameDocumentReference: DocumentReference? = null
