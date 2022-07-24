@@ -30,49 +30,53 @@ class UserViewModel @Inject constructor(
     val highlightStyle by settings.highlightStyle
     var initialized by mutableStateOf(false)
 
-    companion object{
-        var userGames = mutableListOf<Map<String, String>>()
+    companion object {
+        val userGames = mutableListOf<Map<String, String>>()
     }
 
-    fun setChessBoardTheme(boardTheme: Int){
+    fun setChessBoardTheme(boardTheme: Int) {
         viewModelScope.launch {
             settings.setBoardTheme(boardTheme)
         }
     }
 
-    fun setChessPieceTheme(pieceTheme: String){
+    fun setChessPieceTheme(pieceTheme: String) {
         viewModelScope.launch {
             settings.setPieceTheme(pieceTheme)
         }
     }
 
-    fun setTheme(theme: String){
+    fun setTheme(theme: String) {
         viewModelScope.launch {
             settings.setTheme(theme)
         }
     }
 
-    fun setHighlightStyle(theme: String){
+    fun setHighlightStyle(theme: String) {
         viewModelScope.launch {
             settings.setHighlightStyle(theme)
         }
     }
 
-    fun setPieceAnimationSpeed(speed: Int){
+    fun setPieceAnimationSpeed(speed: Int) {
         viewModelScope.launch {
             settings.setPieceAnimationSpeed(speed)
         }
     }
 
     fun initializeGamesList() {
-        println(MainActivity.user)
-        initialized = true
-        if (userGames.isEmpty()) {
-            MainActivity.user?.games?.games?.forEach { game ->
-                userGames.add(game)
+        val games = MainActivity.user?.games?.games
+        if((games?.size ?: 0) > userGames.size){
+            println("adding games")
+            val newGames = games?.subList(userGames.size, games.size)
+            newGames?.asReversed()?.forEachIndexed { index, game ->
+                userGames.add(index, game)
             }
-            userGames.reverse()
         }
+//        MainActivity.user?.games?.games?.forEach { game ->
+//            userGames.add(game)
+//        }
+//        userGames.reverse()
     }
 
 //    fun initializeFriendRequestListener() {
@@ -95,7 +99,11 @@ class UserViewModel @Inject constructor(
         return userRepository.parseFEN(fen)
     }
 
-    fun goToGameReview(gameViewModel: GameViewModel, game: Map<String, String>, homeNavController: NavController){
+    fun goToGameReview(
+        gameViewModel: GameViewModel,
+        game: Map<String, String>,
+        homeNavController: NavController
+    ) {
         userRepository.goToGameReview(gameViewModel, game, homeNavController)
     }
 }

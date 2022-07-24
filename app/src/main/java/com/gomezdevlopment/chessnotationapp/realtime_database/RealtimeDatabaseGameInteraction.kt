@@ -36,11 +36,8 @@ class RealtimeDatabaseGameInteraction @Inject constructor(
 
 
     fun writeMove(playerTurn: String, string: String) {
-        println(playerTurn)
         if (gameID != null) {
-            println("gameId not null")
             if (playerTurn == MainActivity.userColor) {
-                println(userColor)
                 val previousMove = mapOf(
                     "previousMove" to string
                 )

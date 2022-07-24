@@ -286,8 +286,8 @@ fun ResignAlertDialog(viewModel: GameViewModel) {
                     Text("Cancel", color = MaterialTheme.colors.primary)
                 }
             },
-            backgroundColor = textWhite,
-            contentColor = textWhite
+            backgroundColor = MaterialTheme.colors.background,
+            contentColor = MaterialTheme.colors.background
         )
     }
 }
@@ -304,7 +304,6 @@ fun DrawOfferAlertDialog(viewModel: GameViewModel) {
                     fontWeight = FontWeight.Bold
                 )
             },
-            //text = { Text("Hello! This is our Alert Dialog..", color = textWhite) },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -324,8 +323,8 @@ fun DrawOfferAlertDialog(viewModel: GameViewModel) {
                     Text("Cancel", color = MaterialTheme.colors.primary)
                 }
             },
-            backgroundColor = textWhite,
-            contentColor = textWhite
+            backgroundColor = MaterialTheme.colors.background,
+            contentColor = MaterialTheme.colors.background
         )
     }
 }
@@ -363,8 +362,8 @@ fun DrawOfferedAlertDialog(viewModel: GameViewModel) {
                     Text("Decline", color = MaterialTheme.colors.primary)
                 }
             },
-            backgroundColor = textWhite,
-            contentColor = textWhite
+            backgroundColor = MaterialTheme.colors.background,
+            contentColor = MaterialTheme.colors.background
         )
     }
 }

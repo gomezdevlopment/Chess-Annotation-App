@@ -1,6 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.realtime_database
 
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
+import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel.Companion.userGames
 import com.google.firebase.database.*
 import javax.inject.Inject
 
@@ -13,9 +14,9 @@ class RealtimeDatabaseDAO @Inject constructor(private val db: FirebaseDatabase) 
         }
     }
 
-    fun addGame(onlineGame: OnlineGame, username: String, waitForMatch: () -> Unit) {
+    fun addGame(onlineGame: OnlineGame, id: String, waitForMatch: () -> Unit) {
         val dbReference = db.getReference(OnlineGame::class.java.simpleName)
-        dbReference.child(username).setValue(onlineGame).addOnSuccessListener {
+        dbReference.child(id).setValue(onlineGame).addOnSuccessListener {
             waitForMatch()
         }
     }
@@ -27,17 +28,14 @@ class RealtimeDatabaseDAO @Inject constructor(private val db: FirebaseDatabase) 
         query.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 snapshot.children.forEach { user ->
-                    println(user)
                     userMap = user.getValue(User::class.java)
                     MainActivity.user = userMap
                     user.child("games").children.forEach {
-                        println(it)
                         val key = it.key
                         val value = it.value
                         if(key != null && value != null){
                             MainActivity.user?.games?.games?.add(value as MutableMap<String, String>)
                         }
-                        println("User Games: ${MainActivity.user?.games}")
                     }
                 }
             }

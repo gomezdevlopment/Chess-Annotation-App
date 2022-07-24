@@ -14,9 +14,9 @@ class RealtimeDatabaseRepository @Inject constructor(private val realtimeDatabas
         }
     }
 
-    fun addGameToDatabase(onlineGame: OnlineGame, username: String, waitForMatch: () -> Unit) {
+    fun addGameToDatabase(onlineGame: OnlineGame, id: String, waitForMatch: () -> Unit) {
         viewModelScope.launch {
-            realtimeDatabaseDAO.addGame(onlineGame, username) {
+            realtimeDatabaseDAO.addGame(onlineGame, id) {
                 waitForMatch()
             }
         }

@@ -5,10 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
@@ -45,7 +42,8 @@ fun EndOfGameCard(
                 .fillMaxHeight()
                 .padding(50.dp),
             elevation = 10.dp,
-            shape = RoundedCornerShape(20.dp)
+            shape = RoundedCornerShape(20.dp),
+            backgroundColor = MaterialTheme.colors.background
         ) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Column(
@@ -69,10 +67,10 @@ fun EndOfGameCard(
                         navController.navigate("home")
                         viewModel.removeGameListener()
                     }
-                    RoundDialogButton("Rematch")
-                    {
-                        cardVisible.value = false
-                    }
+//                    RoundDialogButton("Rematch")
+//                    {
+//                        cardVisible.value = false
+//                    }
                     Spacer(modifier = Modifier.height(20.dp))
                 }
             }
@@ -93,10 +91,10 @@ private fun RoundDialogButton(
             .fillMaxWidth()
             .padding(20.dp, 5.dp)
             .wrapContentHeight(),
-        border = BorderStroke(2.dp, colorResource(id = R.color.teal)),
+        border = BorderStroke(2.dp, MaterialTheme.colors.primary),
         colors = ButtonDefaults.buttonColors(
-            backgroundColor = Color.White,
-            contentColor = colorResource(id = R.color.teal)
+            backgroundColor = MaterialTheme.colors.background,
+            contentColor = MaterialTheme.colors.primary
         )
     )
     {

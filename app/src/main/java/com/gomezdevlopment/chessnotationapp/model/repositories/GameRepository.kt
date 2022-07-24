@@ -153,7 +153,7 @@ class GameRepository @Inject constructor(val dbInteraction: RealtimeDatabaseGame
                     override fun onDataChange(snapshot: DataSnapshot) {
                         println("data changed")
                         gameMap = snapshot.getValue(OnlineGame::class.java)
-                        if (gameMap?.resignation != "") {
+                        if (gameMap?.resignation != "" && gameMap?.players == 2) {
                             resignation(gameMap?.resignation)
                             startStopClocks()
                         }
@@ -164,7 +164,7 @@ class GameRepository @Inject constructor(val dbInteraction: RealtimeDatabaseGame
                                     openDrawOfferedDialog.value = true
                                 }
                             }
-                            if (drawOffer == "accept") {
+                            if (drawOffer == "accept" && gameMap?.players == 2) {
                                 drawAccepted()
                                 startStopClocks()
                             }
@@ -225,7 +225,8 @@ class GameRepository @Inject constructor(val dbInteraction: RealtimeDatabaseGame
                                     gameListener
                                 )
                         }
-                        dbInteraction.dbGameReference.child(MainActivity.gameID.toString()).removeValue()
+                        dbInteraction.dbGameReference.child(MainActivity.gameID.toString())
+                            .removeValue()
                     }
                 }
             }
@@ -258,27 +259,30 @@ class GameRepository @Inject constructor(val dbInteraction: RealtimeDatabaseGame
 
         game["color"] = color
 
+        game["timeControl"] =
+            when (initialTime.value) {
+                600000L -> "rapid"
+                300000L -> "blitz"
+                else -> "bullet"
+            }
         return game
     }
 
     private fun writeWinToFirestore(result: String) {
         dbInteraction.incrementWins()
         val game = createMapOfGame(result)
-        userGames.add(0, game)
         dbInteraction.writeGame(game)
     }
 
     private fun writeLossToFirestore(result: String) {
         dbInteraction.incrementLosses()
         val game = createMapOfGame(result)
-        userGames.add(0, game)
         dbInteraction.writeGame(game)
     }
 
     private fun writeDrawToFirestore(result: String) {
         dbInteraction.incrementDraws()
         val game = createMapOfGame(result)
-        userGames.add(0, game)
         dbInteraction.writeGame(game)
     }
 

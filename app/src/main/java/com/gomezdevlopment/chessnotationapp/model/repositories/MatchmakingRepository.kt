@@ -17,8 +17,6 @@ class MatchmakingRepository @Inject constructor(
     private val dbRepository: RealtimeDatabaseRepository
 ) : ViewModel() {
 
-    //private val db = Firebase.firestore
-    private val gamePoolCollection = "gamePool"
     val navDestination = mutableStateOf("")
     val time = mutableStateOf(60000L)
 
@@ -27,7 +25,6 @@ class MatchmakingRepository @Inject constructor(
     var resetSearch = mutableStateOf(0)
     val dbReference = db.getReference(OnlineGame::class.java.simpleName)
     var gameReference: DatabaseReference? = null
-    //lateinit var gameDocumentReference: DocumentReference
 
     fun joinGame(timeControl: Long) {
         time.value = timeControl
@@ -35,6 +32,7 @@ class MatchmakingRepository @Inject constructor(
         query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 if (snapshot.exists()) {
+                    var gameAvailable = false
                     snapshot.children.forEach { game ->
                         val onlineGame = game.getValue(OnlineGame::class.java)
                         if (onlineGame?.joinable == true) {
@@ -43,12 +41,14 @@ class MatchmakingRepository @Inject constructor(
                             val username = user?.username
                             if (key != null && username != null) {
                                 if (onlineGame.blackPlayer == "") {
+                                    gameAvailable = true
                                     userColor = "black"
                                     val gameCopy = onlineGame.copy(joinable = false, blackPlayer = username, players = 2)
                                     dbReference.child(key).updateChildren(gameToMap(gameCopy))
                                     navDestination.value = "game"
                                     MainActivity.game = gameCopy
                                 } else {
+                                    gameAvailable = true
                                     userColor = "white"
                                     val gameCopy = onlineGame.copy(joinable = false, whitePlayer = username, players = 2)
                                     dbReference.child(key).updateChildren(gameToMap(gameCopy))
@@ -58,6 +58,10 @@ class MatchmakingRepository @Inject constructor(
                             }
                         }
                     }
+                    if(!gameAvailable){
+                        createGame(timeControl, user?.username.toString())
+                    }
+
                 } else {
                     createGame(timeControl, user?.username.toString())
                 }
@@ -112,18 +116,19 @@ class MatchmakingRepository @Inject constructor(
             timeControl = timeControl,
         )
 
-
-        dbRepository.addGameToDatabase(newGame, username) {
-            gameID = username
-            waitForMatch(username, opponentColor)
+        val id = "$username${System.currentTimeMillis()}"
+        dbRepository.addGameToDatabase(newGame, id) {
+            gameID = id
+            waitForMatch(id, opponentColor)
         }
 
     }
 
-    private fun waitForMatch(username: String, opponentColor: String) {
-        gameReference = dbReference.child(username)
+    private fun waitForMatch(id: String, opponentColor: String) {
+        gameReference = dbReference.child(id)
+        gameReference?.onDisconnect()?.removeValue()
         matchSearch =
-            dbReference.child(username).addValueEventListener(object : ValueEventListener {
+            dbReference.child(id).addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     if (snapshot.exists()) {
                         val game = snapshot.getValue(OnlineGame::class.java)
@@ -132,7 +137,7 @@ class MatchmakingRepository @Inject constructor(
                                 MainActivity.game = game
                                 navDestination.value = "game"
                                 matchSearch?.let {
-                                    dbReference.child(username).removeEventListener(it)
+                                    dbReference.child(id).removeEventListener(it)
                                 }
                             }
                         } else {
@@ -140,13 +145,13 @@ class MatchmakingRepository @Inject constructor(
                                 MainActivity.game = game
                                 navDestination.value = "game"
                                 matchSearch?.let {
-                                    dbReference.child(username).removeEventListener(it)
+                                    dbReference.child(id).removeEventListener(it)
                                 }
                             }
                         }
 
                         if (game?.cancel == true) {
-                            matchSearch?.let { dbReference.child(username).removeEventListener(it) }
+                            matchSearch?.let { dbReference.child(id).removeEventListener(it) }
                         }
                     }
                 }
