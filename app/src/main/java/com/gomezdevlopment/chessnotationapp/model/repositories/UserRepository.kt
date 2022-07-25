@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.model.repositories
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
@@ -7,13 +8,19 @@ import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.model.pieces.ChessPieces
+import com.gomezdevlopment.chessnotationapp.realtime_database.Friends
+import com.gomezdevlopment.chessnotationapp.realtime_database.RealtimeDatabaseRepository
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
 @HiltViewModel
-class UserRepository @Inject constructor(): ViewModel() {
+class UserRepository @Inject constructor(private val realtimeDatabaseRepository: RealtimeDatabaseRepository): ViewModel() {
+    val friendsList = mutableStateListOf<Friends>()
+    val pending = mutableStateListOf<Friends>()
+    val requests = mutableStateListOf<Friends>()
     fun goToGameReview(gameViewModel: GameViewModel, game: Map<String, String>, homeNavController: NavController){
         val annotations = mutableListOf<String>()
         for (i in 0..game.size - 4) {
@@ -102,5 +109,21 @@ class UserRepository @Inject constructor(): ViewModel() {
             }
         }
         return pieces
+    }
+
+    fun sendFriendRequest(request: Friends){
+        realtimeDatabaseRepository.sendFriendRequest(request)
+    }
+
+    fun checkFriends(username: String){
+        realtimeDatabaseRepository.checkFriends(username, friendsList, pending, requests)
+    }
+
+    fun acceptFriendRequest(request: Friends){
+        realtimeDatabaseRepository.acceptFriendRequest(request)
+    }
+
+    fun declineFriendRequest(request: Friends){
+        realtimeDatabaseRepository.declineFriendRequest(request)
     }
 }

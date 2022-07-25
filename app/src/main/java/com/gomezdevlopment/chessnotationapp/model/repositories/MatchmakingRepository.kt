@@ -43,14 +43,22 @@ class MatchmakingRepository @Inject constructor(
                                 if (onlineGame.blackPlayer == "") {
                                     gameAvailable = true
                                     userColor = "black"
-                                    val gameCopy = onlineGame.copy(joinable = false, blackPlayer = username, players = 2)
+                                    val gameCopy = onlineGame.copy(
+                                        joinable = false,
+                                        blackPlayer = username,
+                                        players = 2
+                                    )
                                     dbReference.child(key).updateChildren(gameToMap(gameCopy))
                                     navDestination.value = "game"
                                     MainActivity.game = gameCopy
                                 } else {
                                     gameAvailable = true
                                     userColor = "white"
-                                    val gameCopy = onlineGame.copy(joinable = false, whitePlayer = username, players = 2)
+                                    val gameCopy = onlineGame.copy(
+                                        joinable = false,
+                                        whitePlayer = username,
+                                        players = 2
+                                    )
                                     dbReference.child(key).updateChildren(gameToMap(gameCopy))
                                     navDestination.value = "game"
                                     MainActivity.game = gameCopy
@@ -58,7 +66,7 @@ class MatchmakingRepository @Inject constructor(
                             }
                         }
                     }
-                    if(!gameAvailable){
+                    if (!gameAvailable) {
                         createGame(timeControl, user?.username.toString())
                     }
 
@@ -94,17 +102,20 @@ class MatchmakingRepository @Inject constructor(
         var whitePlayer = ""
         var blackPlayer = ""
         var opponentColor = ""
+        var playerColor = ""
 
         when (randomColor) {
             0 -> {
                 whitePlayer = username
                 userColor = "white"
                 opponentColor = "blackPlayer"
+                playerColor = "whitePlayer"
             }
             1 -> {
                 blackPlayer = username
                 userColor = "black"
                 opponentColor = "whitePlayer"
+                playerColor = "blackPlayer"
             }
         }
 
@@ -126,7 +137,9 @@ class MatchmakingRepository @Inject constructor(
 
     private fun waitForMatch(id: String, opponentColor: String) {
         gameReference = dbReference.child(id)
-        gameReference?.onDisconnect()?.removeValue()
+        gameReference?.onDisconnect()?.updateChildren(mapOf("joinable" to false))
+        gameReference?.onDisconnect()?.updateChildren(mapOf("cancel" to true))
+
         matchSearch =
             dbReference.child(id).addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {

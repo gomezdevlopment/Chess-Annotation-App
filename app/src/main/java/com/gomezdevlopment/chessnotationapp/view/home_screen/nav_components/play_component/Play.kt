@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.play_component
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -45,8 +46,10 @@ fun PlayScreen(
             LazyRow(Modifier.padding(10.dp, 10.dp)) {
                 itemsIndexed(gameModes) { index, mode ->
                     GameSelectionCard(drawableID = gameModeImageIDs[index], title = mode) {
-                        matchmakingViewModel.joinGame(timeControls[index])
-                        navController.navigate("matchSearch")
+                        if(MainActivity.user?.username != null){
+                            matchmakingViewModel.joinGame(timeControls[index])
+                            navController.navigate("matchSearch")
+                        }
                     }
                 }
             }

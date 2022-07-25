@@ -2,6 +2,7 @@ package com.gomezdevlopment.chessnotationapp.di
 
 import android.app.Application
 import androidx.room.Room
+import com.gomezdevlopment.chessnotationapp.App
 import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.model.repositories.AuthenticationRepository
 import com.gomezdevlopment.chessnotationapp.model.repositories.MatchmakingRepository
@@ -62,7 +63,7 @@ object AppModule {
 
 
     @Provides
-    fun provideUserRepository() = UserRepository()
+    fun provideUserRepository(realtimeDBRepository: RealtimeDatabaseRepository) = UserRepository(realtimeDBRepository)
 
     @Singleton
     @Provides
@@ -74,7 +75,7 @@ object AppModule {
 
     @Singleton
     @Provides
-    fun providesRealtimeDatabaseDAO(realtimeDB: FirebaseDatabase) = RealtimeDatabaseDAO(realtimeDB)
+    fun providesRealtimeDatabaseDAO(realtimeDB: FirebaseDatabase, app: Application) = RealtimeDatabaseDAO(realtimeDB, app)
 
     @Singleton
     @Provides

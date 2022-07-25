@@ -99,9 +99,6 @@ class GameRepository @Inject constructor(val dbInteraction: RealtimeDatabaseGame
 
     init {
         initialPosition()
-        //testPositionKiwipete()
-        //testPosition3()
-        //testPosition4()
         checkAllLegalMoves()
     }
 
@@ -153,6 +150,11 @@ class GameRepository @Inject constructor(val dbInteraction: RealtimeDatabaseGame
                     override fun onDataChange(snapshot: DataSnapshot) {
                         println("data changed")
                         gameMap = snapshot.getValue(OnlineGame::class.java)
+
+                        if (gameMap?.cancel == true) {
+                            connectionLoss()
+                        }
+
                         if (gameMap?.resignation != "" && gameMap?.players == 2) {
                             resignation(gameMap?.resignation)
                             startStopClocks()
@@ -322,6 +324,20 @@ class GameRepository @Inject constructor(val dbInteraction: RealtimeDatabaseGame
                     setEndOfGameValues("White Wins!", "by Resignation")
                 }
             }
+        }
+    }
+
+    private fun connectionLoss() {
+        when (userColor) {
+            "white" -> {
+                writeWinToFirestore("Win by connection loss")
+                setEndOfGameValues("White Wins!", "Opponent Lost Connection")
+            }
+            "black" -> {
+                writeWinToFirestore("Win by connection loss")
+                setEndOfGameValues("Black Wins!", "Opponent Lost Connection")
+            }
+
         }
     }
 

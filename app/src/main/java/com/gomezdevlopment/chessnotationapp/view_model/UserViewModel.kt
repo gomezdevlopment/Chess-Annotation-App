@@ -7,6 +7,7 @@ import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.repositories.UserRepository
 import com.gomezdevlopment.chessnotationapp.model.utils.UserSettings
+import com.gomezdevlopment.chessnotationapp.realtime_database.Friends
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -21,7 +22,6 @@ class UserViewModel @Inject constructor(
     var destination = mutableStateOf("Games")
 
     var color = "white"
-    val friendsList = mutableListOf<String>()
     val search = mutableStateOf("")
     val chessBoardTheme by settings.chessBoardTheme
     val pieceThemeSelection by settings.pieceTheme
@@ -29,6 +29,9 @@ class UserViewModel @Inject constructor(
     val themeSelection by settings.theme
     val highlightStyle by settings.highlightStyle
     var initialized by mutableStateOf(false)
+    val friendsList = userRepository.friendsList
+    val requests = userRepository.requests
+    val pending = userRepository.pending
 
     companion object {
         val userGames = mutableListOf<Map<String, String>>()
@@ -73,25 +76,38 @@ class UserViewModel @Inject constructor(
                 userGames.add(index, game)
             }
         }
-//        MainActivity.user?.games?.games?.forEach { game ->
-//            userGames.add(game)
-//        }
-//        userGames.reverse()
+        initializeFriendRequestListener()
     }
 
-//    fun initializeFriendRequestListener() {
-//        userRepository.firestore.friendRequestListener(this)
-//    }
+    fun initializeFriendRequestListener() {
+        if(!initialized){
+            val username = MainActivity.user?.username
+            if(username != null){
+                userRepository.checkFriends(username)
+            }
+            initialized = true
+        }
+    }
 
     fun onSearchChanged(newValue: String) {
         search.value = newValue
     }
 
-//    fun newSearch(friend: String) {
-//        viewModelScope.launch {
-//            userRepository.firestore.sendFriendRequest(friend)
-//        }
-//    }
+    fun acceptFriendRequest(request: Friends){
+        userRepository.acceptFriendRequest(request)
+    }
+
+    fun declineFriendRequest(request: Friends){
+        userRepository.declineFriendRequest(request)
+    }
+
+    fun newSearch(sender: String, receiver: String) {
+        viewModelScope.launch {
+            val request = Friends(sender = sender, receiver = receiver)
+            userRepository.sendFriendRequest(request)
+        }
+    }
+
 
     fun parseFEN(
         fen: String,
