@@ -30,6 +30,8 @@ import dagger.hilt.android.AndroidEntryPoint
 class HomeFragment : Fragment() {
     private lateinit var puzzleViewModel: PuzzleViewModel
     val gameViewModel: GameViewModel by viewModels()
+    val userViewModel: UserViewModel by viewModels()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         puzzleViewModel = ViewModelProvider(this).get(PuzzleViewModel::class.java)
@@ -43,18 +45,28 @@ class HomeFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             val matchmakingViewModel: MatchmakingViewModel by viewModels()
             val signOutViewModel: SignOutViewModel by viewModels()
-            val userViewModel: UserViewModel by viewModels()
             val userSettings: UserSettings by viewModels()
             setContent {
-                val darkTheme = if(userSettings.theme.value == "System") isSystemInDarkTheme() else userSettings.isDarkThemeSelected.value ?: false
-                if(darkTheme){
+                val darkTheme =
+                    if (userSettings.theme.value == "System") isSystemInDarkTheme() else userSettings.isDarkThemeSelected.value
+                        ?: false
+                if (darkTheme) {
                     rememberSystemUiController().setStatusBarColor(backgroundDark, false)
-                }else{
-                    rememberSystemUiController().setStatusBarColor(com.gomezdevlopment.chessnotationapp.view.theming.background, true)
+                } else {
+                    rememberSystemUiController().setStatusBarColor(
+                        com.gomezdevlopment.chessnotationapp.view.theming.background,
+                        true
+                    )
                 }
 
                 AppTheme(darkTheme = darkTheme) {
-                    Navigation(gameViewModel, matchmakingViewModel, signOutViewModel, puzzleViewModel, userViewModel)
+                    Navigation(
+                        gameViewModel,
+                        matchmakingViewModel,
+                        signOutViewModel,
+                        puzzleViewModel,
+                        userViewModel
+                    )
                     SoundFX(viewModel = gameViewModel)
                 }
             }
@@ -64,53 +76,30 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        gameViewModel.export.observe(viewLifecycleOwner, Observer {
-            if(it){
-                val uri by gameViewModel.uri
-                if(uri != null){
-                    val sendIntent = Intent(Intent.ACTION_SEND)
-//                sendIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    sendIntent.putExtra(Intent.EXTRA_STREAM, uri)
-                    sendIntent.type = "text/pgn"
-                    ContextCompat.startActivity(this.requireContext(), Intent.createChooser(sendIntent, "SHARE"), null)
-                }
+        userViewModel.signedOut.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                println("signed out")
+                androidx.navigation.Navigation.findNavController(view)
+                    .navigate(R.id.action_homeFragment_to_signInFragment)
             }
         })
 
 
-//    private fun exportGameFile(context: Context) {
-//        if (homeViewModel.getWhiteMoves().value.isNullOrEmpty()) {
-//            Toast.makeText(context, "Cannot export game because there are no annotations!", Toast.LENGTH_SHORT).show()
-//        } else {
-//            if (whiteMovesAdapter.itemCount != blackMovesAdapter.itemCount) {
-//                homeViewModel.addBlackMove("")
-//            }
-//            val uri = createPGNFile(context)
-//            launchShareIntent(uri)
-//        }
-//    }
-//
-//    private fun createPGNFile(context: Context): Uri {
-//        val filename = "chess_game.pgn"
-//        val path = activity?.getExternalFilesDir(null)
-//        val pgnFile = File(path, filename)
-//        pgnFile.delete()
-//        pgnFile.createNewFile()
-//        pgnFile.appendText(homeViewModel.createPGNString())
-//        return FileProvider.getUriForFile(
-//            context,
-//            activity?.applicationContext?.packageName.toString() + ".provider",
-//            pgnFile
-//        )
-//    }
-//
-//    private fun launchShareIntent(uri: Uri){
-//        val sendIntent = Intent(Intent.ACTION_SEND)
-//        sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-//        sendIntent.putExtra(Intent.EXTRA_STREAM, uri)
-//        sendIntent.type = "text/pgn"
-//        startActivity(Intent.createChooser(sendIntent, "SHARE"))
-//    }
+        gameViewModel.export.observe(viewLifecycleOwner, Observer {
+            if (it) {
+                val uri by gameViewModel.uri
+                if (uri != null) {
+                    val sendIntent = Intent(Intent.ACTION_SEND)
+                    sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    sendIntent.putExtra(Intent.EXTRA_STREAM, uri)
+                    sendIntent.type = "text/pgn"
+                    ContextCompat.startActivity(
+                        this.requireContext(),
+                        Intent.createChooser(sendIntent, "SHARE"),
+                        null
+                    )
+                }
+            }
+        })
     }
 }

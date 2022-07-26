@@ -51,8 +51,12 @@ class RealtimeDatabaseDAO @Inject constructor(
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
-                    }else{
-                        Toast.makeText(app, "Already Friends or Friend Request Already Sent", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(
+                            app,
+                            "Already Friends or Friend Request Already Sent",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 } else {
                     Toast.makeText(app, "$receiver not found", Toast.LENGTH_SHORT).show()
@@ -209,5 +213,13 @@ class RealtimeDatabaseDAO @Inject constructor(
 
         return List(7) { charset.shuffled().random() }
             .joinToString("")
+    }
+
+    fun deleteUserData() {
+        val username = MainActivity.user?.username
+        if (username != null) {
+            db.getReference(User::class.java.simpleName).child(username).removeValue()
+        }
+
     }
 }

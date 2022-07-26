@@ -92,35 +92,4 @@ class AuthenticationRepository @Inject constructor(private val dbRepository: Rea
     private fun createUser(email: String, password: String): User {
         return User(email = email, password = password)
     }
-
-
-
-//    private fun createFriendsDocument(username: String): HashMap<String, Serializable> {
-//        return hashMapOf(
-//            "user" to username,
-//            "friends" to arrayListOf<String>())
-//    }
-
-//    private fun addFirestoreDocument(user: HashMap<String, Serializable>) {
-//        val username = user["username"].toString()
-//        db.collection("friends")
-//            .whereEqualTo("user", user["username"])
-//            .get()
-//            .addOnSuccessListener { query ->
-//                if(query.isEmpty){
-//                    db.collection("friends").add(createFriendsDocument(username)).addOnFailureListener {
-//                        println("failed to add doc")
-//                    }
-//                }
-//            }
-//            .addOnFailureListener {
-//
-//            }
-//        db.collection("users")
-//            .add(user)
-//            .addOnFailureListener { e ->
-//                Toast.makeText(application, e.toString(), Toast.LENGTH_LONG).show()
-//            }
-//
-//    }
 }

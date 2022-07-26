@@ -52,7 +52,7 @@ fun UserScreen(userViewModel: UserViewModel, homeNavController: NavController, u
         when (userViewModel.destination.value) {
             "Games" -> Games(userViewModel, homeNavController, gameViewModel)
             "Friends" -> Friends(userViewModel)
-            "Settings" -> Settings(userNavController, userViewModel)
+            "Settings" -> Settings(userNavController, homeNavController, userViewModel)
         }
     }
 }
@@ -142,16 +142,15 @@ fun UserNavbarItem(modifier: Modifier,
     }
 }
 
-//@Composable
-//fun Settings(signOutViewModel: SignOutViewModel, navController: NavController) {
-//    Column(verticalArrangement = Arrangement.Center) {
-//        Button(
-//            onClick = {
-//                signOutViewModel.signOut()
-//                navController.navigate(R.id.action_settingsFragment_to_signInFragment)
-//            }
-//        ) {
-//            Text("Sign Out")
-//        }
-//    }
-//}
+@Composable
+fun SignOut(navController: NavController) {
+    Column(verticalArrangement = Arrangement.Center) {
+        Button(
+            onClick = {
+                navController.navigate(R.id.action_homeFragment_to_signInFragment)
+            }
+        ) {
+            Text("Sign Out")
+        }
+    }
+}

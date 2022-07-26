@@ -126,4 +126,8 @@ class UserRepository @Inject constructor(private val realtimeDatabaseRepository:
     fun declineFriendRequest(request: Friends){
         realtimeDatabaseRepository.declineFriendRequest(request)
     }
+
+    fun deleteUserData(){
+        realtimeDatabaseRepository.deleteUserData()
+    }
 }
