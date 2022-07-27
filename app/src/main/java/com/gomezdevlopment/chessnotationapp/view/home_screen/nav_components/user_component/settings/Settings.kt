@@ -30,7 +30,6 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 @Composable
 fun Settings(
     userNavController: NavController,
-    homeNavController: NavController,
     userViewModel: UserViewModel
 ) {
     val animationSpeedOptions = listOf(

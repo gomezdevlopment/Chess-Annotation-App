@@ -52,7 +52,7 @@ fun UserScreen(userViewModel: UserViewModel, homeNavController: NavController, u
         when (userViewModel.destination.value) {
             "Games" -> Games(userViewModel, homeNavController, gameViewModel)
             "Friends" -> Friends(userViewModel)
-            "Settings" -> Settings(userNavController, homeNavController, userViewModel)
+            "Settings" -> Settings(userNavController, userViewModel)
         }
     }
 }
@@ -71,7 +71,7 @@ fun User() {
     Row(
         Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colors.primary)
+            .background(MaterialTheme.colors.background)
             .padding(20.dp),
     ) {
         Column() {
@@ -80,12 +80,12 @@ fun User() {
                 Modifier.padding(10.dp, 5.dp),
                 fontWeight = FontWeight.ExtraBold,
                 fontSize = 20.sp,
-                color = MaterialTheme.colors.onPrimary
+                color = MaterialTheme.colors.onBackground
             )
             val wins = user?.wins
             val losses = user?.losses
             val draws = user?.draws
-            Text("$wins Wins/$losses Losses/$draws Draws", Modifier.padding(10.dp, 5.dp), color = MaterialTheme.colors.onPrimary)
+            Text("$wins Wins/$losses Losses/$draws Draws", Modifier.padding(10.dp, 5.dp), color = MaterialTheme.colors.onBackground)
         }
     }
 }
@@ -99,7 +99,7 @@ fun UserNavbar(userViewModel: UserViewModel) {
     Row(
         verticalAlignment = Alignment.CenterVertically, modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colors.primary)
+            .background(MaterialTheme.colors.background)
             .padding(0.dp, 10.dp)
     ) {
         UserNavbarItem(
@@ -128,14 +128,14 @@ fun UserNavbarItem(modifier: Modifier,
             .padding(15.dp, 5.dp)
             .fillMaxWidth(),
         onClick = {viewModel.destination.value = text},
-        colors = ButtonDefaults.buttonColors(backgroundColor = if (isSelected) MaterialTheme.colors.surface else MaterialTheme.colors.primary),
+        colors = ButtonDefaults.buttonColors(backgroundColor = if (isSelected) MaterialTheme.colors.surface else MaterialTheme.colors.background),
         elevation = ButtonDefaults.elevation(0.dp)
     ) {
         Column() {
             Text(
                 text = text,
                 fontSize = 16.sp,
-                color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.onPrimary,
+                color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.onBackground,
                 modifier = Modifier.padding(0.dp)
             )
         }
