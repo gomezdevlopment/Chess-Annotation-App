@@ -216,7 +216,7 @@ fun DeleteAccountDialog(userViewModel: UserViewModel) {
                 )
             },
             text = {
-                   Text("All your data will be deleted, this can not be undone.", color = MaterialTheme.colors.onBackground)
+                   Text("All your data will be deleted, this cannot be undone.", color = MaterialTheme.colors.onBackground)
             },
             confirmButton = {
                 TextButton(

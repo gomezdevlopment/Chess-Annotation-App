@@ -1,9 +1,7 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.settings
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import android.widget.Space
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyVerticalGrid
@@ -37,7 +35,9 @@ fun BoardThemes(navController: NavController, viewModel: UserViewModel) {
         "Teal" to tealBoard,
         "Orange" to orangeBoard,
         "Blue" to blueBoard,
-        "Grey" to greyBoard
+        "Grey" to greyBoard,
+        "Dark Cyan" to darkCyanBoard,
+        "Purple" to purpleBoard
     )
 
     Column(
@@ -52,10 +52,11 @@ fun BoardThemes(navController: NavController, viewModel: UserViewModel) {
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
                 contentDescription = "Go Back",
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier
+                    .size(30.dp)
                     .clickable {
-                    navController.popBackStack()
-                })
+                        navController.popBackStack()
+                    })
         }
         Row(
             Modifier
@@ -74,8 +75,12 @@ fun BoardThemes(navController: NavController, viewModel: UserViewModel) {
                         viewModel.setChessBoardTheme(board.second)
                     }
                 }
+                item(){
+                    Spacer(modifier = Modifier.height(100.dp))
+                }
             }
         }
+
     }
 }
 

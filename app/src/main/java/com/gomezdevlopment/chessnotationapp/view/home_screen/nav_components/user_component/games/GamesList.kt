@@ -1,11 +1,11 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.games
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
@@ -17,12 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.graphics.vector.VectorProperty
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
@@ -52,10 +49,14 @@ fun Games(
         olderGames = userGames.subList(3, userGames.size)
     }
 
-    LazyColumn() {
+    LazyColumn {
 
         item {
-            Text(text = "Recent Games", modifier = Modifier.padding(20.dp, 5.dp))
+            if(recentGames.isNotEmpty()){
+                Text(text = "Recent Games", modifier = Modifier.padding(20.dp, 5.dp))
+            }else{
+                Text(text = "You have not played any games.", modifier = Modifier.padding(20.dp, 5.dp))
+            }
         }
         itemsIndexed(recentGames) { index, game ->
             val color = game["color"]
@@ -67,9 +68,11 @@ fun Games(
             }
         }
         item {
-            Text(text = "Older Games", modifier = Modifier.padding(20.dp, 5.dp))
+            if(olderGames.isNotEmpty()){
+                Text(text = "Older Games", modifier = Modifier.padding(20.dp, 5.dp))
+            }
         }
-        itemsIndexed(olderGames) { index, game ->
+        items(olderGames) { game ->
             val color = game["color"]
             if (color != null) {
                 MainActivity.userColor = color
@@ -147,7 +150,7 @@ fun GamesCard(
             .clickable { onClick() }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             GamesCardBoardState(viewModel = viewModel, index)
-            Column() {
+            Column {
                 result?.let {
                     Text(
                         it,
@@ -194,7 +197,7 @@ fun OlderGamesCard(
             .padding(20.dp, 5.dp)
             .clickable { onClick() }) {
         Row(modifier = Modifier.padding(10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Column() {
+            Column {
                 Canvas(modifier = Modifier.padding(20.dp, 15.dp)) {
                     drawCircle(
                         color = if (color == "white") Color.Black else white,
@@ -206,7 +209,7 @@ fun OlderGamesCard(
                     )
                 }
             }
-            Column() {
+            Column {
                 result?.let {
                     Text(
                         it,

@@ -1,6 +1,8 @@
 package com.gomezdevlopment.chessnotationapp.model.repositories
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
@@ -21,6 +23,7 @@ class UserRepository @Inject constructor(private val realtimeDatabaseRepository:
     val friendsList = mutableStateListOf<Friends>()
     val pending = mutableStateListOf<Friends>()
     val requests = mutableStateListOf<Friends>()
+    val friendsRecord = mutableStateOf("0W/0L/0D")
     fun goToGameReview(gameViewModel: GameViewModel, game: Map<String, String>, homeNavController: NavController){
         val annotations = mutableListOf<String>()
         for (i in 0..game.size - 4) {
@@ -129,5 +132,9 @@ class UserRepository @Inject constructor(private val realtimeDatabaseRepository:
 
     fun deleteUserData(){
         realtimeDatabaseRepository.deleteUserData()
+    }
+
+    fun getFriendsStats(friendsUsername: String) {
+        realtimeDatabaseRepository.getFriendsStats(friendsUsername, friendsRecord)
     }
 }

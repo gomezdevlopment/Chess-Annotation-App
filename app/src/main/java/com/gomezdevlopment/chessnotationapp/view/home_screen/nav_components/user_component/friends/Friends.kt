@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.friends
 
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -19,10 +20,6 @@ import androidx.compose.ui.unit.dp
 import com.gomezdevlopment.chessnotationapp.realtime_database.Friends
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.util.Collections.list
 
 @Composable
 fun FriendsList(viewModel: UserViewModel) {
@@ -48,8 +45,7 @@ fun FriendsList(viewModel: UserViewModel) {
                 Text("Friend Requests", modifier = Modifier.padding(20.dp, 5.dp))
             }
             items(requests) { friend ->
-                FriendsCard(friend = friend.sender, true, viewModel) {
-                    println("This is a Friend Request")
+                FriendsCard(friend = friend.sender, true, viewModel, false) {
                 }
             }
         }
@@ -59,8 +55,7 @@ fun FriendsList(viewModel: UserViewModel) {
                 Text("Pending", modifier = Modifier.padding(20.dp, 5.dp))
             }
             items(pending) { friend ->
-                FriendsCard(friend = friend.receiver, false, viewModel) {
-                    println("This is a Pending Friend")
+                FriendsCard(friend = friend.receiver, false, viewModel, false) {
                 }
             }
         }
@@ -69,9 +64,15 @@ fun FriendsList(viewModel: UserViewModel) {
             item() {
                 Text("Friends", modifier = Modifier.padding(20.dp, 5.dp))
             }
-            items(friends) { friend ->
-                FriendsCard(friend = friend, false, viewModel) {
-                    println("This is a Friend")
+            itemsIndexed(friends) { index, friend ->
+                FriendsCard(
+                    friend = friend,
+                    false,
+                    viewModel,
+                    viewModel.friendIndex.value == index
+                ) {
+                    viewModel.friendIndex.value = index
+                    viewModel.showFriendsStats(friend)
                 }
             }
         }
@@ -79,7 +80,13 @@ fun FriendsList(viewModel: UserViewModel) {
 }
 
 @Composable
-fun FriendsCard(friend: String, pending: Boolean, viewModel: UserViewModel, onClick: () -> Unit) {
+fun FriendsCard(
+    friend: String,
+    pending: Boolean,
+    viewModel: UserViewModel,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
     val username = MainActivity.user?.username
     Card(
         Modifier
@@ -90,11 +97,18 @@ fun FriendsCard(friend: String, pending: Boolean, viewModel: UserViewModel, onCl
                 onClick()
             }) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                friend, modifier = Modifier
-                    .padding(10.dp, 10.dp)
-                    .weight(1f)
-            )
+            Column() {
+                Text(
+                    friend, modifier = Modifier
+                        .padding(10.dp, 10.dp)
+                )
+                if (viewModel.showFriendsRecord.value && isSelected) {
+                    Text(
+                        viewModel.friendsRecord, modifier = Modifier
+                            .padding(10.dp, 10.dp)
+                    )
+                }
+            }
             if (pending) {
                 Column(
                     horizontalAlignment = Alignment.End,
@@ -159,7 +173,9 @@ fun FriendSearchBar(viewModel: UserViewModel) {
             onSearch = {
                 val username = MainActivity.user?.username
                 if (username != null) {
-                    viewModel.newSearch(username, search)
+                    if (username != search) {
+                        viewModel.newSearch(username, search)
+                    }
                 }
             }
         )

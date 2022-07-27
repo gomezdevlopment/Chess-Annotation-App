@@ -2,6 +2,7 @@ package com.gomezdevlopment.chessnotationapp.realtime_database
 
 import android.app.Application
 import android.widget.Toast
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
@@ -36,36 +37,40 @@ class RealtimeDatabaseDAO @Inject constructor(
         val query = userReference.orderByChild("username").equalTo(receiver)
         query.addListenerForSingleValueEvent(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                println(snapshot)
                 if (snapshot.hasChildren()) {
                     val dbReference = db.getReference(Friends::class.java.simpleName)
-                    val friendRequestAlreadySent = dbReference.child("$sender$receiver").key != null
-                            || dbReference.child("$receiver$sender").key != null
-
-                    if (!friendRequestAlreadySent) {
-                        dbReference.child("$sender$receiver").setValue(request)
-                            .addOnSuccessListener {
+                    dbReference.addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val friendRequestAlreadySent =
+                                snapshot.child("$sender$receiver").exists()
+                                        || snapshot.child("$receiver$sender").exists()
+                            if (!friendRequestAlreadySent) {
+                                dbReference.child("$sender$receiver").setValue(request)
+                                    .addOnSuccessListener {
+                                        Toast.makeText(
+                                            app,
+                                            "Friend Request sent to $receiver",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                            } else {
                                 Toast.makeText(
                                     app,
-                                    "Friend Request sent to $receiver",
+                                    "Already Friends or Friend Request Already Sent",
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }
-                    } else {
-                        Toast.makeText(
-                            app,
-                            "Already Friends or Friend Request Already Sent",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {}
+                    })
+
                 } else {
                     Toast.makeText(app, "$receiver not found", Toast.LENGTH_SHORT).show()
                 }
             }
 
-            override fun onCancelled(error: DatabaseError) {
-
-            }
+            override fun onCancelled(error: DatabaseError) {}
 
         })
 
@@ -91,11 +96,12 @@ class RealtimeDatabaseDAO @Inject constructor(
                                         pending.add(friend)
                                     }
                                     "accepted" -> {
-                                        friendsList.add(friend)
+                                        if(!friendsList.contains(friend)){
+                                            friendsList.add(friend)
+                                        }
                                         pending.remove(friend.copy(status = "pending"))
                                     }
                                     "declined" -> {
-                                        friendsList.add(friend)
                                         pending.remove(friend.copy(status = "pending"))
                                     }
 
@@ -120,14 +126,17 @@ class RealtimeDatabaseDAO @Inject constructor(
                             if (friend != null) {
                                 when (friend.status) {
                                     "pending" -> {
-                                        requests.add(friend)
+                                        if(!requests.contains(friend)){
+                                            requests.add(friend)
+                                        }
                                     }
                                     "accepted" -> {
-                                        friendsList.add(friend)
+                                        if(!friendsList.contains(friend)){
+                                            friendsList.add(friend)
+                                        }
                                         requests.remove(friend.copy(status = "pending"))
                                     }
                                     "declined" -> {
-                                        friendsList.add(friend)
                                         requests.remove(friend.copy(status = "pending"))
                                     }
                                 }
@@ -218,8 +227,60 @@ class RealtimeDatabaseDAO @Inject constructor(
     fun deleteUserData() {
         val username = MainActivity.user?.username
         if (username != null) {
+            deleteFriends(username)
             db.getReference(User::class.java.simpleName).child(username).removeValue()
         }
+    }
 
+    private fun deleteFriends(username: String) {
+        val dbReference = db.getReference(Friends::class.java.simpleName)
+        val query = dbReference.orderByChild("sender").equalTo(username)
+        query.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.hasChildren()) {
+                    snapshot.children.forEach {
+                        val key = it.key
+                        if (key != null) {
+                            dbReference.child(key).removeValue()
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
+        val query2 = dbReference.orderByChild("receiver").equalTo(username)
+        query2.addListenerForSingleValueEvent(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                if (snapshot.hasChildren()) {
+                    snapshot.children.forEach {
+                        val key = it.key
+                        if (key != null) {
+                            dbReference.child(key).removeValue()
+                        }
+                    }
+                }
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
+    }
+
+    fun getFriendsStats(friendsUsername: String, friendsRecord: MutableState<String>) {
+        val dbReference = db.getReference(User::class.java.simpleName)
+        dbReference.child(friendsUsername)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val friend = snapshot.getValue(User::class.java)
+                    if (friend != null) {
+                        friendsRecord.value = "${friend.wins}W/${friend.losses}L/${friend.draws}D"
+                    }
+                }
+                override fun onCancelled(error: DatabaseError) {}
+            })
     }
 }

@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.realtime_database
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -50,5 +51,9 @@ class RealtimeDatabaseRepository @Inject constructor(private val realtimeDatabas
 
     fun deleteUserData() {
         realtimeDatabaseDAO.deleteUserData()
+    }
+
+    fun getFriendsStats(friendsUsername: String, friendsRecord: MutableState<String>) {
+        realtimeDatabaseDAO.getFriendsStats(friendsUsername, friendsRecord)
     }
 }

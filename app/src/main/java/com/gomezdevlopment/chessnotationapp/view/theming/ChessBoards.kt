@@ -6,3 +6,5 @@ const val tealBoard = R.drawable.ic_chess_board_teal
 const val greyBoard = R.drawable.ic_ches_board_grey
 const val blueBoard = R.drawable.ic_chess_board_blue
 const val orangeBoard = R.drawable.ic_chess_board_orange
+const val purpleBoard = R.drawable.ic_chessboardpurple
+const val darkCyanBoard = R.drawable.ic_chessboardtealdark

@@ -40,7 +40,9 @@ class UserViewModel @Inject constructor(
     val signedOut: MutableLiveData<Boolean> = MutableLiveData(false)
     val signedOutStatusBarColorChange = mutableStateOf(false)
     val showDeleteAccountDialog = mutableStateOf(false)
-    val deleteAccount = mutableStateOf(false)
+    val showFriendsRecord = mutableStateOf(false)
+    val friendsRecord by userRepository.friendsRecord
+    val friendIndex = mutableStateOf(0)
 
     companion object {
         val userGames = mutableListOf<Map<String, String>>()
@@ -57,6 +59,7 @@ class UserViewModel @Inject constructor(
         userRepository.deleteUserData()
         val firebaseAuth = FirebaseAuth.getInstance()
         firebaseAuth.currentUser?.delete()
+        firebaseAuth.signOut()
         signedOut.postValue(true)
     }
 
@@ -146,5 +149,10 @@ class UserViewModel @Inject constructor(
         userRepository.goToGameReview(gameViewModel, game, homeNavController)
     }
 
-
+    fun showFriendsStats(friendsUsername: String) {
+        showFriendsRecord.value = !showFriendsRecord.value
+        if(showFriendsRecord.value){
+            userRepository.getFriendsStats(friendsUsername)
+        }
+    }
 }
