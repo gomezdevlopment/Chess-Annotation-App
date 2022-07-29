@@ -19,8 +19,6 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 @Composable
 fun GameReview(viewModel: GameViewModel, navController: NavController){
 //    rememberSystemUiController().setStatusBarColor(MaterialTheme.colors.background)
-    val chessBoardVector: ImageVector =
-        ImageVector.vectorResource(id = viewModel.chessBoardTheme)
 
     Column(Modifier.fillMaxHeight().background(MaterialTheme.colors.background),) {
         Row(verticalAlignment = Alignment.Top) {
@@ -47,7 +45,7 @@ fun GameReview(viewModel: GameViewModel, navController: NavController){
                         .fillMaxWidth()
                         .aspectRatio(1f),
                 ) {
-                    ChessBoard(chessBoardVector = chessBoardVector, modifier = Modifier.chessBoardFullScreen())
+                    ChessBoard(chessBoard= viewModel.chessBoardTheme, modifier = Modifier.chessBoardFullScreen())
                     Pieces(
                         height = maxWidth / 8,
                         pieces = viewModel.piecesOnBoard,

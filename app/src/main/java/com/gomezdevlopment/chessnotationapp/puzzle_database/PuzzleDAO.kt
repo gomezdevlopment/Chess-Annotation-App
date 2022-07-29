@@ -13,13 +13,13 @@ interface PuzzleDAO {
     @Query("SELECT * FROM puzzle WHERE rating BETWEEN :userRating-400 AND :userRating+100")
     fun getPuzzles(userRating: Int): List<Puzzle>
 
-    @Query("SELECT * FROM puzzle WHERE rating BETWEEN 500 AND 1000")
+    @Query("SELECT * FROM puzzle WHERE rating BETWEEN 500 AND 999")
     fun getBeginnerPuzzles(): List<Puzzle>
 
-    @Query("SELECT * FROM puzzle WHERE rating BETWEEN 1000 AND 1500")
+    @Query("SELECT * FROM puzzle WHERE rating BETWEEN 1000 AND 1499")
     fun getIntermediatePuzzles(): List<Puzzle>
 
-    @Query("SELECT * FROM puzzle WHERE rating BETWEEN 1500 AND 3000")
+    @Query("SELECT * FROM puzzle WHERE rating BETWEEN 150 AND 3000")
     fun getAdvancedPuzzles(): List<Puzzle>
 
 }

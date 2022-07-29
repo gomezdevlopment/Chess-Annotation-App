@@ -1,9 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.settings
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
@@ -36,6 +33,7 @@ fun PieceThemes(navController: NavController, viewModel: UserViewModel) {
     val pieceThemes = listOf(
         "Alpha" to alphaTheme,
         "Leipzig" to leipzigTheme,
+        "Chess7" to chess7Theme
     )
 
     Column(
@@ -85,7 +83,6 @@ fun PieceThemeSelectionItem(
     viewModel: UserViewModel,
     onClick: () -> Unit
 ) {
-    val pieceThemeVector = ImageVector.vectorResource(id = theme)
     val currentSelection = viewModel.pieceThemeSelection
 
     Card(
@@ -103,8 +100,9 @@ fun PieceThemeSelectionItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(15.dp)
         ) {
-            ChessBoard(
-                chessBoardVector = pieceThemeVector,
+            Image(
+                ImageVector.vectorResource(id = theme),
+                contentDescription = "Chess Board",
                 modifier = Modifier.fillMaxWidth()
             )
             Text(

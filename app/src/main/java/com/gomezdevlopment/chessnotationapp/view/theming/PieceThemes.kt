@@ -33,3 +33,19 @@ val leipzig = mapOf(
     "bn" to R.drawable.ic_bn_leipzig,
     "bp" to R.drawable.ic_bp_leipzig,
 )
+
+val chess7Theme = R.drawable.ic_chess7_theme
+val chess7 = mapOf(
+    "wk" to R.drawable.ic_wk_chess7,
+    "wq" to R.drawable.ic_wq_chess7,
+    "wr" to R.drawable.ic_wr_chess7,
+    "wb" to R.drawable.ic_wb_chess7,
+    "wn" to R.drawable.ic_wn_chess7,
+    "wp" to R.drawable.ic_wp_chess7,
+    "bk" to R.drawable.ic_bk_chess7,
+    "bq" to R.drawable.ic_bq_chess7,
+    "br" to R.drawable.ic_br_chess7,
+    "bb" to R.drawable.ic_bb_chess7,
+    "bn" to R.drawable.ic_bn_chess7,
+    "bp" to R.drawable.ic_bp_chess7,
+)

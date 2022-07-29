@@ -33,11 +33,15 @@ import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
 fun BoardThemes(navController: NavController, viewModel: UserViewModel) {
     val boardThemes = listOf(
         "Teal" to tealBoard,
+        "Dark Cyan" to darkCyanBoard,
+        "Brown" to brownBoard,
         "Orange" to orangeBoard,
         "Blue" to blueBoard,
+        "Purple" to purpleBoard,
         "Grey" to greyBoard,
-        "Dark Cyan" to darkCyanBoard,
-        "Purple" to purpleBoard
+        "Checkers" to checkersBoard,
+        "Wood" to woodBoard,
+        "Purple Pearl" to purplePearlBoard
     )
 
     Column(
@@ -91,7 +95,6 @@ fun BoardSelectionItem(
     viewModel: UserViewModel,
     onClick: () -> Unit
 ) {
-    val chessBoardVector = ImageVector.vectorResource(id = board)
     val currentSelection = viewModel.chessBoardTheme
 
     Card(
@@ -110,7 +113,7 @@ fun BoardSelectionItem(
             modifier = Modifier.padding(15.dp)
         ) {
             ChessBoard(
-                chessBoardVector = chessBoardVector,
+                chessBoard = board,
                 modifier = Modifier.chessBoardThemeSelection()
             )
             Text(

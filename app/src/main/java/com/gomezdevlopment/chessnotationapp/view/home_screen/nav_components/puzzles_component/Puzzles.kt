@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -44,11 +45,10 @@ import com.gomezdevlopment.chessnotationapp.view_model.PuzzleViewModel
 fun PuzzleScreen(viewModel: PuzzleViewModel, navController: NavController) {
 
     if(viewModel.showNoMorePuzzlesCard.value){
-        AllPuzzlesCompletedCard(header = "Congratulations!", message = "You completed all Puzzles!")
+        AllPuzzlesCompletedCard(header = "Congratulations!", message = "You completed all Puzzles!"){
+            navController.popBackStack()
+        }
     }
-
-    val chessBoardVector: ImageVector =
-        ImageVector.vectorResource(id = viewModel.chessBoardTheme)
 
     Column(
         verticalArrangement = Arrangement.Center,
@@ -61,7 +61,8 @@ fun PuzzleScreen(viewModel: PuzzleViewModel, navController: NavController) {
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
                 contentDescription = "Go Back",
-                modifier = Modifier.size(30.dp)
+                modifier = Modifier
+                    .size(30.dp)
                     .clickable {
                         navController.popBackStack()
                     })
@@ -85,7 +86,7 @@ fun PuzzleScreen(viewModel: PuzzleViewModel, navController: NavController) {
                 .fillMaxWidth()
                 .aspectRatio(1f),
         ) {
-            ChessBoard(chessBoardVector = chessBoardVector, modifier = Modifier.chessBoardFullScreen())
+            ChessBoard(chessBoard = viewModel.chessBoardTheme, modifier = Modifier.chessBoardFullScreen())
             Pieces(
                 height = maxWidth / 8,
                 pieces = viewModel.piecesOnBoard,
@@ -436,7 +437,8 @@ fun PuzzlePromotion(
 @Composable
 fun AllPuzzlesCompletedCard(
     header: String,
-    message: String
+    message: String,
+    onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -449,9 +451,9 @@ fun AllPuzzlesCompletedCard(
     {
         Card(
             modifier = Modifier
-                .fillMaxWidth()
                 .wrapContentHeight()
-                .padding(50.dp),
+                .wrapContentWidth()
+                .padding(10.dp),
             elevation = 10.dp,
             shape = RoundedCornerShape(20.dp)
         ) {
@@ -465,14 +467,14 @@ fun AllPuzzlesCompletedCard(
                         text = header,
                         textAlign = TextAlign.Center,
                         fontSize = 24.sp,
-                        modifier = Modifier.absolutePadding(10.dp)
+                        modifier = Modifier.padding(10.dp)
                     )
                     Spacer(modifier = Modifier.height(20.dp))
                     Text(text = message, textAlign = TextAlign.Center, fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(50.dp))
                 }
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                    TextButton(onClick = {  }) {
+                    TextButton(onClick = { onClick() }) {
                         Text("Close", color = MaterialTheme.colors.primary)
                     }
                     Spacer(modifier = Modifier.height(20.dp))
@@ -481,3 +483,4 @@ fun AllPuzzlesCompletedCard(
         }
     }
 }
+

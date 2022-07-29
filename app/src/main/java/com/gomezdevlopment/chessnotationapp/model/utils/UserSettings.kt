@@ -14,9 +14,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import com.gomezdevlopment.chessnotationapp.R
-import com.gomezdevlopment.chessnotationapp.view.theming.alpha
-import com.gomezdevlopment.chessnotationapp.view.theming.backgroundDark
-import com.gomezdevlopment.chessnotationapp.view.theming.leipzig
+import com.gomezdevlopment.chessnotationapp.view.theming.*
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -46,6 +44,7 @@ class UserSettings @Inject constructor(private val context: Application): ViewMo
         when(theme){
             "Alpha" -> pieceThemeMap.value = alpha
             "Leipzig" -> pieceThemeMap.value = leipzig
+            "Chess7" -> pieceThemeMap.value = chess7
         }
     }
 
@@ -92,7 +91,7 @@ class UserSettings @Inject constructor(private val context: Application): ViewMo
 
     private suspend fun chessBoardTheme(): Int {
         val preferences = context.dataStore.data.first()
-        return preferences[BOARD_THEME] ?: R.drawable.ic_chess_board_teal
+        return preferences[BOARD_THEME] ?: tealBoard
     }
 
     private suspend fun pieceTheme(): String {
@@ -112,7 +111,7 @@ class UserSettings @Inject constructor(private val context: Application): ViewMo
 
     private suspend fun pieceAnimationSpeed(): Int {
         val preferences = context.dataStore.data.first()
-        return preferences[PIECE_ANIMATION_SPEED] ?: 150
+        return preferences[PIECE_ANIMATION_SPEED] ?: 50
     }
 
     init {

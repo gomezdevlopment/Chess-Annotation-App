@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -23,17 +24,16 @@ import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
+import com.gomezdevlopment.chessnotationapp.view.theming.purplePearlBoard
 import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
 import com.gomezdevlopment.chessnotationapp.view.theming.textWhite
+import com.gomezdevlopment.chessnotationapp.view.theming.woodBoard
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     rememberSystemUiController().setStatusBarColor(MaterialTheme.colors.background)
-    val chessBoardVector: ImageVector =
-        ImageVector.vectorResource(id = viewModel.chessBoardTheme)
-
     ResignAlertDialog(viewModel = viewModel)
     DrawOfferAlertDialog(viewModel = viewModel)
     DrawOfferedAlertDialog(viewModel = viewModel)
@@ -74,7 +74,7 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
                         .aspectRatio(1f),
                 ) {
                     ChessBoard(
-                        chessBoardVector = chessBoardVector,
+                        chessBoard = viewModel.chessBoardTheme,
                         modifier = Modifier.chessBoardFullScreen()
                     )
                     Pieces(
@@ -168,12 +168,20 @@ fun WhiteClock(viewModel: GameViewModel, size: Dp, arrangement: Arrangement.Hori
 
 
 @Composable
-fun ChessBoard(chessBoardVector: ImageVector, modifier: Modifier) {
-    Image(
-        imageVector = chessBoardVector,
-        contentDescription = "Chess Board",
-        modifier = modifier
-    )
+fun ChessBoard(chessBoard: Int, modifier: Modifier) {
+    if(chessBoard == woodBoard || chessBoard == purplePearlBoard){
+        Image(
+            painterResource(id = chessBoard),
+            contentDescription = "Chess Board",
+            modifier = modifier
+        )
+    }else{
+        Image(
+            ImageVector.vectorResource(id = chessBoard),
+            contentDescription = "Chess Board",
+            modifier = modifier
+        )
+    }
 }
 
 fun Modifier.chessBoardFullScreen() =
