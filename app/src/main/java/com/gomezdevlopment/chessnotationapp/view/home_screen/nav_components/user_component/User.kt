@@ -34,25 +34,23 @@ import com.gomezdevlopment.chessnotationapp.view.theming.textWhite
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
 
-@Composable
-fun UserNavigation(userViewModel: UserViewModel, homeNavController: NavController, gameViewModel: GameViewModel) {
-    val userNavController = rememberNavController()
-    NavHost(navController = userNavController, startDestination = "user") {
-        composable("user") { UserScreen(userViewModel, homeNavController, userNavController, gameViewModel) }
-        composable("boardThemes") { BoardThemes(userNavController, userViewModel) }
-        composable("pieceThemes") { PieceThemes(userNavController, userViewModel) }
-    }
-}
+//@Composable
+//fun UserNavigation(userViewModel: UserViewModel, homeNavController: NavController, gameViewModel: GameViewModel) {
+//    val userNavController = rememberNavController()
+//    NavHost(navController = userNavController, startDestination = "user") {
+//        composable("user") { UserScreen(userViewModel, homeNavController, userNavController, gameViewModel) }
+//    }
+//}
 
 @Composable
-fun UserScreen(userViewModel: UserViewModel, homeNavController: NavController, userNavController: NavController, gameViewModel: GameViewModel) {
+fun UserScreen(userViewModel: UserViewModel, navController: NavController, gameViewModel: GameViewModel) {
     Column(Modifier.fillMaxSize()) {
         User()
         UserNavbar(userViewModel)
         when (userViewModel.destination.value) {
-            "Games" -> Games(userViewModel, homeNavController, gameViewModel)
+            "Games" -> Games(userViewModel, navController, gameViewModel)
             "Friends" -> Friends(userViewModel)
-            "Settings" -> Settings(userNavController, userViewModel)
+            "Settings" -> Settings(navController, userViewModel)
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -16,13 +15,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.gomezdevlopment.chessnotationapp.view.game_screen.board.GameScreen
-import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.games.GameReview
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.play_component.PlayScreen
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component.PuzzleDifficultySelectionScreen
-import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component.PuzzleScreen
-import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.UserNavigation
-import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.UserScreen
 import com.gomezdevlopment.chessnotationapp.view_model.*
 
 @Composable
@@ -100,61 +95,23 @@ fun NavigationFromMatchSearch(
 }
 
 @Composable
-fun Navigation(
-    gameViewModel: GameViewModel,
-    matchmakingViewModel: MatchmakingViewModel,
-    signOutViewModel: SignOutViewModel,
-    puzzleViewModel: PuzzleViewModel,
-    userViewModel: UserViewModel
-) {
-    val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "home") {
-        composable("home") {
-            Home(
-                navController,
-                matchmakingViewModel,
-                gameViewModel,
-                puzzleViewModel,
-                userViewModel
-            )
-        }
-        composable("game") {
-            GameScreen(gameViewModel, navController)
-        }
-        composable("gameReview") {
-            GameReview(gameViewModel, navController)
-        }
-        composable("matchSearch") {
-            MatchSearch(
-                gameViewModel,
-                matchmakingViewModel,
-                navController
-            )
-        }
-    }
-}
-
-@Composable
 fun HomeBottomNavigation(
-    navController: NavHostController,
-    playNavController: NavController,
+    bottomNavBarController: NavHostController,
+    navController: NavController,
     matchmakingViewModel: MatchmakingViewModel,
     gameViewModel: GameViewModel,
     puzzleViewModel: PuzzleViewModel,
     userViewModel: UserViewModel
 ) {
-    NavHost(navController = navController, startDestination = "play") {
+    NavHost(navController = bottomNavBarController, startDestination = "play") {
         composable("play") {
-            PlayScreen(playNavController, matchmakingViewModel, gameViewModel)
+            PlayScreen(navController, matchmakingViewModel, gameViewModel)
         }
         composable("puzzleDifficultySelection") {
             PuzzleDifficultySelectionScreen(puzzleViewModel, navController)
         }
-        composable("puzzles") {
-            PuzzleScreen(puzzleViewModel, navController)
-        }
         composable("user") {
-            UserNavigation(userViewModel, playNavController, gameViewModel)
+            UserScreen(userViewModel, navController, gameViewModel)
         }
     }
 }
@@ -170,8 +127,8 @@ fun Home(
     val bottomNavBarController = rememberNavController()
     Scaffold(bottomBar = { BottomNavBar(navController = bottomNavBarController) }) {
         HomeBottomNavigation(
-            navController = bottomNavBarController,
-            playNavController = navController,
+            bottomNavBarController = bottomNavBarController,
+            navController = navController,
             matchmakingViewModel = matchmakingViewModel,
             gameViewModel = gameViewModel,
             puzzleViewModel = puzzleViewModel,

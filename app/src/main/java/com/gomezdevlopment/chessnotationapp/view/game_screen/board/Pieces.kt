@@ -141,7 +141,7 @@ fun Pieces(
         if (highlightStyle == "Outline") {
             Outline(height = height, square = previousSquare, color = yellow)
         } else {
-            Highlight(height = height, square = previousSquare, color = yellow, .9f)
+            Highlight(height = height, square = previousSquare, color = yellow, .8f)
         }
     }
 
@@ -149,7 +149,7 @@ fun Pieces(
         if (highlightStyle == "Outline") {
             Outline(height = height, square = currentSquare, color = yellow)
         } else {
-            Highlight(height = height, square = currentSquare, yellow, .9f)
+            Highlight(height = height, square = currentSquare, yellow, .8f)
         }
     }
 

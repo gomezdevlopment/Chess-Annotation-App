@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component
 
+import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Canvas
@@ -18,6 +19,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
@@ -44,97 +46,136 @@ import com.gomezdevlopment.chessnotationapp.view_model.PuzzleViewModel
 @Composable
 fun PuzzleScreen(viewModel: PuzzleViewModel, navController: NavController) {
 
-    if(viewModel.showNoMorePuzzlesCard.value){
-        AllPuzzlesCompletedCard(header = "Congratulations!", message = "You completed all Puzzles!"){
+    if (viewModel.showNoMorePuzzlesCard.value) {
+        AllPuzzlesCompletedCard(
+            header = "Congratulations!",
+            message = "You completed all Puzzles!"
+        ) {
             navController.popBackStack()
         }
     }
 
-    Column(
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(10.dp, 5.dp), horizontalArrangement = Arrangement.Start) {
-            Icon(
-                imageVector = Icons.Filled.ArrowBack,
-                contentDescription = "Go Back",
-                modifier = Modifier
-                    .size(30.dp)
-                    .clickable {
-                        navController.popBackStack()
-                    })
-        }
-        BoxWithConstraints(
-            Modifier
-                .weight(1f)
-        ) {
-            Column(verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    viewModel.puzzleRating.value,
-                    fontSize = 20.sp,
-                    modifier = Modifier.padding(20.dp),
+    val config = LocalConfiguration.current
+    when (config.orientation) {
+        Configuration.ORIENTATION_PORTRAIT -> {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)
+            ) {
+                PuzzleUIElements(
+                    viewModel = viewModel,
+                    navController = navController,
+                    weight = Modifier.weight(1f),
+                    config = config,
+                    backButtonModifier = Modifier.fillMaxWidth()
                 )
             }
         }
-
-        BoxWithConstraints(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(1f),
-        ) {
-            ChessBoard(chessBoard = viewModel.chessBoardTheme, modifier = Modifier.chessBoardFullScreen())
-            Pieces(
-                height = maxWidth / 8,
-                pieces = viewModel.piecesOnBoard,
-                playerTurn = viewModel.getPlayerTurn(),
-                userColor = viewModel.userColor.value,
-                selectedPiece = viewModel.selectedPiece,
-                pieceClicked = viewModel.pieceClicked,
-                kingInCheck = viewModel.kingInCheck.value,
-                currentSquare = viewModel.getCurrentSquare().value,
-                previousSquare = viewModel.getPreviousSquare().value,
-                kingSquare = viewModel.kingSquare,
-                theme = viewModel.pieceTheme,
-                pieceAnimationSpeed = 300,
-                highlightStyle = viewModel.highlightStyle,
-                hint = viewModel.hint.value,
-                correctPiece = viewModel.correctPiece.value
-            )
-            Coordinates(size = maxWidth / 8)
-            PuzzleUILogic(height = maxWidth / 8, viewModel = viewModel)
-
-//            if (viewModel.endOfPuzzle.value) {
-//                if (viewModel.correct.value) {
-//                    OutlineBoard(height = maxWidth, color = greenCorrect)
-//                } else {
-//                    OutlineBoard(height = maxWidth, color = redIncorrect)
-//                }
-//            }
-        }
-        BoxWithConstraints(
-            Modifier
-                .weight(1f)
-        ) {
-            if (!viewModel.endOfPuzzle.value) {
-                HintButton(viewModel = viewModel)
-            }
-            Column(Modifier.height(maxHeight), verticalArrangement = Arrangement.Bottom) {
-                if (viewModel.endOfPuzzle.value) {
-                    EndOfPuzzleCard(viewModel)
-                }
-                //Hacky Way to account for the height of the nav bar
-                Spacer(modifier = Modifier.height(60.dp))
+        else -> {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.Top,
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)
+            ) {
+                PuzzleUIElements(
+                    viewModel = viewModel,
+                    navController = navController,
+                    weight = Modifier.weight(1f),
+                    config = config,
+                    backButtonModifier = Modifier
+                )
             }
         }
     }
 }
 
 @Composable
-fun EndOfPuzzleCard(viewModel: PuzzleViewModel) {
+fun PuzzleUIElements(
+    viewModel: PuzzleViewModel,
+    navController: NavController,
+    weight: Modifier,
+    config: Configuration,
+    backButtonModifier: Modifier
+) {
+    Row(
+        backButtonModifier
+            .padding(10.dp, 5.dp), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top
+    ) {
+        Icon(
+            imageVector = Icons.Filled.ArrowBack,
+            contentDescription = "Go Back",
+            tint = MaterialTheme.colors.onBackground,
+            modifier = Modifier
+                .size(30.dp)
+                .clickable {
+                    navController.popBackStack()
+                })
+    }
+    BoxWithConstraints(
+        weight
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                viewModel.puzzleRating.value,
+                fontSize = 20.sp,
+                modifier = Modifier.padding(20.dp),
+                color = MaterialTheme.colors.onBackground
+            )
+        }
+    }
+    val modifier = if (config.orientation == Configuration.ORIENTATION_LANDSCAPE)
+        Modifier.fillMaxHeight()
+    else Modifier.fillMaxWidth()
+    BoxWithConstraints(
+        modifier = modifier
+            .aspectRatio(1f),
+    ) {
+        ChessBoard(
+            chessBoard = viewModel.chessBoardTheme,
+            modifier = Modifier.chessBoardFullScreen()
+        )
+        Pieces(
+            height = maxWidth / 8,
+            pieces = viewModel.piecesOnBoard,
+            playerTurn = viewModel.getPlayerTurn(),
+            userColor = viewModel.userColor.value,
+            selectedPiece = viewModel.selectedPiece,
+            pieceClicked = viewModel.pieceClicked,
+            kingInCheck = viewModel.kingInCheck.value,
+            currentSquare = viewModel.getCurrentSquare().value,
+            previousSquare = viewModel.getPreviousSquare().value,
+            kingSquare = viewModel.kingSquare,
+            theme = viewModel.pieceTheme,
+            pieceAnimationSpeed = 300,
+            highlightStyle = viewModel.highlightStyle,
+            hint = viewModel.hint.value,
+            correctPiece = viewModel.correctPiece.value
+        )
+        Coordinates(size = maxWidth / 8)
+        PuzzleUILogic(height = maxWidth / 8, viewModel = viewModel)
+    }
+    BoxWithConstraints(
+        weight
+    ) {
+        if (!viewModel.endOfPuzzle.value) {
+            HintButton(viewModel = viewModel)
+        }
+        Column(Modifier.height(maxHeight), verticalArrangement = Arrangement.Bottom) {
+            if (viewModel.endOfPuzzle.value) {
+                EndOfPuzzleCard(viewModel, config.orientation==Configuration.ORIENTATION_LANDSCAPE)
+            }
+            //Hacky Way to account for the height of the nav bar
+            Spacer(modifier = Modifier.height(60.dp))
+        }
+    }
+}
+
+@Composable
+fun EndOfPuzzleCard(viewModel: PuzzleViewModel, landscape: Boolean) {
     val message by viewModel.message
     val image by viewModel.image
     Row(
@@ -154,7 +195,6 @@ fun EndOfPuzzleCard(viewModel: PuzzleViewModel) {
             ) {
                 Column(horizontalAlignment = Alignment.Start) {
 
-
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Image(
                             imageVector = ImageVector.vectorResource(id = image),
@@ -165,40 +205,49 @@ fun EndOfPuzzleCard(viewModel: PuzzleViewModel) {
                     }
                 }
                 Column(horizontalAlignment = Alignment.End, modifier = Modifier.weight(1f)) {
-                    Row() {
-                        if (viewModel.endOfPuzzle.value) {
-                            if (!viewModel.correct.value) {
-                                TextButton(onClick = {
-                                    viewModel.setPuzzle()
-                                }) {
-                                    Text(
-                                        text = "Try Again",
-                                        fontSize = 14.sp,
-                                        color = MaterialTheme.colors.onSurface,
-                                        modifier = Modifier.padding(10.dp)
-                                    )
-                                }
-                            }
+                    if(landscape){
+                        Column() {
+                            EndOfPuzzleCardButtons(viewModel = viewModel)
                         }
-                        TextButton(onClick = {
-                            viewModel.puzzleIndex += 1
-                            viewModel.setPuzzle()
-                        }) {
-                            Text(
-                                text = "Next",
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colors.onSurface,
-                                modifier = Modifier.padding(10.dp)
-                            )
+                    }else{
+                        Row() {
+                            EndOfPuzzleCardButtons(viewModel = viewModel)
                         }
                     }
-
                 }
             }
         }
     }
 }
 
+@Composable
+fun EndOfPuzzleCardButtons(viewModel: PuzzleViewModel){
+    if (viewModel.endOfPuzzle.value) {
+        if (!viewModel.correct.value) {
+            TextButton(onClick = {
+                viewModel.setPuzzle()
+            }) {
+                Text(
+                    text = "Try Again",
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colors.onSurface,
+                    modifier = Modifier.padding(10.dp)
+                )
+            }
+        }
+    }
+    TextButton(onClick = {
+        viewModel.puzzleIndex += 1
+        viewModel.setPuzzle()
+    }) {
+        Text(
+            text = "Next",
+            fontSize = 14.sp,
+            color = MaterialTheme.colors.onSurface,
+            modifier = Modifier.padding(10.dp)
+        )
+    }
+}
 @Composable
 fun HintButton(viewModel: PuzzleViewModel) {
     TextButton(
@@ -280,56 +329,6 @@ private fun PuzzleUILogic(height: Dp, viewModel: PuzzleViewModel) {
 }
 
 @Composable
-fun HintOutline(
-    height: Dp,
-    square: Square,
-    color: Color,
-    modifier: Modifier
-) {
-    val offsetX = Utils().offsetX(height.value, square.file)
-    val offsetY = Utils().offsetY(height.value, square.rank)
-    Canvas(
-        modifier = modifier
-            .height(height)
-            .aspectRatio(1f)
-            .absoluteOffset(offsetX.dp, offsetY.dp)
-            .padding(3.dp)
-            .zIndex(2f)
-
-    ) {
-        drawRect(
-            color = color,
-            size = size,
-            alpha = 1f,
-            style = Stroke(size.width * .075f)
-        )
-    }
-}
-
-@Composable
-fun OutlineBoard(
-    height: Dp,
-    color: Color
-) {
-    Canvas(
-        modifier = Modifier
-            .height(height)
-            .aspectRatio(1f)
-            .absoluteOffset(0.dp, 0.dp)
-            .padding(1.dp)
-            .zIndex(2f)
-
-    ) {
-        drawRect(
-            color = color,
-            size = size,
-            alpha = 1f,
-            style = Stroke(size.width * .01f)
-        )
-    }
-}
-
-@Composable
 private fun SoundFX(viewModel: PuzzleViewModel) {
     val pieceSound = remember { viewModel.getPieceSound() }
     val checkSound = remember { viewModel.getCheckSound() }
@@ -385,7 +384,7 @@ fun PuzzlePromotion(
         offsetY = width * 4
     }
 
-    if(rank == 7 && MainActivity.userColor == "black"){
+    if (rank == 7 && MainActivity.userColor == "black") {
         offsetY = width * 4
     }
 
@@ -408,7 +407,7 @@ fun PuzzlePromotion(
             Column(Modifier.fillMaxWidth()) {
                 list.forEach() {
                     var drawable = pieces[it]?.pieceDrawable
-                    if(drawable == null){
+                    if (drawable == null) {
                         drawable = com.google.android.material.R.drawable.mtrl_ic_error
                     }
                     Image(
@@ -473,7 +472,10 @@ fun AllPuzzlesCompletedCard(
                     Text(text = message, textAlign = TextAlign.Center, fontSize = 14.sp)
                     Spacer(modifier = Modifier.height(50.dp))
                 }
-                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     TextButton(onClick = { onClick() }) {
                         Text("Close", color = MaterialTheme.colors.primary)
                     }

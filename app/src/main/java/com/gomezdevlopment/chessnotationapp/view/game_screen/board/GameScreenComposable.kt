@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen.board
 
+import android.content.res.Configuration
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.AlertDialog
@@ -8,9 +9,11 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +27,7 @@ import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
+import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component.PuzzleUIElements
 import com.gomezdevlopment.chessnotationapp.view.theming.purplePearlBoard
 import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
 import com.gomezdevlopment.chessnotationapp.view.theming.textWhite
@@ -37,108 +41,216 @@ fun GameScreen(viewModel: GameViewModel, navController: NavController) {
     ResignAlertDialog(viewModel = viewModel)
     DrawOfferAlertDialog(viewModel = viewModel)
     DrawOfferedAlertDialog(viewModel = viewModel)
-    Column(
-        Modifier
-            .fillMaxHeight()
-            .background(MaterialTheme.colors.background)) {
+    val config = LocalConfiguration.current
+    Column(Modifier.fillMaxSize()) {
         Row(verticalAlignment = Alignment.Top) {
             AnnotationBar(viewModel)
         }
-        Column(verticalArrangement = Arrangement.Center, modifier = Modifier.weight(1f)) {
-            BoxWithConstraints(Modifier.fillMaxWidth()) {
-                val size = maxWidth / 7
-                when (userColor) {
-                    "white" -> {
-                        Column() {
-                            BlackClock(viewModel = viewModel, size = size, Arrangement.Start)
-                        }
-                        Column() {
-                            BlackCaptures(viewModel, Arrangement.End)
-                        }
+        when (config.orientation) {
+            Configuration.ORIENTATION_PORTRAIT -> {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colors.background)
+                        .weight(1f)
+                ) {
+                    GameUIElements(
+                        viewModel = viewModel,
+                        navController = navController,
+                        weight = Modifier.weight(1f),
+                        landscape = false
+                    )
+                }
+            }
+            else -> {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.Top,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colors.background)
+                        .weight(1f)
+                ) {
+                    GameUIElements(
+                        viewModel = viewModel,
+                        navController = navController,
+                        weight = Modifier.weight(1f),
+                        landscape = true
+                    )
+                }
+            }
+        }
+        Row(verticalAlignment = Alignment.Bottom) {
+            if (userColor == "both") {
+                LocalGameBar(viewModel = viewModel, navController = navController)
+            } else {
+                GameBar(viewModel = viewModel)
+            }
+        }
+    }
+
+}
+
+@Composable
+fun GameUIElements(
+    viewModel: GameViewModel,
+    navController: NavController,
+    weight: Modifier,
+    landscape: Boolean
+) {
+    BoxWithConstraints(modifier = weight) {
+        val size = if (landscape) maxWidth / 2 else maxWidth / 7
+        when (userColor) {
+            "white" -> {
+                if (landscape) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(maxWidth),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        BlackClock(viewModel = viewModel, size = size)
+                        BlackCaptures(viewModel, Arrangement.End)
                     }
-                    "black" -> {
-                        Column() {
-                            WhiteClock(viewModel = viewModel, size = size, Arrangement.Start)
-                        }
-                        Column() {
-                            WhiteCaptures(viewModel, Arrangement.End)
-                        }
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        BlackClock(viewModel = viewModel, size = size)
+                        BlackCaptures(viewModel, Arrangement.End)
                     }
                 }
 
             }
-            Row(verticalAlignment = CenterVertically) {
-                BoxWithConstraints(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f),
-                ) {
-                    ChessBoard(
-                        chessBoard = viewModel.chessBoardTheme,
-                        modifier = Modifier.chessBoardFullScreen()
-                    )
-                    Pieces(
-                        height = maxWidth / 8,
-                        pieces = viewModel.piecesOnBoard,
-                        playerTurn = viewModel.getPlayerTurn(),
-                        userColor = userColor,
-                        selectedPiece = viewModel.getSelectedPiece(),
-                        pieceClicked = viewModel.isPieceClicked(),
-                        kingInCheck = viewModel.kingInCheck(),
-                        currentSquare = viewModel.getCurrentSquare().value,
-                        previousSquare = viewModel.getPreviousSquare().value,
-                        kingSquare = viewModel.kingSquare,
-                        theme = viewModel.pieceTheme,
-                        pieceAnimationSpeed = viewModel.pieceAnimationSpeed,
-                        highlightStyle = viewModel.highlightStyle,
-                        hint = false,
-                        correctPiece = null
-                    )
-                    Coordinates(size = maxWidth / 8)
-                    ChessUILogic(height = maxWidth / 8, viewModel = viewModel, navController)
-                }
-            }
-            BoxWithConstraints(Modifier.fillMaxWidth()) {
-                val size = maxWidth / 7
-                when (userColor) {
-                    "white" -> {
-                        Column() {
-                            WhiteClock(viewModel = viewModel, size = size, Arrangement.End)
-                        }
-                        Column() {
-                            WhiteCaptures(viewModel, Arrangement.Start)
-                        }
+            "black" -> {
+                if (landscape) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(maxWidth),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        WhiteClock(
+                            viewModel = viewModel,
+                            size = size
+                        )
+                        WhiteCaptures(viewModel, Arrangement.End)
                     }
-                    "black" -> {
-                        Column() {
-                            BlackClock(viewModel = viewModel, size = size, Arrangement.End)
-                        }
-                        Column() {
-                            BlackCaptures(viewModel, Arrangement.Start)
-                        }
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        WhiteClock(
+                            viewModel = viewModel,
+                            size = size
+                        )
+                        WhiteCaptures(viewModel, Arrangement.End)
                     }
                 }
             }
         }
 
-        Row(verticalAlignment = Alignment.Bottom) {
-            if (userColor == "both") {
-                LocalGameBar(viewModel = viewModel, navController = navController)
-            }else{
-                GameBar(viewModel = viewModel)
+    }
+    Row(horizontalArrangement = Arrangement.Center, verticalAlignment = CenterVertically) {
+        val config = LocalConfiguration.current
+        val modifier = if (config.orientation == Configuration.ORIENTATION_LANDSCAPE)
+            Modifier.fillMaxHeight()
+        else Modifier.fillMaxWidth()
+
+        BoxWithConstraints(
+            modifier = modifier
+                .aspectRatio(1f),
+        ) {
+            ChessBoard(
+                chessBoard = viewModel.chessBoardTheme,
+                modifier = Modifier.chessBoardFullScreen()
+            )
+            Pieces(
+                height = maxWidth / 8,
+                pieces = viewModel.piecesOnBoard,
+                playerTurn = viewModel.getPlayerTurn(),
+                userColor = userColor,
+                selectedPiece = viewModel.getSelectedPiece(),
+                pieceClicked = viewModel.isPieceClicked(),
+                kingInCheck = viewModel.kingInCheck(),
+                currentSquare = viewModel.getCurrentSquare().value,
+                previousSquare = viewModel.getPreviousSquare().value,
+                kingSquare = viewModel.kingSquare,
+                theme = viewModel.pieceTheme,
+                pieceAnimationSpeed = viewModel.pieceAnimationSpeed,
+                highlightStyle = viewModel.highlightStyle,
+                hint = false,
+                correctPiece = null
+            )
+            Coordinates(size = maxWidth / 8)
+            ChessUILogic(height = maxWidth / 8, viewModel = viewModel, navController)
+        }
+    }
+
+    BoxWithConstraints(modifier = weight) {
+        val size = if (landscape) maxWidth / 2 else maxWidth / 7
+        when (userColor) {
+            "white" -> {
+                if (landscape) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(maxWidth),
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        WhiteCaptures(viewModel, Arrangement.Start)
+                        WhiteClock(viewModel = viewModel, size = size)
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        WhiteCaptures(viewModel, Arrangement.Start)
+                        WhiteClock(viewModel = viewModel, size = size)
+                    }
+                }
+
+            }
+            "black" -> {
+                if (landscape) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(maxWidth),
+                        verticalArrangement = Arrangement.Bottom,
+                        horizontalAlignment = Alignment.End
+                    ) {
+                        BlackCaptures(viewModel, Arrangement.Start)
+                        BlackClock(viewModel = viewModel, size = size)
+                    }
+                } else {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        BlackCaptures(viewModel, Arrangement.Start)
+                        BlackClock(viewModel = viewModel, size = size)
+                    }
+                }
+
             }
         }
     }
 }
 
 @Composable
-fun BlackClock(viewModel: GameViewModel, size: Dp, arrangement: Arrangement.Horizontal) {
-
+fun BlackClock(viewModel: GameViewModel, size: Dp) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(7.dp),
-        horizontalArrangement = arrangement
+            .padding(7.dp)
     ) {
         CountDownView(
             size,
@@ -150,12 +262,10 @@ fun BlackClock(viewModel: GameViewModel, size: Dp, arrangement: Arrangement.Hori
 }
 
 @Composable
-fun WhiteClock(viewModel: GameViewModel, size: Dp, arrangement: Arrangement.Horizontal) {
+fun WhiteClock(viewModel: GameViewModel, size: Dp) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(7.dp),
-        horizontalArrangement = arrangement
+            .padding(7.dp)
     ) {
         CountDownView(
             size,
@@ -169,13 +279,13 @@ fun WhiteClock(viewModel: GameViewModel, size: Dp, arrangement: Arrangement.Hori
 
 @Composable
 fun ChessBoard(chessBoard: Int, modifier: Modifier) {
-    if(chessBoard == woodBoard || chessBoard == purplePearlBoard){
+    if (chessBoard == woodBoard || chessBoard == purplePearlBoard) {
         Image(
             painterResource(id = chessBoard),
             contentDescription = "Chess Board",
             modifier = modifier
         )
-    }else{
+    } else {
         Image(
             ImageVector.vectorResource(id = chessBoard),
             contentDescription = "Chess Board",
@@ -200,22 +310,6 @@ fun ChessUILogic(height: Dp, viewModel: GameViewModel, navController: NavControl
     val targetRank = remember { mutableStateOf(0) }
     val targetFile = remember { mutableStateOf(0) }
     val endOfGame by remember { viewModel.endOfGame }
-
-//    val xRays = remember {
-//        viewModel.xRays()
-//    }
-////
-//    val attacks = remember {
-//        viewModel.getAttacks()
-//    }
-////
-//    for(attack in attacks){
-//        Highlight(height = height, square = attack, color = Color.Red, .5f)
-//    }
-////
-//    for(attack in xRays){
-//        Outline(height = height, square = attack, color = Color.Blue)
-//    }
 
     if (showMoves && viewModel.pieceIsClickable()) {
         val legalMoves = viewModel.onEvent(GameEvent.OnPieceClicked, clickedPiece.value)
@@ -264,110 +358,88 @@ fun ChessUILogic(height: Dp, viewModel: GameViewModel, navController: NavControl
 
 @Composable
 fun ResignAlertDialog(viewModel: GameViewModel) {
-    if (viewModel.openResignDialog.value) {
-        AlertDialog(
-            onDismissRequest = { viewModel.openResignDialog.value = false },
-            title = {
-                Text(
-                    text = "Resign?",
-                    color = MaterialTheme.colors.primary,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            //text = { Text("Hello! This is our Alert Dialog..", color = textWhite) },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.resign()
-                        viewModel.openResignDialog.value = false
-                    }
-                ) {
-                    Text("Confirm", color = MaterialTheme.colors.primary)
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.openResignDialog.value = false
-                    }
-                ) {
-                    Text("Cancel", color = MaterialTheme.colors.primary)
-                }
-            },
-            backgroundColor = MaterialTheme.colors.background,
-            contentColor = MaterialTheme.colors.background
-        )
-    }
+    GameDialog(
+        title = "Resign?",
+        positiveButtonText = "Confirm",
+        negativeButtonText = "Cancel",
+        showDialog = viewModel.openResignDialog,
+        onAccept = {
+            viewModel.resign()
+            viewModel.openResignDialog.value = false
+        },
+        onDismiss = {
+            viewModel.openResignDialog.value = false
+        })
 }
 
 @Composable
 fun DrawOfferAlertDialog(viewModel: GameViewModel) {
-    if (viewModel.openDrawOfferDialog.value) {
-        AlertDialog(
-            onDismissRequest = { viewModel.openDrawOfferDialog.value = false },
-            title = {
-                Text(
-                    text = "Offer Draw?",
-                    color = MaterialTheme.colors.primary,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.drawOffer(userColor)
-                        viewModel.openDrawOfferDialog.value = false
-                    }
-                ) {
-                    Text("Confirm", color = MaterialTheme.colors.primary)
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.openDrawOfferDialog.value = false
-                    }
-                ) {
-                    Text("Cancel", color = MaterialTheme.colors.primary)
-                }
-            },
-            backgroundColor = MaterialTheme.colors.background,
-            contentColor = MaterialTheme.colors.background
-        )
-    }
+    GameDialog(
+        title = "Offer Draw?",
+        positiveButtonText = "Confirm",
+        negativeButtonText = "Cancel",
+        showDialog = viewModel.openDrawOfferDialog,
+        onAccept = {
+            viewModel.drawOffer(userColor)
+            viewModel.openDrawOfferDialog.value = false
+        },
+        onDismiss = {
+            viewModel.openDrawOfferDialog.value = false
+        })
 }
 
 @Composable
 fun DrawOfferedAlertDialog(viewModel: GameViewModel) {
-    if (viewModel.openDrawOfferedDialog.value) {
+    GameDialog(
+        title = "Accept Draw Offer?",
+        positiveButtonText = "Accept",
+        negativeButtonText = "Decline",
+        showDialog = viewModel.openDrawOfferedDialog,
+        onAccept = {
+            viewModel.drawOffer("accept")
+            viewModel.openDrawOfferedDialog.value = false
+        },
+        onDismiss = {
+            viewModel.drawOffer("decline")
+            viewModel.openDrawOfferedDialog.value = false
+        })
+}
+
+@Composable
+fun GameDialog(
+    title: String,
+    positiveButtonText: String,
+    negativeButtonText: String,
+    showDialog: MutableState<Boolean>,
+    onAccept: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    if (showDialog.value) {
         AlertDialog(
-            onDismissRequest = { viewModel.openDrawOfferedDialog.value = false },
+            onDismissRequest = { onDismiss() },
             title = {
                 Text(
-                    text = "Accept Draw Offer?",
+                    text = title,
                     color = MaterialTheme.colors.primary,
                     fontWeight = FontWeight.Bold
                 )
             },
-            //text = { Text("Hello! This is our Alert Dialog..", color = textWhite) },
             confirmButton = {
                 TextButton(
                     onClick = {
-                        viewModel.drawOffer("accept")
-                        viewModel.openDrawOfferedDialog.value = false
+                        onAccept()
                     }
                 ) {
-                    Text("Accept", color = MaterialTheme.colors.primary)
+                    Text(positiveButtonText, color = MaterialTheme.colors.primary)
                 }
             },
             dismissButton = {
                 TextButton(
                     onClick = {
-                        viewModel.drawOffer("decline")
-                        viewModel.openDrawOfferedDialog.value = false
+                        onDismiss()
                     }
                 ) {
-                    Text("Decline", color = MaterialTheme.colors.primary)
+                    Text(negativeButtonText, color = MaterialTheme.colors.primary)
                 }
             },
             backgroundColor = MaterialTheme.colors.background,

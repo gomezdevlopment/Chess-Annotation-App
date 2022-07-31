@@ -27,6 +27,7 @@ import com.gomezdevlopment.chessnotationapp.model.utils.Utils
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.gomezdevlopment.chessnotationapp.view.blitz
 import com.gomezdevlopment.chessnotationapp.view.bullet
+import com.gomezdevlopment.chessnotationapp.view.game_screen.board.ChessBoard
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.notClickable
 import com.gomezdevlopment.chessnotationapp.view.rapid
 import com.gomezdevlopment.chessnotationapp.view.theming.white
@@ -87,21 +88,6 @@ fun Games(
     }
 }
 
-
-@Composable
-fun ChessBoard(board: Int) {
-    val chessBoardVector = ImageVector.vectorResource(id = board)
-    Image(
-        imageVector = chessBoardVector,
-        //imageVector = chessBoardVector,
-        contentDescription = "Chess Board",
-        modifier = Modifier
-            .width(100.dp)
-            .aspectRatio(1f)
-            .zIndex(1f)
-    )
-}
-
 @Composable
 fun GamesCardBoardState(viewModel: UserViewModel, index: Int) {
     val color = MainActivity.userColor
@@ -111,7 +97,7 @@ fun GamesCardBoardState(viewModel: UserViewModel, index: Int) {
             .aspectRatio(1f),
     ) {
         val size = (100.dp / 8).value
-        ChessBoard(viewModel.chessBoardTheme)
+        ChessBoard(viewModel.chessBoardTheme,Modifier.width(100.dp).aspectRatio(1f).zIndex(1f))
         val game = userGames[index]
         val finalPosition = game[(game.size - 6).toString()]
         if (finalPosition != null) {

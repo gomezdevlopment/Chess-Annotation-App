@@ -19,13 +19,12 @@ import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 
 @Composable
-fun WhiteCaptures(pieces: List<ChessPiece>, arrangement: Arrangement.Horizontal) {
+fun WhiteCaptures(pieces: List<ChessPiece>, horizontalArrangement: Arrangement.Horizontal) {
     LazyRow(
         Modifier
-            .fillMaxWidth()
             .height(30.dp)
             .padding(10.dp, 0.dp),
-        horizontalArrangement = arrangement,
+        horizontalArrangement = horizontalArrangement,
         verticalAlignment = Alignment.CenterVertically
     ) {
         var pieceValue = 0
@@ -39,20 +38,23 @@ fun WhiteCaptures(pieces: List<ChessPiece>, arrangement: Arrangement.Horizontal)
         }
         item {
             if (pieceValue > 0) {
-                Text(text = "+$pieceValue", fontSize = 10.sp, color = MaterialTheme.colors.onBackground)
+                Text(
+                    text = "+$pieceValue",
+                    fontSize = 10.sp,
+                    color = MaterialTheme.colors.onBackground
+                )
             }
         }
     }
 }
 
 @Composable
-fun BlackCaptures(pieces: List<ChessPiece>, arrangement: Arrangement.Horizontal) {
+fun BlackCaptures(pieces: List<ChessPiece>, horizontalArrangement: Arrangement.Horizontal) {
     LazyRow(
         Modifier
-            .fillMaxWidth()
             .height(30.dp)
             .padding(10.dp, 0.dp),
-        horizontalArrangement = arrangement,
+        horizontalArrangement = horizontalArrangement,
         verticalAlignment = Alignment.CenterVertically
     ) {
         var pieceValue = 0
@@ -66,7 +68,11 @@ fun BlackCaptures(pieces: List<ChessPiece>, arrangement: Arrangement.Horizontal)
         }
         item {
             if (pieceValue > 0) {
-                Text(text = "+$pieceValue", fontSize = 10.sp, color = MaterialTheme.colors.onBackground)
+                Text(
+                    text = "+$pieceValue",
+                    fontSize = 10.sp,
+                    color = MaterialTheme.colors.onBackground
+                )
             }
         }
     }
@@ -86,17 +92,23 @@ fun PieceIcon(piece: ChessPiece) {
 }
 
 @Composable
-fun WhiteCaptures(viewModel: GameViewModel, arrangement: Arrangement.Horizontal){
+fun WhiteCaptures(
+    viewModel: GameViewModel,
+    horizontalArrangement: Arrangement.Horizontal
+) {
     val capturedPieces = remember {
         viewModel.capturedPieces
     }
-    WhiteCaptures(pieces = capturedPieces, arrangement)
+    WhiteCaptures(pieces = capturedPieces, horizontalArrangement)
 }
 
 @Composable
-fun BlackCaptures(viewModel: GameViewModel, arrangement: Arrangement.Horizontal){
+fun BlackCaptures(
+    viewModel: GameViewModel,
+    horizontalArrangement: Arrangement.Horizontal
+) {
     val capturedPieces = remember {
         viewModel.capturedPieces
     }
-    BlackCaptures(pieces = capturedPieces, arrangement)
+    BlackCaptures(pieces = capturedPieces, horizontalArrangement)
 }

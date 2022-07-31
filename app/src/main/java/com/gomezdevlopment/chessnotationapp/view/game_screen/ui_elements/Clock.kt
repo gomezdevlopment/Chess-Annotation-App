@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements
 
+import android.util.DisplayMetrics
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
@@ -7,18 +8,20 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ProgressIndicatorDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
-import java.util.concurrent.TimeUnit
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import com.google.android.material.internal.ViewUtils.dpToPx
 import kotlinx.coroutines.flow.StateFlow
+import java.util.concurrent.TimeUnit
+
 
 fun formatTime(time: Long): String {
     val timeFormat = "%02d:%02d"
@@ -61,12 +64,15 @@ fun CountDownIndicator(
                     color = MaterialTheme.colors.onBackground,
                     modifier = Modifier.align(Alignment.CenterHorizontally),
                     fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp
+                    fontSize = dpToSp(size/4)
                 )
             }
         }
     }
 }
+
+@Composable
+fun dpToSp(dp: Dp) = with(LocalDensity.current) { dp.toSp() }
 
 @Composable
 fun CountDownView(

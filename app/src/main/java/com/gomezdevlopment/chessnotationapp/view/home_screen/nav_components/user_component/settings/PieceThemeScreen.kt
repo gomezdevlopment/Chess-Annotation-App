@@ -48,6 +48,7 @@ fun PieceThemes(navController: NavController, viewModel: UserViewModel) {
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
                 contentDescription = "Go Back",
+                tint = MaterialTheme.colors.onBackground,
                 modifier = Modifier
                     .size(30.dp)
                     .clickable {
@@ -58,7 +59,7 @@ fun PieceThemes(navController: NavController, viewModel: UserViewModel) {
             Modifier
                 .fillMaxWidth()
                 .padding(20.dp, 5.dp), horizontalArrangement = Arrangement.Start) {
-            Text("Piece Theme", fontWeight = FontWeight.Bold, fontSize = 30.sp)
+            Text("Piece Theme", fontWeight = FontWeight.Bold, fontSize = 40.sp, color = MaterialTheme.colors.onBackground)
         }
         Row {
             LazyColumn(){

@@ -43,7 +43,7 @@ class PuzzleViewModel @Inject constructor(
     val selectedPiece: MutableState<ChessPiece> = mutableStateOf(ChessPieces().whiteKing(10,10))
     val legalMoves = selectedPiece.value.legalMoves
 
-    var puzzles = listOf<Puzzle>()
+    private var puzzles = listOf<Puzzle>()
 
     private lateinit var currentPuzzle: Puzzle
     private lateinit var correctMoveOrder: List<String>

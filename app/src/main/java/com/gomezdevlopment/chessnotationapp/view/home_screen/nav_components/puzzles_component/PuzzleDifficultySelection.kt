@@ -16,6 +16,7 @@ import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.view_model.PuzzleViewModel
 
 
+
 @Composable
 fun PuzzleDifficultySelectionScreen(
     puzzleViewModel: PuzzleViewModel,

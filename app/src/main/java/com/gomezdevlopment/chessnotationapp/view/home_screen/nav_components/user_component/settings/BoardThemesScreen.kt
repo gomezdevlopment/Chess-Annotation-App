@@ -1,5 +1,6 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.settings
 
+import android.content.res.Configuration
 import android.widget.Space
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -56,6 +58,7 @@ fun BoardThemes(navController: NavController, viewModel: UserViewModel) {
             Icon(
                 imageVector = Icons.Filled.ArrowBack,
                 contentDescription = "Go Back",
+                tint = MaterialTheme.colors.onBackground,
                 modifier = Modifier
                     .size(30.dp)
                     .clickable {
@@ -66,10 +69,15 @@ fun BoardThemes(navController: NavController, viewModel: UserViewModel) {
             Modifier
                 .fillMaxWidth()
                 .padding(20.dp, 5.dp), horizontalArrangement = Arrangement.Start) {
-            Text("Board Theme", fontWeight = FontWeight.Bold, fontSize = 30.sp)
+            Text("Board Theme", fontWeight = FontWeight.Bold, fontSize = 40.sp, color = MaterialTheme.colors.onBackground)
         }
         Row() {
-            LazyVerticalGrid(cells = GridCells.Fixed(2)) {
+            val config = LocalConfiguration.current
+            val gridSize = if (config.orientation == Configuration.ORIENTATION_LANDSCAPE)
+                3
+            else 2
+
+            LazyVerticalGrid(cells = GridCells.Fixed(gridSize)) {
                 itemsIndexed(boardThemes) { _, board ->
                     BoardSelectionItem(
                         boardName = board.first,

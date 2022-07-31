@@ -44,7 +44,6 @@ class HomeFragment : Fragment() {
         // Inflate the layout for this fragment
         return ComposeView(requireContext()).apply {
             val matchmakingViewModel: MatchmakingViewModel by viewModels()
-            val signOutViewModel: SignOutViewModel by viewModels()
             val userSettings: UserSettings by viewModels()
             setContent {
                 val darkTheme =
@@ -63,7 +62,6 @@ class HomeFragment : Fragment() {
                     Navigation(
                         gameViewModel,
                         matchmakingViewModel,
-                        signOutViewModel,
                         puzzleViewModel,
                         userViewModel
                     )
