@@ -159,6 +159,7 @@ interface GameSetup {
                 allLegalMoves.addAll(piece.legalMoves)
             }
         }
+        println(allLegalMoves)
     }
 
     fun changePieceSquare(piece: ChessPiece, newSquare: Square): ChessPiece {

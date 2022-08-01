@@ -5,6 +5,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
+import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.effects.sound.SoundPlayer
@@ -107,6 +108,11 @@ class PuzzleViewModel @Inject constructor(
         puzzleRepository.moveIndex.value += 1
 
         if(moveIndex >= correctMoveOrder.lastIndex || !correct.value){
+            if(kingInCheck.value && puzzleRepository.allLegalMoves.isEmpty()){
+                message.value = "Correct!"
+                image.value = R.drawable.ic_correct
+                correct.value = true
+            }
             puzzleRepository.endOfPuzzle.value = true
         }else{
             CoroutineScope(Dispatchers.IO).launch {
