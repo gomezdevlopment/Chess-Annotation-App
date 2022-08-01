@@ -93,19 +93,6 @@ interface GameSetup {
         )
     }
 
-//    fun kingSquare(): MutableState<Square> {
-//        if (playerTurn.value == "white") {
-//            println("returning white")
-//            println(whiteKingSquare)
-//            println(blackKingSquare)
-//            return whiteKingSquare
-//        }
-//        println("returning black")
-//        println(blackKingSquare)
-//        println(whiteKingSquare)
-//        return blackKingSquare
-//    }
-
     fun getEnemyKingSquare(): Square {
         if (playerTurn.value == "white") {
             return blackKingSquare.value

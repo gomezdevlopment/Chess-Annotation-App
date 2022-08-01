@@ -2,6 +2,8 @@ package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.use
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
@@ -45,7 +47,7 @@ fun Settings(
 
     Column(
         Modifier
-            .padding(30.dp)
+            .padding(20.dp)
             .verticalScroll(rememberScrollState())
     ) {
         SettingsItemButton(text = "Board Theme") {
@@ -55,8 +57,8 @@ fun Settings(
             userNavController.navigate("pieceThemes")
         }
         Text("Piece Animation Speed", modifier = Modifier.padding(10.dp))
-        Row() {
-            animationSpeedOptions.forEach {
+        LazyRow() {
+            items(animationSpeedOptions) {
                 ChipItem(
                     text = it.first,
                     border = BorderStroke(
@@ -69,8 +71,8 @@ fun Settings(
             }
         }
         Text("Theme", modifier = Modifier.padding(10.dp))
-        Row() {
-            themeOptions.forEach {
+        LazyRow() {
+            items(themeOptions) {
                 ChipItem(
                     text = it,
                     border = BorderStroke(
@@ -83,8 +85,8 @@ fun Settings(
             }
         }
         Text("Piece Highlight Styles", modifier = Modifier.padding(10.dp))
-        Row() {
-            highlightStyles.forEach {
+        LazyRow() {
+            items(highlightStyles) {
                 ChipItem(
                     text = it,
                     border = BorderStroke(
@@ -107,7 +109,7 @@ fun Settings(
         Row(
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState())
         ) {
             TextButton(onClick = {
                 userViewModel.signOut()

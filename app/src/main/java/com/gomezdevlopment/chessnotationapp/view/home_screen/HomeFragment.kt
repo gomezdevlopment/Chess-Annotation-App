@@ -15,6 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.utils.UserSettings
 import com.gomezdevlopment.chessnotationapp.view.theming.AppTheme
@@ -76,7 +77,6 @@ class HomeFragment : Fragment() {
 
         userViewModel.signedOut.observe(viewLifecycleOwner, Observer {
             if (it) {
-                println("signed out")
                 androidx.navigation.Navigation.findNavController(view)
                     .navigate(R.id.action_homeFragment_to_signInFragment)
             }

@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import androidx.navigation.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.repositories.UserRepository
 import com.gomezdevlopment.chessnotationapp.model.utils.UserSettings
@@ -13,9 +12,7 @@ import com.gomezdevlopment.chessnotationapp.realtime_database.Friends
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.grpc.InternalChannelz.id
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -96,7 +93,6 @@ class UserViewModel @Inject constructor(
     fun initializeGamesList() {
         val games = MainActivity.user?.games?.games
         if((games?.size ?: 0) > userGames.size){
-            println("adding games")
             val newGames = games?.subList(userGames.size, games.size)
             newGames?.asReversed()?.forEachIndexed { index, game ->
                 userGames.add(index, game)

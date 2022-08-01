@@ -8,15 +8,12 @@ import com.gomezdevlopment.chessnotationapp.realtime_database.User
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.firestore.FirebaseFirestore
-import java.io.Serializable
 import javax.inject.Inject
 
 
 class AuthenticationRepository @Inject constructor(private val dbRepository: RealtimeDatabaseRepository, private val application: Application) {
     private val firebaseAuth = FirebaseAuth.getInstance()
-    private val userMutableLiveData: MutableLiveData<FirebaseUser> = MutableLiveData()
+    private val userMutableLiveData: MutableLiveData<FirebaseUser?> = MutableLiveData()
     private val signedOutMutableLiveData: MutableLiveData<Boolean> = MutableLiveData()
 
 
@@ -64,7 +61,6 @@ class AuthenticationRepository @Inject constructor(private val dbRepository: Rea
                     if (currentUser != null) {
                         userMutableLiveData.postValue(firebaseAuth.currentUser)
                         currentUser.email?.let { dbRepository.getUserMap(it) }
-                        println("****************${user}")
                     }
                 } else {
                     Toast.makeText(application, task.exception.toString(), Toast.LENGTH_LONG).show()
@@ -81,7 +77,7 @@ class AuthenticationRepository @Inject constructor(private val dbRepository: Rea
         signedOutMutableLiveData.postValue(true)
     }
 
-    fun getUserMutableLiveData(): MutableLiveData<FirebaseUser> {
+    fun getUserMutableLiveData(): MutableLiveData<FirebaseUser?> {
         return userMutableLiveData
     }
 

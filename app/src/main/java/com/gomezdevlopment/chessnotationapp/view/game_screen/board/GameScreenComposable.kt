@@ -23,20 +23,25 @@ import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.model.GameEvent
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
+import com.gomezdevlopment.chessnotationapp.view.BackPressHandler
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.user
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.*
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component.PuzzleUIElements
-import com.gomezdevlopment.chessnotationapp.view.theming.purplePearlBoard
-import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
-import com.gomezdevlopment.chessnotationapp.view.theming.textWhite
-import com.gomezdevlopment.chessnotationapp.view.theming.woodBoard
+import com.gomezdevlopment.chessnotationapp.view.theming.*
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun GameScreen(viewModel: GameViewModel, navController: NavController) {
+    BackPressHandler() {
+        if (userColor == "both"){
+            navController.popBackStack()
+        }else{
+            viewModel.openResignDialog.value = true
+        }
+    }
     rememberSystemUiController().setStatusBarColor(MaterialTheme.colors.background)
     ResignAlertDialog(viewModel = viewModel)
     DrawOfferAlertDialog(viewModel = viewModel)
@@ -310,12 +315,13 @@ fun ChessUILogic(height: Dp, viewModel: GameViewModel, navController: NavControl
     val targetRank = remember { mutableStateOf(0) }
     val targetFile = remember { mutableStateOf(0) }
     val endOfGame by remember { viewModel.endOfGame }
-
+    val pieceTheme = viewModel.pieceTheme
+    val checkers = pieceTheme == checkers
     if (showMoves && viewModel.pieceIsClickable()) {
         val legalMoves = viewModel.onEvent(GameEvent.OnPieceClicked, clickedPiece.value)
         for (move in legalMoves) {
             if (hashMap.containsKey(move)) {
-                PossibleCapture(height, move, targetRank, targetFile, isMoveSelected)
+                PossibleCapture(height, move, targetRank, targetFile, isMoveSelected, checkers)
             } else {
                 PossibleMove(height, move, targetRank, targetFile, isMoveSelected)
             }

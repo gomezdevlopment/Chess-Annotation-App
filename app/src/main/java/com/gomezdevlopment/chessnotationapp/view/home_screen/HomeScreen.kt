@@ -15,6 +15,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.gomezdevlopment.chessnotationapp.view.BackPressHandler
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.play_component.PlayScreen
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.puzzles_component.PuzzleDifficultySelectionScreen
 import com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.UserScreen
@@ -26,6 +27,9 @@ fun MatchSearch(
     matchmakingViewModel: MatchmakingViewModel,
     navController: NavController
 ) {
+    BackPressHandler() {
+        matchmakingViewModel.cancelSearch()
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()

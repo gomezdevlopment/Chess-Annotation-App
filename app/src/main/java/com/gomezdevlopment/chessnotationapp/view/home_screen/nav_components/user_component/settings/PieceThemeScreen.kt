@@ -2,9 +2,7 @@ package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.use
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -22,9 +20,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.navigation.NavController
-import com.gomezdevlopment.chessnotationapp.view.game_screen.board.ChessBoard
 import com.gomezdevlopment.chessnotationapp.view.theming.*
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
 

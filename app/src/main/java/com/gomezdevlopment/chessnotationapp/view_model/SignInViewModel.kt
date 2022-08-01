@@ -14,7 +14,7 @@ import javax.inject.Inject
 class SignInViewModel @Inject constructor(private val appRepository: AuthenticationRepository) : ViewModel() {
 
     //private val appRepository = AuthenticationRepository(application)
-    private val userMutableLiveData: MutableLiveData<FirebaseUser> = appRepository.getUserMutableLiveData()
+    private val userMutableLiveData: MutableLiveData<FirebaseUser?> = appRepository.getUserMutableLiveData()
     val signedOut:MutableLiveData<Boolean> = appRepository.getSignedOutMutableLiveData()
 
     fun signUp(email: String, password: String, confirmPassword: String){
@@ -29,7 +29,7 @@ class SignInViewModel @Inject constructor(private val appRepository: Authenticat
         }
     }
 
-    fun getUserMutableLiveDate(): MutableLiveData<FirebaseUser>{
+    fun getUserMutableLiveDate(): MutableLiveData<FirebaseUser?> {
         return userMutableLiveData
     }
 

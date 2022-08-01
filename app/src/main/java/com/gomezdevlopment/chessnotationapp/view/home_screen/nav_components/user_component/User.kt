@@ -2,6 +2,9 @@ package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.use
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -15,6 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -34,14 +38,6 @@ import com.gomezdevlopment.chessnotationapp.view.theming.textWhite
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
 
-//@Composable
-//fun UserNavigation(userViewModel: UserViewModel, homeNavController: NavController, gameViewModel: GameViewModel) {
-//    val userNavController = rememberNavController()
-//    NavHost(navController = userNavController, startDestination = "user") {
-//        composable("user") { UserScreen(userViewModel, homeNavController, userNavController, gameViewModel) }
-//    }
-//}
-
 @Composable
 fun UserScreen(userViewModel: UserViewModel, navController: NavController, gameViewModel: GameViewModel) {
     Column(Modifier.fillMaxSize()) {
@@ -59,9 +55,6 @@ fun UserScreen(userViewModel: UserViewModel, navController: NavController, gameV
 @Composable
 fun Friends(viewModel: UserViewModel) {
     FriendsList(viewModel = viewModel)
-//    LaunchedEffect(true){
-//        viewModel.initializeFriendRequestListener()
-//    }
 }
 
 @Composable
@@ -94,24 +87,11 @@ fun UserNavbar(userViewModel: UserViewModel) {
     val games: Boolean = userViewModel.destination.value == "Games"
     val friends: Boolean = userViewModel.destination.value == "Friends"
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically, modifier = Modifier
-            .fillMaxWidth()
-            .background(MaterialTheme.colors.background)
-            .padding(0.dp, 10.dp)
-    ) {
-        UserNavbarItem(
-            modifier = Modifier
-                .weight(1f), "Games", games, userViewModel
-        )
-        UserNavbarItem(
-            modifier = Modifier
-                .weight(1f), "Friends", friends, userViewModel
-        )
-        UserNavbarItem(
-            modifier = Modifier
-                .weight(1f), "Settings", settings, userViewModel
-        )
+    val navItems = listOf("Games" to games, "Friends" to friends, "Settings" to settings)
+    Row(horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()){
+        navItems.forEach {
+            UserNavbarItem(Modifier,it.first, it.second, userViewModel)
+        }
     }
 }
 
@@ -123,8 +103,8 @@ fun UserNavbarItem(modifier: Modifier,
     Button(
         shape = RoundedCornerShape(25.dp),
         modifier = modifier
-            .padding(15.dp, 5.dp)
-            .fillMaxWidth(),
+            .padding(10.dp, 5.dp)
+            .wrapContentWidth(),
         onClick = {viewModel.destination.value = text},
         colors = ButtonDefaults.buttonColors(backgroundColor = if (isSelected) MaterialTheme.colors.surface else MaterialTheme.colors.background),
         elevation = ButtonDefaults.elevation(0.dp)
@@ -132,23 +112,12 @@ fun UserNavbarItem(modifier: Modifier,
         Column() {
             Text(
                 text = text,
-                fontSize = 16.sp,
+                fontSize = if (isSelected) 22.sp else 12.sp,
                 color = if (isSelected) MaterialTheme.colors.primary else MaterialTheme.colors.onBackground,
-                modifier = Modifier.padding(0.dp)
+                modifier = Modifier.padding(0.dp),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
-        }
-    }
-}
-
-@Composable
-fun SignOut(navController: NavController) {
-    Column(verticalArrangement = Arrangement.Center) {
-        Button(
-            onClick = {
-                navController.navigate(R.id.action_homeFragment_to_signInFragment)
-            }
-        ) {
-            Text("Sign Out")
         }
     }
 }

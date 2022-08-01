@@ -43,6 +43,7 @@ class SignInFragment : Fragment() {
         signInViewModel.getUserMutableLiveDate().observe(viewLifecycleOwner, Observer {
             if(it != null){
                 Navigation.findNavController(view).navigate(R.id.action_signInFragment_to_homeFragment)
+                Navigation.findNavController(view).clearBackStack(R.id.signInFragment)
             }
         })
 

@@ -40,7 +40,7 @@ fun EndOfGameCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .fillMaxHeight()
-                .padding(50.dp),
+                .padding(10.dp),
             elevation = 10.dp,
             shape = RoundedCornerShape(20.dp),
             backgroundColor = MaterialTheme.colors.background
@@ -61,20 +61,39 @@ fun EndOfGameCard(
                     Text(text = message, textAlign = TextAlign.Center, fontSize = 14.sp)
                 }
                 Column(modifier = Modifier.fillMaxWidth()) {
-                    RoundDialogButton("Close")
+                    TextButton("Close")
                     {
                         cardVisible.value = false
                         navController.navigate("home")
                         viewModel.removeGameListener()
                     }
-//                    RoundDialogButton("Rematch")
-//                    {
-//                        cardVisible.value = false
-//                    }
                     Spacer(modifier = Modifier.height(20.dp))
                 }
             }
         }
+    }
+}
+
+
+@Composable
+private fun TextButton(
+    buttonText: String,
+    onClick: () -> Unit
+) {
+    TextButton(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp, 5.dp)
+            .wrapContentHeight(),
+        border = BorderStroke(2.dp, MaterialTheme.colors.primary),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = MaterialTheme.colors.background,
+            contentColor = MaterialTheme.colors.primary
+        )
+    )
+    {
+        Text(buttonText)
     }
 }
 

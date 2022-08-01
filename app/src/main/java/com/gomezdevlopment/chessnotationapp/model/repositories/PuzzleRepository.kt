@@ -2,22 +2,15 @@ package com.gomezdevlopment.chessnotationapp.model.repositories
 
 import androidx.compose.runtime.*
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
-import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.model.game_logic.GameSetup
 import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPiece
 import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPieces
-import com.gomezdevlopment.chessnotationapp.view.MainActivity
-import kotlinx.coroutines.launch
-import javax.inject.Inject
-import kotlin.math.pow
-import kotlin.math.roundToInt
 
-class PuzzleRepository @Inject constructor(private val firestore: FirestoreInteraction) : ViewModel(), GameSetup {
+class PuzzleRepository: ViewModel(), GameSetup {
     override var piecesOnBoard: MutableList<ChessPiece> = mutableStateListOf()
     override var capturedPieces: MutableList<ChessPiece> = mutableStateListOf()
     override var occupiedSquares: MutableMap<Square, ChessPiece> = mutableMapOf()

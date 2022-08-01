@@ -2,14 +2,10 @@ package com.gomezdevlopment.chessnotationapp.view
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import com.gomezdevlopment.chessnotationapp.R
 import com.gomezdevlopment.chessnotationapp.databinding.ActivityMainBinding
-import com.gomezdevlopment.chessnotationapp.realtime_database.Games
 import com.gomezdevlopment.chessnotationapp.realtime_database.OnlineGame
 import com.gomezdevlopment.chessnotationapp.realtime_database.User
-import com.google.firebase.firestore.DocumentReference
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -17,13 +13,9 @@ import dagger.hilt.android.AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
     companion object{
-//        var games: Games? = null
         var user: User? = null
         var userColor: String = "both"
-//        var gameDocumentReference: DocumentReference? = null
-//        var userDocumentReference: DocumentReference? = null
         var game: OnlineGame? = null
         var gameID: String? = null
     }
@@ -35,6 +27,4 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
     }
 
-    override fun onBackPressed() {
-    }
 }

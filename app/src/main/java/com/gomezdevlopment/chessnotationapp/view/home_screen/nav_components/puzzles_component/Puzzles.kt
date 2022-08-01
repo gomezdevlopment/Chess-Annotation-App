@@ -40,9 +40,7 @@ import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.Highlight
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.Outline
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleCapture
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleMove
-import com.gomezdevlopment.chessnotationapp.view.theming.pink
-import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
-import com.gomezdevlopment.chessnotationapp.view.theming.yellow
+import com.gomezdevlopment.chessnotationapp.view.theming.*
 import com.gomezdevlopment.chessnotationapp.view_model.PuzzleViewModel
 
 @Composable
@@ -63,7 +61,9 @@ fun PuzzleScreen(viewModel: PuzzleViewModel, navController: NavController) {
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colors.background)
             ) {
                 PuzzleUIElements(
                     viewModel = viewModel,
@@ -78,7 +78,9 @@ fun PuzzleScreen(viewModel: PuzzleViewModel, navController: NavController) {
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.Top,
-                modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colors.background)
             ) {
                 PuzzleUIElements(
                     viewModel = viewModel,
@@ -102,7 +104,9 @@ fun PuzzleUIElements(
 ) {
     Row(
         backButtonModifier
-            .padding(10.dp, 5.dp), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.Top
+            .padding(10.dp, 5.dp),
+        horizontalArrangement = Arrangement.Start,
+        verticalAlignment = Alignment.Top
     ) {
         Icon(
             imageVector = Icons.Filled.ArrowBack,
@@ -168,16 +172,20 @@ fun PuzzleUIElements(
         }
         Column(Modifier.height(maxHeight), verticalArrangement = Arrangement.Bottom) {
             if (viewModel.endOfPuzzle.value) {
-                EndOfPuzzleCard(viewModel, config.orientation==Configuration.ORIENTATION_LANDSCAPE)
+                val landscape = config.orientation == Configuration.ORIENTATION_LANDSCAPE
+                if (landscape) {
+                    EndOfPuzzleLandscape(viewModel = viewModel)
+                } else {
+                    EndOfPuzzleCard(viewModel)
+                }
             }
-            //Hacky Way to account for the height of the nav bar
-            Spacer(modifier = Modifier.height(60.dp))
+            Spacer(modifier = Modifier.height(10.dp))
         }
     }
 }
 
 @Composable
-fun EndOfPuzzleCard(viewModel: PuzzleViewModel, landscape: Boolean) {
+fun EndOfPuzzleCard(viewModel: PuzzleViewModel) {
     val message by viewModel.message
     val image by viewModel.image
     Row(
@@ -207,14 +215,8 @@ fun EndOfPuzzleCard(viewModel: PuzzleViewModel, landscape: Boolean) {
                     }
                 }
                 Column(horizontalAlignment = Alignment.End, modifier = Modifier.weight(1f)) {
-                    if(landscape){
-                        Column() {
-                            EndOfPuzzleCardButtons(viewModel = viewModel)
-                        }
-                    }else{
-                        Row() {
-                            EndOfPuzzleCardButtons(viewModel = viewModel)
-                        }
+                    Row() {
+                        EndOfPuzzleCardButtons(viewModel = viewModel)
                     }
                 }
             }
@@ -223,7 +225,33 @@ fun EndOfPuzzleCard(viewModel: PuzzleViewModel, landscape: Boolean) {
 }
 
 @Composable
-fun EndOfPuzzleCardButtons(viewModel: PuzzleViewModel){
+fun EndOfPuzzleLandscape(viewModel: PuzzleViewModel) {
+    val message by viewModel.message
+    val image by viewModel.image
+    Column(Modifier.fillMaxSize(), horizontalAlignment = Alignment.End) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                imageVector = ImageVector.vectorResource(id = image),
+                contentDescription = message,
+                modifier = Modifier.padding(10.dp)
+            )
+            Text(message, modifier = Modifier.padding(10.dp))
+        }
+        Column(
+            verticalArrangement = Arrangement.Bottom,
+            horizontalAlignment = Alignment.End,
+            modifier = Modifier
+                .weight(1f)
+                .padding(10.dp)
+        ) {
+            EndOfPuzzleCardButtons(viewModel = viewModel)
+        }
+
+    }
+}
+
+@Composable
+fun EndOfPuzzleCardButtons(viewModel: PuzzleViewModel) {
     if (viewModel.endOfPuzzle.value) {
         if (!viewModel.correct.value) {
             TextButton(onClick = {
@@ -250,6 +278,7 @@ fun EndOfPuzzleCardButtons(viewModel: PuzzleViewModel){
         )
     }
 }
+
 @Composable
 fun HintButton(viewModel: PuzzleViewModel) {
     TextButton(
@@ -284,12 +313,14 @@ private fun PuzzleUILogic(height: Dp, viewModel: PuzzleViewModel) {
     val clickedPiece = remember { viewModel.selectedPiece }
     val targetRank = remember { mutableStateOf(0) }
     val targetFile = remember { mutableStateOf(0) }
+    val pieceTheme = viewModel.pieceTheme
+    val checkers = pieceTheme == checkers
 
     if (showMoves) {
         val legalMoves: List<Square> = clickedPiece.value.legalMoves
         for (move in legalMoves) {
             if (hashMap.containsKey(move)) {
-                PossibleCapture(height, move, targetRank, targetFile, isMoveSelected)
+                PossibleCapture(height, move, targetRank, targetFile, isMoveSelected, checkers)
             } else {
                 PossibleMove(height, move, targetRank, targetFile, isMoveSelected)
             }

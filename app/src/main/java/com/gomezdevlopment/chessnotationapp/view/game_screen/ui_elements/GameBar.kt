@@ -19,7 +19,7 @@ import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
 
 @Composable
 fun GameBar(viewModel: GameViewModel) {
-    Row(Modifier.height(60.dp).background(color = MaterialTheme.colors.surface), verticalAlignment = Alignment.Bottom) {
+    Row(Modifier.height(40.dp).background(color = MaterialTheme.colors.surface), verticalAlignment = Alignment.Bottom) {
         GameBarItem(
             modifier = Modifier.weight(1f),
             drawableResource = R.drawable.ic_resign,
@@ -58,7 +58,7 @@ fun GameBar(viewModel: GameViewModel) {
 
 @Composable
 fun ReviewGameBar(viewModel: GameViewModel, navController: NavController) {
-    Row(Modifier.height(60.dp), verticalAlignment = Alignment.Bottom) {
+    Row(Modifier.height(40.dp).background(color = MaterialTheme.colors.surface), verticalAlignment = Alignment.Bottom) {
         GameBarItem(
             modifier = Modifier.weight(1f),
             drawableResource = R.drawable.ic_home,
@@ -96,7 +96,7 @@ fun ReviewGameBar(viewModel: GameViewModel, navController: NavController) {
 
 @Composable
 fun LocalGameBar(viewModel: GameViewModel, navController: NavController) {
-    Row(Modifier.height(60.dp), verticalAlignment = Alignment.Bottom) {
+    Row(Modifier.height(40.dp).background(color = MaterialTheme.colors.surface), verticalAlignment = Alignment.Bottom) {
         GameBarItem(
             modifier = Modifier.weight(1f),
             drawableResource = R.drawable.ic_home,

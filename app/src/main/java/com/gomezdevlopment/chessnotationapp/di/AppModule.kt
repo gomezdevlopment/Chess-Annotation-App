@@ -2,8 +2,6 @@ package com.gomezdevlopment.chessnotationapp.di
 
 import android.app.Application
 import androidx.room.Room
-import com.gomezdevlopment.chessnotationapp.App
-import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.model.repositories.AuthenticationRepository
 import com.gomezdevlopment.chessnotationapp.model.repositories.MatchmakingRepository
 import com.gomezdevlopment.chessnotationapp.model.repositories.PuzzleRepository
@@ -16,7 +14,6 @@ import com.gomezdevlopment.chessnotationapp.realtime_database.RealtimeDatabaseDA
 import com.gomezdevlopment.chessnotationapp.realtime_database.RealtimeDatabaseGameInteraction
 import com.gomezdevlopment.chessnotationapp.realtime_database.RealtimeDatabaseRepository
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -43,18 +40,15 @@ object AppModule {
     @Provides
     fun provideRoomRepository(puzzleDAO: PuzzleDAO) = RoomRepository(puzzleDAO)
 
-    //@Singleton
     @Provides
-    fun providePuzzleRepository(firestore: FirestoreInteraction) = PuzzleRepository(firestore)
+    fun providePuzzleRepository() = PuzzleRepository()
 
-    //@Singleton
     @Provides
     fun provideMatchmakingRepository(
         db: FirebaseDatabase,
         dbRepository: RealtimeDatabaseRepository
     ) = MatchmakingRepository(db, dbRepository)
 
-    //@Singleton
     @Provides
     fun provideAuthenticationRepository(
         realtimeDBRepository: RealtimeDatabaseRepository,
@@ -64,10 +58,6 @@ object AppModule {
 
     @Provides
     fun provideUserRepository(realtimeDBRepository: RealtimeDatabaseRepository) = UserRepository(realtimeDBRepository)
-
-    @Singleton
-    @Provides
-    fun provideFirestoreDatabase() = FirebaseFirestore.getInstance()
 
     @Singleton
     @Provides
@@ -86,10 +76,6 @@ object AppModule {
     @Provides
     fun providesRealtimeDatabaseInteractionClass(realtimeDB: FirebaseDatabase) =
         RealtimeDatabaseGameInteraction(realtimeDB)
-
-    @Singleton
-    @Provides
-    fun provideFirestoreInteractionClass(db: FirebaseFirestore) = FirestoreInteraction(db)
 
     @Singleton
     @Provides

@@ -5,7 +5,9 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -13,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.R
@@ -33,29 +36,29 @@ fun PlayScreen(
     val timeControls = arrayListOf(600000L, 300000L, 60000L)
     val gameModeImageIDs =
         arrayListOf(R.drawable.ic_rapid, R.drawable.ic_blitz, R.drawable.ic_bullet)
-    Column() {
-        Column(Modifier.weight(1f)) {
-            Spacer(modifier = Modifier.height(30.dp))
-            Text(
-                text = "Select Game Mode",
-                modifier = Modifier.padding(20.dp),
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.h5,
-            )
+    Column(Modifier.verticalScroll(rememberScrollState())) {
+        Spacer(modifier = Modifier.height(30.dp))
+        Text(
+            text = "Select Game Mode",
+            modifier = Modifier.padding(20.dp),
+            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.h5,
+        )
 
-            LazyRow(Modifier.padding(10.dp, 10.dp)) {
-                itemsIndexed(gameModes) { index, mode ->
-                    GameSelectionCard(drawableID = gameModeImageIDs[index], title = mode) {
-                        if(MainActivity.user?.username != null){
-                            matchmakingViewModel.joinGame(timeControls[index])
-                            navController.navigate("matchSearch")
-                        }
+        LazyRow(Modifier.padding(10.dp, 10.dp)) {
+            itemsIndexed(gameModes) { index, mode ->
+                GameSelectionCard(drawableID = gameModeImageIDs[index], title = mode) {
+                    if (MainActivity.user?.username != null) {
+                        matchmakingViewModel.joinGame(timeControls[index])
+                        navController.navigate("matchSearch")
                     }
                 }
             }
-            VSPlayerCard(navController = navController, viewModel = gameViewModel)
         }
+        VSPlayerCard(navController = navController, viewModel = gameViewModel)
+        Spacer(modifier = Modifier.height(60.dp))
     }
+
 }
 
 @Composable
@@ -99,7 +102,9 @@ fun VSPlayerCard(navController: NavController, viewModel: GameViewModel) {
                             "Play Local Game",
                             fontWeight = FontWeight.Bold,
                             style = MaterialTheme.typography.h4,
-                            modifier = Modifier.padding(20.dp)
+                            modifier = Modifier.padding(20.dp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
                         )
                     }
                     Row(
@@ -162,7 +167,9 @@ fun GameSelectionCard(drawableID: Int, title: String, onClick: () -> Unit) {
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.h4,
                     color = MaterialTheme.colors.onSurface,
-                    modifier = Modifier.padding(20.dp)
+                    modifier = Modifier.padding(20.dp),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
             Row(
@@ -177,7 +184,6 @@ fun GameSelectionCard(drawableID: Int, title: String, onClick: () -> Unit) {
                         .padding(1.dp), tint = MaterialTheme.colors.primary
                 )
             }
-            Spacer(modifier = Modifier.height(50.dp))
             Row(
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
@@ -186,12 +192,11 @@ fun GameSelectionCard(drawableID: Int, title: String, onClick: () -> Unit) {
                     onClick = onClick,
                     shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.primary),
-                    modifier = Modifier.padding(10.dp)
+                    modifier = Modifier.padding(10.dp, 20.dp)
                 ) {
                     Text("New Game", color = MaterialTheme.colors.onPrimary)
                 }
             }
-            Spacer(modifier = Modifier.height(20.dp))
         }
 
     }

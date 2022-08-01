@@ -1,6 +1,5 @@
 package com.gomezdevlopment.chessnotationapp.model.repositories
 
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
@@ -8,14 +7,11 @@ import androidx.navigation.NavController
 import com.gomezdevlopment.chessnotationapp.model.data_classes.ChessPiece
 import com.gomezdevlopment.chessnotationapp.model.data_classes.GameState
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
-import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.model.pieces.ChessPieces
 import com.gomezdevlopment.chessnotationapp.realtime_database.Friends
 import com.gomezdevlopment.chessnotationapp.realtime_database.RealtimeDatabaseRepository
 import com.gomezdevlopment.chessnotationapp.view_model.GameViewModel
-import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import javax.inject.Inject
 
 @HiltViewModel

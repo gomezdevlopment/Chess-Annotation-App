@@ -17,6 +17,7 @@ import androidx.compose.ui.zIndex
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.utils.Utils
 import com.gomezdevlopment.chessnotationapp.view.theming.alpha
+import com.gomezdevlopment.chessnotationapp.view.theming.bloodOrange
 import com.gomezdevlopment.chessnotationapp.view.theming.blue
 
 @Composable
@@ -76,7 +77,8 @@ fun PossibleCapture(
     square: Square,
     targetRank: MutableState<Int>,
     targetFile: MutableState<Int>,
-    squareClicked: MutableState<Boolean>
+    squareClicked: MutableState<Boolean>,
+    checkers: Boolean
 ) {
     val offsetX = Utils().offsetX(height.value, square.file)
     val offsetY = Utils().offsetY(height.value, square.rank)
@@ -85,7 +87,7 @@ fun PossibleCapture(
             .height(height)
             .aspectRatio(1f)
             .absoluteOffset(offsetX.dp, offsetY.dp)
-            .zIndex(2f)
+            .zIndex(if(checkers) 4f else 2f)
             .clickable {
                 targetRank.value = square.rank
                 targetFile.value = square.file
@@ -93,7 +95,7 @@ fun PossibleCapture(
             }
     ) {
         drawCircle(
-            color = Color.Red,
+            color = bloodOrange,
             radius = size.width * .4f,
             alpha = 1f,
             style = Stroke(size.width * .08f)

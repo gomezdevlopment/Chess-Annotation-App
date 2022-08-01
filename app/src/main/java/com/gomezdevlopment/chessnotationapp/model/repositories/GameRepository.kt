@@ -10,12 +10,10 @@ import com.gomezdevlopment.chessnotationapp.realtime_database.OnlineGame
 import com.gomezdevlopment.chessnotationapp.model.data_classes.Square
 import com.gomezdevlopment.chessnotationapp.model.game_logic.*
 import com.gomezdevlopment.chessnotationapp.model.pieces.*
-import com.gomezdevlopment.chessnotationapp.model.firestore_interaction.FirestoreInteraction
 import com.gomezdevlopment.chessnotationapp.realtime_database.RealtimeDatabaseGameInteraction
 import com.gomezdevlopment.chessnotationapp.view.MainActivity
 import com.gomezdevlopment.chessnotationapp.view.MainActivity.Companion.userColor
 import com.gomezdevlopment.chessnotationapp.view.game_screen.ui_elements.formatTime
-import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel.Companion.userGames
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
@@ -148,7 +146,6 @@ class GameRepository @Inject constructor(val dbInteraction: RealtimeDatabaseGame
                 .addValueEventListener(object : ValueEventListener {
                     var gameMap: OnlineGame? = null
                     override fun onDataChange(snapshot: DataSnapshot) {
-                        println("data changed")
                         gameMap = snapshot.getValue(OnlineGame::class.java)
 
                         if (gameMap?.cancel == true) {
@@ -661,15 +658,12 @@ class GameRepository @Inject constructor(val dbInteraction: RealtimeDatabaseGame
         if (occupiedSquares.containsKey(newSquare)) {
             occupiedSquares[newSquare]?.let {
                 capturedPieces.add(it)
-                //println("capture")
                 pieceCaptured = true
             }
             removePiece(newSquare)
         } else if (isEnPassant(piece, newSquare)) {
             occupiedSquares[currentSquare.value]?.let {
                 capturedPieces.add(it)
-                //println("capture")
-                //println("en passant")
                 pieceCaptured = true
             }
             removePiece(currentSquare.value)

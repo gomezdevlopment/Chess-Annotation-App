@@ -1,12 +1,11 @@
 package com.gomezdevlopment.chessnotationapp.view.home_screen.nav_components.user_component.settings
 
 import android.content.res.Configuration
-import android.widget.Space
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
@@ -18,9 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,7 +27,6 @@ import com.gomezdevlopment.chessnotationapp.view.game_screen.board.ChessBoard
 import com.gomezdevlopment.chessnotationapp.view.theming.*
 import com.gomezdevlopment.chessnotationapp.view_model.UserViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun BoardThemes(navController: NavController, viewModel: UserViewModel) {
     val boardThemes = listOf(
@@ -77,7 +73,7 @@ fun BoardThemes(navController: NavController, viewModel: UserViewModel) {
                 3
             else 2
 
-            LazyVerticalGrid(cells = GridCells.Fixed(gridSize)) {
+            LazyVerticalGrid(GridCells.Fixed(gridSize)) {
                 itemsIndexed(boardThemes) { _, board ->
                     BoardSelectionItem(
                         boardName = board.first,
