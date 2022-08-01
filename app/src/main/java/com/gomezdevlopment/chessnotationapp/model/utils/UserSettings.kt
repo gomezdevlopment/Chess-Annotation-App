@@ -45,6 +45,7 @@ class UserSettings @Inject constructor(private val context: Application): ViewMo
             "Alpha" -> pieceThemeMap.value = alpha
             "Leipzig" -> pieceThemeMap.value = leipzig
             "Chess7" -> pieceThemeMap.value = chess7
+            "Checkers" -> pieceThemeMap.value = checkers
         }
     }
 

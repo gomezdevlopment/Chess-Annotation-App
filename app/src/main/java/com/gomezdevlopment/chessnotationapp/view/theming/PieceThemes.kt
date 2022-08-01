@@ -49,3 +49,19 @@ val chess7 = mapOf(
     "bn" to R.drawable.ic_bn_chess7,
     "bp" to R.drawable.ic_bp_chess7,
 )
+
+val checkersTheme = R.drawable.ic_checkers_theme
+val checkers = mapOf(
+    "wk" to R.drawable.ic_wk_checkers,
+    "wq" to R.drawable.ic_wq_checkers,
+    "wr" to R.drawable.ic_wr_checkers,
+    "wb" to R.drawable.ic_wb_checkers,
+    "wn" to R.drawable.ic_wn_checkers,
+    "wp" to R.drawable.ic_wp_checkers,
+    "bk" to R.drawable.ic_bk_checkers,
+    "bq" to R.drawable.ic_bq_checkers,
+    "br" to R.drawable.ic_br_checkers,
+    "bb" to R.drawable.ic_bb_checkers,
+    "bn" to R.drawable.ic_bn_checkers,
+    "bp" to R.drawable.ic_bp_checkers,
+)

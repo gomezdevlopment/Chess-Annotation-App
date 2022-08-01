@@ -36,11 +36,13 @@ import com.gomezdevlopment.chessnotationapp.model.pieces.PromotionPieces
 import com.gomezdevlopment.chessnotationapp.model.utils.Utils
 import com.gomezdevlopment.chessnotationapp.view.*
 import com.gomezdevlopment.chessnotationapp.view.game_screen.board.*
+import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.Highlight
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.Outline
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleCapture
 import com.gomezdevlopment.chessnotationapp.view.game_screen.utils.PossibleMove
 import com.gomezdevlopment.chessnotationapp.view.theming.pink
 import com.gomezdevlopment.chessnotationapp.view.theming.tealDarker
+import com.gomezdevlopment.chessnotationapp.view.theming.yellow
 import com.gomezdevlopment.chessnotationapp.view_model.PuzzleViewModel
 
 @Composable
@@ -311,7 +313,12 @@ private fun PuzzleUILogic(height: Dp, viewModel: PuzzleViewModel) {
     if (viewModel.hint.value) {
         val correctPiece = viewModel.correctPiece.value
         if (correctPiece != null) {
-            Outline(height, correctPiece.square, pink)
+            if (viewModel.highlightStyle == "Outline") {
+                Outline(height, correctPiece.square, pink)
+            } else {
+                Highlight(height = height, square = correctPiece.square, color = pink, .8f)
+            }
+
         }
 
     }

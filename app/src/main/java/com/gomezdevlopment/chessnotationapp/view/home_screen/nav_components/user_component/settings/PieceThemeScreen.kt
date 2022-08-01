@@ -33,7 +33,8 @@ fun PieceThemes(navController: NavController, viewModel: UserViewModel) {
     val pieceThemes = listOf(
         "Alpha" to alphaTheme,
         "Leipzig" to leipzigTheme,
-        "Chess7" to chess7Theme
+        "Chess7" to chess7Theme,
+        "Checkers" to checkersTheme
     )
 
     Column(
