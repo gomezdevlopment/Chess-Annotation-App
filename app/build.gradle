@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdk 33
 
     packagingOptions {
         exclude 'META-INF/*'
@@ -16,9 +16,9 @@ android {
     defaultConfig {
         applicationId "com.gomezdevlopment.chessnotationapp"
         minSdk 21
-        targetSdk 32
-        versionCode 3
-        versionName "1.02"
+        targetSdk 33
+        versionCode 5
+        versionName "1.05"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
